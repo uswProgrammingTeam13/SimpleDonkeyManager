@@ -1,12 +1,76 @@
+using SimpleDonkeyManager.controls;
+
 namespace SimpleDonkeyManager
 {
     public partial class MainWindow : Form
     {
+        private InitialScreen initialScreen;
+        private DataLoadControl dataLoadControl;
+        private DataFilterControl dataFilterControl;
+        private TrainingControl trainingControl;
+        private ResultControl resultControl;
+        private int currentControlIndex = -1;
+        private UserControl[] controls;
+
         public MainWindow()
         {
             InitializeComponent();
             pnlButtons.Paint += PnlButtons_Paint;
             pnlConditionView.Paint += PnlConditionView_Paint;
+            InitializeControls();
+        }
+
+        private void InitializeControls()
+        {
+            // UserControl 생성
+            initialScreen = new InitialScreen();
+            dataLoadControl = new DataLoadControl();
+            dataFilterControl = new DataFilterControl();
+            trainingControl = new TrainingControl();
+            resultControl = new ResultControl();
+
+            // 배열에 저장 (InitialScreen은 배열에 포함 안 함)
+            controls = new UserControl[] { dataLoadControl, dataFilterControl, trainingControl, resultControl };
+
+            // 모든 UserControl 설정
+            initialScreen.Dock = DockStyle.Fill;
+            initialScreen.Visible = true;
+            pnlMainContent.Controls.Add(initialScreen);
+
+            foreach (var control in controls)
+            {
+                control.Dock = DockStyle.Fill;
+                control.Visible = false;
+                pnlMainContent.Controls.Add(control);
+            }
+
+            // 초기 화면을 맨 앞으로 (BringToFront)
+            initialScreen.BringToFront();
+
+            // 버튼 클릭 이벤트 연결
+            btnDebugControlChanger.Click += BtnDebugControlChanger_Click;
+        }
+
+        private void BtnDebugControlChanger_Click(object sender, EventArgs e)
+        {
+            // InitialScreen에서 첫 번째 컨트롤로 이동
+            if (currentControlIndex == -1)
+            {
+                initialScreen.Visible = false;
+                currentControlIndex = 0;
+                controls[currentControlIndex].Visible = true;
+            }
+            else
+            {
+                // 현재 컨트롤 숨기기
+                controls[currentControlIndex].Visible = false;
+
+                // 다음 컨트롤로 이동 (순환)
+                currentControlIndex = (currentControlIndex + 1) % controls.Length;
+
+                // 다음 컨트롤 표시
+                controls[currentControlIndex].Visible = true;
+            }
         }
 
         private void PnlButtons_Paint(object sender, PaintEventArgs e)

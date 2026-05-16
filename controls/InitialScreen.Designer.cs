@@ -1,6 +1,6 @@
-﻿namespace SimpleDonkeyManager
+﻿namespace SimpleDonkeyManager.controls
 {
-    partial class DataLoadControl
+    partial class InitialScreen
     {
         /// <summary> 
         /// 필수 디자이너 변수입니다.
@@ -34,19 +34,20 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(1133, 576);
+            label1.Location = new Point(1074, 573);
             label1.Name = "label1";
-            label1.Size = new Size(44, 15);
+            label1.Size = new Size(36, 15);
             label1.TabIndex = 0;
-            label1.Text = "DataLoad";
+            label1.Text = "initial";
             // 
-            // DataLoadControl
+            // InitialScreen
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(label1);
-            Name = "DataLoadControl";
+            Name = "InitialScreen";
             Size = new Size(1176, 600);
+            Load += InitialScreen_Load;
             ResumeLayout(false);
             PerformLayout();
         }

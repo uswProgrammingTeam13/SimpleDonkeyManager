@@ -34,10 +34,12 @@
             pnlSplitPanel2 = new Panel();
             pnlButtons = new Panel();
             pnlConditionView = new Panel();
+            btnDebugControlChanger = new Button();
             ((System.ComponentModel.ISupportInitialize)splLogHelp).BeginInit();
             splLogHelp.Panel1.SuspendLayout();
             splLogHelp.Panel2.SuspendLayout();
             splLogHelp.SuspendLayout();
+            pnlButtons.SuspendLayout();
             SuspendLayout();
             // 
             // pnlMainContent
@@ -90,6 +92,7 @@
             // pnlButtons
             // 
             pnlButtons.BackColor = Color.LightGray;
+            pnlButtons.Controls.Add(btnDebugControlChanger);
             pnlButtons.Location = new Point(0, 3);
             pnlButtons.Name = "pnlButtons";
             pnlButtons.Size = new Size(1184, 60);
@@ -102,6 +105,15 @@
             pnlConditionView.Name = "pnlConditionView";
             pnlConditionView.Size = new Size(1184, 28);
             pnlConditionView.TabIndex = 3;
+            // 
+            // btnDebugControlChanger
+            // 
+            btnDebugControlChanger.Location = new Point(1124, 9);
+            btnDebugControlChanger.Name = "btnDebugControlChanger";
+            btnDebugControlChanger.Size = new Size(43, 43);
+            btnDebugControlChanger.TabIndex = 0;
+            btnDebugControlChanger.Text = "다음";
+            btnDebugControlChanger.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
@@ -118,6 +130,7 @@
             splLogHelp.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splLogHelp).EndInit();
             splLogHelp.ResumeLayout(false);
+            pnlButtons.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -129,5 +142,6 @@
         private Panel pnlConditionView;
         private Panel pnlSplitPanel1;
         private Panel pnlSplitPanel2;
+        private Button btnDebugControlChanger;
     }
 }
