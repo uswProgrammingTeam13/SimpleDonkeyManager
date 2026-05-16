@@ -14,5 +14,25 @@ namespace SimpleDonkeyManager
         {
             InitializeComponent();
         }
+
+        private void pnlFilterAdditional_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pnlFilterSetBasic_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
