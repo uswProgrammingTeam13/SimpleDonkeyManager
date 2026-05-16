@@ -34,19 +34,21 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(1133, 576);
+            label1.Location = new Point(1457, 768);
+            label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
-            label1.Size = new Size(57, 15);
+            label1.Size = new Size(74, 20);
             label1.TabIndex = 0;
             label1.Text = "DataFilter";
             // 
             // DataFilterControl
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(9F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(label1);
+            Margin = new Padding(4, 4, 4, 4);
             Name = "DataFilterControl";
-            Size = new Size(1176, 600);
+            Size = new Size(1512, 800);
             ResumeLayout(false);
             PerformLayout();
         }

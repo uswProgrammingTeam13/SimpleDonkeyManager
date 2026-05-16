@@ -33,26 +33,33 @@
             pnlSplitPanel1 = new Panel();
             pnlSplitPanel2 = new Panel();
             pnlButtons = new Panel();
+            btnDataLoadCon = new Button();
+            btnTraningCon = new Button();
+            btnResultCon = new Button();
+            btnDataFilterCon = new Button();
             pnlConditionView = new Panel();
-            btnDebugControlChanger = new Button();
+            checkedListBox1 = new CheckedListBox();
             ((System.ComponentModel.ISupportInitialize)splLogHelp).BeginInit();
             splLogHelp.Panel1.SuspendLayout();
             splLogHelp.Panel2.SuspendLayout();
             splLogHelp.SuspendLayout();
+            pnlSplitPanel1.SuspendLayout();
             pnlButtons.SuspendLayout();
             SuspendLayout();
             // 
             // pnlMainContent
             // 
             pnlMainContent.BackColor = SystemColors.ControlLight;
-            pnlMainContent.Location = new Point(4, 69);
+            pnlMainContent.Location = new Point(5, 92);
+            pnlMainContent.Margin = new Padding(4);
             pnlMainContent.Name = "pnlMainContent";
-            pnlMainContent.Size = new Size(1176, 600);
+            pnlMainContent.Size = new Size(1512, 800);
             pnlMainContent.TabIndex = 0;
             // 
             // splLogHelp
             // 
-            splLogHelp.Location = new Point(4, 675);
+            splLogHelp.Location = new Point(5, 900);
+            splLogHelp.Margin = new Padding(4);
             splLogHelp.Name = "splLogHelp";
             // 
             // splLogHelp.Panel1
@@ -66,70 +73,115 @@
             splLogHelp.Panel2.BackColor = SystemColors.ControlLight;
             splLogHelp.Panel2.Controls.Add(pnlSplitPanel2);
             splLogHelp.Panel2MinSize = 350;
-            splLogHelp.Size = new Size(1176, 178);
-            splLogHelp.SplitterDistance = 585;
-            splLogHelp.SplitterWidth = 8;
+            splLogHelp.Size = new Size(1512, 237);
+            splLogHelp.SplitterDistance = 752;
+            splLogHelp.SplitterWidth = 10;
             splLogHelp.TabIndex = 1;
             // 
             // pnlSplitPanel1
             // 
+            pnlSplitPanel1.Controls.Add(checkedListBox1);
             pnlSplitPanel1.Dock = DockStyle.Fill;
             pnlSplitPanel1.Location = new Point(0, 0);
-            pnlSplitPanel1.MinimumSize = new Size(300, 150);
+            pnlSplitPanel1.Margin = new Padding(4);
+            pnlSplitPanel1.MinimumSize = new Size(386, 200);
             pnlSplitPanel1.Name = "pnlSplitPanel1";
-            pnlSplitPanel1.Size = new Size(585, 178);
+            pnlSplitPanel1.Size = new Size(752, 237);
             pnlSplitPanel1.TabIndex = 0;
             // 
             // pnlSplitPanel2
             // 
             pnlSplitPanel2.Dock = DockStyle.Fill;
             pnlSplitPanel2.Location = new Point(0, 0);
-            pnlSplitPanel2.MinimumSize = new Size(300, 150);
+            pnlSplitPanel2.Margin = new Padding(4);
+            pnlSplitPanel2.MinimumSize = new Size(386, 200);
             pnlSplitPanel2.Name = "pnlSplitPanel2";
-            pnlSplitPanel2.Size = new Size(583, 178);
+            pnlSplitPanel2.Size = new Size(750, 237);
             pnlSplitPanel2.TabIndex = 0;
             // 
             // pnlButtons
             // 
             pnlButtons.BackColor = Color.LightGray;
-            pnlButtons.Controls.Add(btnDebugControlChanger);
-            pnlButtons.Location = new Point(0, 3);
+            pnlButtons.Controls.Add(btnDataLoadCon);
+            pnlButtons.Controls.Add(btnTraningCon);
+            pnlButtons.Controls.Add(btnResultCon);
+            pnlButtons.Controls.Add(btnDataFilterCon);
+            pnlButtons.Location = new Point(0, 4);
+            pnlButtons.Margin = new Padding(4);
             pnlButtons.Name = "pnlButtons";
-            pnlButtons.Size = new Size(1184, 60);
+            pnlButtons.Size = new Size(1522, 80);
             pnlButtons.TabIndex = 2;
+            // 
+            // btnDataLoadCon
+            // 
+            btnDataLoadCon.Location = new Point(40, 12);
+            btnDataLoadCon.Name = "btnDataLoadCon";
+            btnDataLoadCon.Size = new Size(197, 57);
+            btnDataLoadCon.TabIndex = 2;
+            btnDataLoadCon.Text = "파일 로드";
+            btnDataLoadCon.UseVisualStyleBackColor = true;
+            // 
+            // btnTraningCon
+            // 
+            btnTraningCon.Location = new Point(514, 12);
+            btnTraningCon.Name = "btnTraningCon";
+            btnTraningCon.Size = new Size(197, 57);
+            btnTraningCon.TabIndex = 5;
+            btnTraningCon.Text = "트레이닝";
+            btnTraningCon.UseVisualStyleBackColor = true;
+            // 
+            // btnResultCon
+            // 
+            btnResultCon.Location = new Point(767, 12);
+            btnResultCon.Name = "btnResultCon";
+            btnResultCon.Size = new Size(197, 57);
+            btnResultCon.TabIndex = 4;
+            btnResultCon.Text = "결과";
+            btnResultCon.UseVisualStyleBackColor = true;
+            // 
+            // btnDataFilterCon
+            // 
+            btnDataFilterCon.Location = new Point(276, 12);
+            btnDataFilterCon.Name = "btnDataFilterCon";
+            btnDataFilterCon.Size = new Size(197, 57);
+            btnDataFilterCon.TabIndex = 1;
+            btnDataFilterCon.Text = "파일 필터";
+            btnDataFilterCon.UseVisualStyleBackColor = true;
             // 
             // pnlConditionView
             // 
             pnlConditionView.BackColor = Color.LightGray;
-            pnlConditionView.Location = new Point(0, 859);
+            pnlConditionView.Location = new Point(0, 1145);
+            pnlConditionView.Margin = new Padding(4);
             pnlConditionView.Name = "pnlConditionView";
-            pnlConditionView.Size = new Size(1184, 28);
+            pnlConditionView.Size = new Size(1522, 37);
             pnlConditionView.TabIndex = 3;
             // 
-            // btnDebugControlChanger
+            // checkedListBox1
             // 
-            btnDebugControlChanger.Location = new Point(1124, 9);
-            btnDebugControlChanger.Name = "btnDebugControlChanger";
-            btnDebugControlChanger.Size = new Size(43, 43);
-            btnDebugControlChanger.TabIndex = 0;
-            btnDebugControlChanger.Text = "다음";
-            btnDebugControlChanger.UseVisualStyleBackColor = true;
+            checkedListBox1.FormattingEnabled = true;
+            checkedListBox1.Location = new Point(513, 69);
+            checkedListBox1.Name = "checkedListBox1";
+            checkedListBox1.Size = new Size(8, 4);
+            checkedListBox1.TabIndex = 0;
             // 
             // MainWindow
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(9F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1184, 885);
+            ClientSize = new Size(1522, 1055);
             Controls.Add(pnlConditionView);
             Controls.Add(pnlButtons);
             Controls.Add(splLogHelp);
             Controls.Add(pnlMainContent);
+            Margin = new Padding(4);
             Name = "MainWindow";
             Text = "SimpleDonkeyManager";
             splLogHelp.Panel1.ResumeLayout(false);
             splLogHelp.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splLogHelp).EndInit();
             splLogHelp.ResumeLayout(false);
+            pnlSplitPanel1.ResumeLayout(false);
             pnlButtons.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -142,6 +194,10 @@
         private Panel pnlConditionView;
         private Panel pnlSplitPanel1;
         private Panel pnlSplitPanel2;
-        private Button btnDebugControlChanger;
+        private Button btnResultCon;
+        private Button btnDataLoadCon;
+        private Button btnDataFilterCon;
+        private Button btnTraningCon;
+        private CheckedListBox checkedListBox1;
     }
 }

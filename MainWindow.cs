@@ -48,10 +48,45 @@ namespace SimpleDonkeyManager
             initialScreen.BringToFront();
 
             // 버튼 클릭 이벤트 연결
-            btnDebugControlChanger.Click += BtnDebugControlChanger_Click;
+            btnDataLoadCon.Click += BtnDataLoadCon_Click;
+            btnDataFilterCon.Click += BtnDataFilterCon_Click;
+            btnTraningCon.Click += BtnTraningCon_Click;
+            btnResultCon.Click += BtnResultCon_Click;
         }
 
-        private void BtnDebugControlChanger_Click(object sender, EventArgs e)
+        private void ShowControl(int index)
+        {
+            initialScreen.Visible = false;
+            if (currentControlIndex != -1)
+            {
+                controls[currentControlIndex].Visible = false;
+            }
+            currentControlIndex = index;
+            controls[currentControlIndex].Visible = true;
+            controls[currentControlIndex].BringToFront();
+        }
+
+        private void BtnDataLoadCon_Click(object? sender, EventArgs e)
+        {
+            ShowControl(0); // DataLoadControl
+        }
+
+        private void BtnDataFilterCon_Click(object? sender, EventArgs e)
+        {
+            ShowControl(1); // DataFilterControl
+        }
+
+        private void BtnTraningCon_Click(object? sender, EventArgs e)
+        {
+            ShowControl(2); // TrainingControl
+        }
+
+        private void BtnResultCon_Click(object? sender, EventArgs e)
+        {
+            ShowControl(3); // ResultControl
+        }
+
+        private void BtnDebugControlChanger_Click(object? sender, EventArgs e)
         {
             // InitialScreen에서 첫 번째 컨트롤로 이동
             if (currentControlIndex == -1)
