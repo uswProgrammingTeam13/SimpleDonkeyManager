@@ -33,8 +33,8 @@
             pnlSplitPanel1 = new Panel();
             pnlSplitPanel2 = new Panel();
             pnlButtons = new Panel();
-            pnlConditionView = new Panel();
             btnDebugControlChanger = new Button();
+            pnlConditionView = new Panel();
             ((System.ComponentModel.ISupportInitialize)splLogHelp).BeginInit();
             splLogHelp.Panel1.SuspendLayout();
             splLogHelp.Panel2.SuspendLayout();
@@ -67,7 +67,7 @@
             splLogHelp.Panel2.Controls.Add(pnlSplitPanel2);
             splLogHelp.Panel2MinSize = 350;
             splLogHelp.Size = new Size(1176, 178);
-            splLogHelp.SplitterDistance = 585;
+            splLogHelp.SplitterDistance = 591;
             splLogHelp.SplitterWidth = 8;
             splLogHelp.TabIndex = 1;
             // 
@@ -77,7 +77,7 @@
             pnlSplitPanel1.Location = new Point(0, 0);
             pnlSplitPanel1.MinimumSize = new Size(300, 150);
             pnlSplitPanel1.Name = "pnlSplitPanel1";
-            pnlSplitPanel1.Size = new Size(585, 178);
+            pnlSplitPanel1.Size = new Size(591, 178);
             pnlSplitPanel1.TabIndex = 0;
             // 
             // pnlSplitPanel2
@@ -86,7 +86,7 @@
             pnlSplitPanel2.Location = new Point(0, 0);
             pnlSplitPanel2.MinimumSize = new Size(300, 150);
             pnlSplitPanel2.Name = "pnlSplitPanel2";
-            pnlSplitPanel2.Size = new Size(583, 178);
+            pnlSplitPanel2.Size = new Size(577, 178);
             pnlSplitPanel2.TabIndex = 0;
             // 
             // pnlButtons
@@ -98,14 +98,6 @@
             pnlButtons.Size = new Size(1184, 60);
             pnlButtons.TabIndex = 2;
             // 
-            // pnlConditionView
-            // 
-            pnlConditionView.BackColor = Color.LightGray;
-            pnlConditionView.Location = new Point(0, 859);
-            pnlConditionView.Name = "pnlConditionView";
-            pnlConditionView.Size = new Size(1184, 28);
-            pnlConditionView.TabIndex = 3;
-            // 
             // btnDebugControlChanger
             // 
             btnDebugControlChanger.Location = new Point(1124, 9);
@@ -114,6 +106,14 @@
             btnDebugControlChanger.TabIndex = 0;
             btnDebugControlChanger.Text = "다음";
             btnDebugControlChanger.UseVisualStyleBackColor = true;
+            // 
+            // pnlConditionView
+            // 
+            pnlConditionView.BackColor = Color.LightGray;
+            pnlConditionView.Location = new Point(0, 859);
+            pnlConditionView.Name = "pnlConditionView";
+            pnlConditionView.Size = new Size(1184, 28);
+            pnlConditionView.TabIndex = 3;
             // 
             // MainWindow
             // 
