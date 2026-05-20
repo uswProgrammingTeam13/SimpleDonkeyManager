@@ -196,6 +196,14 @@
             richTxtHelp.TabIndex = 2;
             richTxtHelp.Text = "";
             // 
+            // pnlConditionView
+            // 
+            pnlConditionView.BackColor = Color.LightGray;
+            pnlConditionView.Location = new Point(0, 859);
+            pnlConditionView.Name = "pnlConditionView";
+            pnlConditionView.Size = new Size(1184, 28);
+            pnlConditionView.TabIndex = 3;
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
