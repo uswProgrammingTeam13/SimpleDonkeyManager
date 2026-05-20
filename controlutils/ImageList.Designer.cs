@@ -69,7 +69,7 @@
             listBoxImages.FormattingEnabled = true;
             listBoxImages.Location = new Point(24, 173);
             listBoxImages.Name = "listBoxImages";
-            listBoxImages.Size = new Size(506, 932);
+            listBoxImages.Size = new Size(506, 484);
             listBoxImages.TabIndex = 2;
             // 
             // btnPrev
@@ -158,7 +158,7 @@
             panel1.Controls.Add(btnDots);
             panel1.Controls.Add(btnNext);
             panel1.Controls.Add(btnLast);
-            panel1.Location = new Point(24, 1136);
+            panel1.Location = new Point(24, 677);
             panel1.Name = "panel1";
             panel1.Size = new Size(499, 75);
             panel1.TabIndex = 7;
@@ -175,7 +175,7 @@
             Controls.Add(lblTitle);
             Margin = new Padding(6);
             Name = "ImageList";
-            Size = new Size(558, 1235);
+            Size = new Size(558, 1225);
             panel1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();

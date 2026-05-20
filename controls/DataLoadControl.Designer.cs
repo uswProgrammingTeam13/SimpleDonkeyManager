@@ -32,7 +32,7 @@
             imgListPan = new Panel();
             mainPan = new Panel();
             panelBottomInfo = new Panel();
-            btnSelecFolder = new Button();
+            btnSelectFolder = new Button();
             lblFileSize1 = new Label();
             lblResolution1 = new Label();
             lblImageFormat1 = new Label();
@@ -66,6 +66,7 @@
             imgListPan.Name = "imgListPan";
             imgListPan.Size = new Size(438, 910);
             imgListPan.TabIndex = 1;
+            imgListPan.Paint += imgListPan_Paint;
             // 
             // mainPan
             // 
@@ -78,7 +79,7 @@
             // panelBottomInfo
             // 
             panelBottomInfo.BackColor = Color.FromArgb(248, 248, 248);
-            panelBottomInfo.Controls.Add(btnSelecFolder);
+            panelBottomInfo.Controls.Add(btnSelectFolder);
             panelBottomInfo.Controls.Add(lblFileSize1);
             panelBottomInfo.Controls.Add(lblResolution1);
             panelBottomInfo.Controls.Add(lblImageFormat1);
@@ -97,19 +98,19 @@
             panelBottomInfo.Size = new Size(2332, 297);
             panelBottomInfo.TabIndex = 1;
             // 
-            // btnSelecFolder
+            // btnSelectFolder
             // 
-            btnSelecFolder.FlatAppearance.BorderColor = Color.DodgerBlue;
-            btnSelecFolder.FlatAppearance.MouseOverBackColor = Color.Azure;
-            btnSelecFolder.FlatStyle = FlatStyle.Flat;
-            btnSelecFolder.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnSelecFolder.ForeColor = SystemColors.Highlight;
-            btnSelecFolder.Location = new Point(1877, 201);
-            btnSelecFolder.Name = "btnSelecFolder";
-            btnSelecFolder.Size = new Size(441, 61);
-            btnSelecFolder.TabIndex = 0;
-            btnSelecFolder.Text = "폴더선택";
-            btnSelecFolder.UseVisualStyleBackColor = true;
+            btnSelectFolder.FlatAppearance.BorderColor = Color.DodgerBlue;
+            btnSelectFolder.FlatAppearance.MouseOverBackColor = Color.Azure;
+            btnSelectFolder.FlatStyle = FlatStyle.Flat;
+            btnSelectFolder.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnSelectFolder.ForeColor = SystemColors.Highlight;
+            btnSelectFolder.Location = new Point(1877, 201);
+            btnSelectFolder.Name = "btnSelectFolder";
+            btnSelectFolder.Size = new Size(441, 61);
+            btnSelectFolder.TabIndex = 0;
+            btnSelectFolder.Text = "폴더선택";
+            btnSelectFolder.UseVisualStyleBackColor = true;
             // 
             // lblFileSize1
             // 
@@ -296,6 +297,6 @@
         private Label lblFolderPath1;
         private Label lblTotalImages1;
         private PictureBox pictureBox1;
-        private Button btnSelecFolder;
+        private Button btnSelectFolder;
     }
 }

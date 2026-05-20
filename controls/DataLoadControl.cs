@@ -10,15 +10,23 @@ namespace SimpleDonkeyManager
 {
     public partial class DataLoadControl : UserControl
     {
-        public DataLoadControl()
-        {
-            InitializeComponent();
-        }
 
-        private void DataLoadControl_Load(object sender, EventArgs e)
-        {
+            private controlutils.ImageList imageList = new controlutils.ImageList();
 
-        }
+            public DataLoadControl()
+            {
+                InitializeComponent();
+
+                imageList.Dock = DockStyle.Fill;
+                imageList.Visible = true;
+                imgListPan.Controls.Add(imageList);
+            }
+
+            private void DataLoadControl_Load(object sender, EventArgs e)
+            {
+
+            }
+        
 
         private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
@@ -41,6 +49,11 @@ namespace SimpleDonkeyManager
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void imgListPan_Paint(object sender, PaintEventArgs e)
         {
 
         }
