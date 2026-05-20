@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             pnlMainContent = new Panel();
             splLogHelp = new SplitContainer();
             pnlSplitPanel1 = new Panel();
@@ -55,7 +54,6 @@
             // pnlMainContent
             // 
             pnlMainContent.BackColor = SystemColors.ControlLightLight;
-            pnlMainContent.BackgroundImage = (Image)resources.GetObject("pnlMainContent.BackgroundImage");
             pnlMainContent.BackgroundImageLayout = ImageLayout.Stretch;
             pnlMainContent.Location = new Point(4, 69);
             pnlMainContent.Name = "pnlMainContent";
