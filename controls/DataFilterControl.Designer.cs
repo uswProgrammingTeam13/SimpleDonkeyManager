@@ -35,36 +35,38 @@
             pnlFilterAutoDel = new Panel();
             label2 = new Label();
             pnlFilterSetBasic = new Panel();
-            checkBox1 = new CheckBox();
-            lblFilterBasic = new Label();
-            lblFilterSetting = new Label();
-            pnlDataPreview = new Panel();
-            pnlImageView = new Panel();
-            pnlFilterResult = new Panel();
-            checkBox2 = new CheckBox();
-            label1 = new Label();
-            numericUpDown1 = new NumericUpDown();
-            numericUpDown2 = new NumericUpDown();
-            label3 = new Label();
+            comboBox1 = new ComboBox();
+            label6 = new Label();
             label4 = new Label();
             numericUpDown3 = new NumericUpDown();
             numericUpDown4 = new NumericUpDown();
             label5 = new Label();
-            label6 = new Label();
-            comboBox1 = new ComboBox();
+            label3 = new Label();
+            numericUpDown2 = new NumericUpDown();
+            numericUpDown1 = new NumericUpDown();
+            label1 = new Label();
+            checkBox2 = new CheckBox();
+            checkBox1 = new CheckBox();
+            lblFilterBasic = new Label();
+            lblFilterSetting = new Label();
+            pnlImageView = new Panel();
+            pnlFilterResult = new Panel();
+            button1 = new Button();
+            button2 = new Button();
+            button3 = new Button();
             pnlFilterSet.SuspendLayout();
             pnlFilterAdditional.SuspendLayout();
             pnlFilterAutoDel.SuspendLayout();
             pnlFilterSetBasic.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown4).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             SuspendLayout();
             // 
             // pnlFrameList
             // 
-            pnlFrameList.BackColor = SystemColors.Control;
+            pnlFrameList.BackColor = Color.FromArgb(248, 248, 248);
             pnlFrameList.BorderStyle = BorderStyle.FixedSingle;
             pnlFrameList.Location = new Point(3, 3);
             pnlFrameList.Margin = new Padding(4);
@@ -74,7 +76,7 @@
             // 
             // pnlFilterSet
             // 
-            pnlFilterSet.BackColor = SystemColors.Control;
+            pnlFilterSet.BackColor = Color.FromArgb(248, 248, 248);
             pnlFilterSet.BorderStyle = BorderStyle.FixedSingle;
             pnlFilterSet.Controls.Add(pnlFilterAdditional);
             pnlFilterSet.Controls.Add(pnlFilterAutoDel);
@@ -88,7 +90,7 @@
             // 
             // pnlFilterAdditional
             // 
-            pnlFilterAdditional.BackColor = SystemColors.Control;
+            pnlFilterAdditional.BackColor = Color.FromArgb(242, 242, 242);
             pnlFilterAdditional.BorderStyle = BorderStyle.FixedSingle;
             pnlFilterAdditional.Controls.Add(lblFilterAdditional);
             pnlFilterAdditional.ForeColor = SystemColors.ControlText;
@@ -102,7 +104,7 @@
             // 
             lblFilterAdditional.AutoSize = true;
             lblFilterAdditional.Font = new Font("나눔고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblFilterAdditional.ForeColor = Color.Blue;
+            lblFilterAdditional.ForeColor = Color.RoyalBlue;
             lblFilterAdditional.Location = new Point(3, 6);
             lblFilterAdditional.Name = "lblFilterAdditional";
             lblFilterAdditional.Size = new Size(73, 17);
@@ -111,7 +113,7 @@
             // 
             // pnlFilterAutoDel
             // 
-            pnlFilterAutoDel.BackColor = SystemColors.Control;
+            pnlFilterAutoDel.BackColor = Color.FromArgb(242, 242, 242);
             pnlFilterAutoDel.BorderStyle = BorderStyle.FixedSingle;
             pnlFilterAutoDel.Controls.Add(label2);
             pnlFilterAutoDel.ForeColor = SystemColors.ControlText;
@@ -124,7 +126,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("나눔고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            label2.ForeColor = Color.Blue;
+            label2.ForeColor = Color.RoyalBlue;
             label2.Location = new Point(3, 6);
             label2.Name = "label2";
             label2.Size = new Size(88, 17);
@@ -133,7 +135,7 @@
             // 
             // pnlFilterSetBasic
             // 
-            pnlFilterSetBasic.BackColor = SystemColors.Control;
+            pnlFilterSetBasic.BackColor = Color.FromArgb(242, 242, 242);
             pnlFilterSetBasic.BorderStyle = BorderStyle.FixedSingle;
             pnlFilterSetBasic.Controls.Add(comboBox1);
             pnlFilterSetBasic.Controls.Add(label6);
@@ -155,123 +157,24 @@
             pnlFilterSetBasic.TabIndex = 1;
             pnlFilterSetBasic.Paint += pnlFilterSetBasic_Paint;
             // 
-            // checkBox1
+            // comboBox1
             // 
-            checkBox1.AutoSize = true;
-            checkBox1.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold);
-            checkBox1.Location = new Point(7, 37);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(117, 18);
-            checkBox1.TabIndex = 5;
-            checkBox1.Text = "Throttle 0 제외";
-            checkBox1.UseVisualStyleBackColor = true;
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(7, 292);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(121, 23);
+            comboBox1.TabIndex = 16;
+            comboBox1.Text = "(전체)";
             // 
-            // lblFilterBasic
+            // label6
             // 
-            lblFilterBasic.AutoSize = true;
-            lblFilterBasic.Font = new Font("나눔고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblFilterBasic.ForeColor = Color.Blue;
-            lblFilterBasic.Location = new Point(7, 7);
-            lblFilterBasic.Name = "lblFilterBasic";
-            lblFilterBasic.Size = new Size(73, 17);
-            lblFilterBasic.TabIndex = 4;
-            lblFilterBasic.Text = "기본 필터";
-            // 
-            // lblFilterSetting
-            // 
-            lblFilterSetting.AutoSize = true;
-            lblFilterSetting.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblFilterSetting.ForeColor = Color.Blue;
-            lblFilterSetting.Location = new Point(9, 12);
-            lblFilterSetting.Name = "lblFilterSetting";
-            lblFilterSetting.Size = new Size(155, 21);
-            lblFilterSetting.TabIndex = 0;
-            lblFilterSetting.Text = "필터링 조건 설정";
-            // 
-            // pnlDataPreview
-            // 
-            pnlDataPreview.BackColor = SystemColors.Control;
-            pnlDataPreview.BorderStyle = BorderStyle.FixedSingle;
-            pnlDataPreview.Location = new Point(625, 3);
-            pnlDataPreview.Margin = new Padding(4);
-            pnlDataPreview.Name = "pnlDataPreview";
-            pnlDataPreview.Size = new Size(239, 431);
-            pnlDataPreview.TabIndex = 2;
-            // 
-            // pnlImageView
-            // 
-            pnlImageView.BackColor = SystemColors.Control;
-            pnlImageView.BorderStyle = BorderStyle.FixedSingle;
-            pnlImageView.Location = new Point(872, 3);
-            pnlImageView.Margin = new Padding(4);
-            pnlImageView.Name = "pnlImageView";
-            pnlImageView.Size = new Size(300, 400);
-            pnlImageView.TabIndex = 0;
-            // 
-            // pnlFilterResult
-            // 
-            pnlFilterResult.BackColor = SystemColors.Control;
-            pnlFilterResult.BorderStyle = BorderStyle.FixedSingle;
-            pnlFilterResult.Location = new Point(625, 442);
-            pnlFilterResult.Margin = new Padding(4);
-            pnlFilterResult.Name = "pnlFilterResult";
-            pnlFilterResult.Size = new Size(548, 155);
-            pnlFilterResult.TabIndex = 3;
-            // 
-            // checkBox2
-            // 
-            checkBox2.AutoSize = true;
-            checkBox2.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold);
-            checkBox2.Location = new Point(7, 64);
-            checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(146, 18);
-            checkBox2.TabIndex = 6;
-            checkBox2.Text = "기본 반전 이미지 제외";
-            checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            label1.Location = new Point(7, 112);
-            label1.Name = "label1";
-            label1.Size = new Size(111, 14);
-            label1.TabIndex = 7;
-            label1.Text = "Angle 범위 (Rad)";
-            label1.Click += label1_Click;
-            // 
-            // numericUpDown1
-            // 
-            numericUpDown1.DecimalPlaces = 2;
-            numericUpDown1.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
-            numericUpDown1.Location = new Point(7, 136);
-            numericUpDown1.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(55, 23);
-            numericUpDown1.TabIndex = 8;
-            numericUpDown1.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
-            // 
-            // numericUpDown2
-            // 
-            numericUpDown2.DecimalPlaces = 2;
-            numericUpDown2.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
-            numericUpDown2.Location = new Point(93, 136);
-            numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
-            numericUpDown2.Name = "numericUpDown2";
-            numericUpDown2.Size = new Size(55, 23);
-            numericUpDown2.TabIndex = 9;
-            numericUpDown2.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            label3.Location = new Point(70, 141);
-            label3.Name = "label3";
-            label3.Size = new Size(16, 14);
-            label3.TabIndex = 10;
-            label3.Text = "~";
-            label3.Click += label3_Click;
+            label6.AutoSize = true;
+            label6.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            label6.Location = new Point(7, 269);
+            label6.Name = "label6";
+            label6.Size = new Size(71, 14);
+            label6.TabIndex = 15;
+            label6.Text = "해상도 필터";
             // 
             // label4
             // 
@@ -315,33 +218,166 @@
             label5.TabIndex = 11;
             label5.Text = "Throttle 범위";
             // 
-            // label6
+            // label3
             // 
-            label6.AutoSize = true;
-            label6.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            label6.Location = new Point(7, 269);
-            label6.Name = "label6";
-            label6.Size = new Size(71, 14);
-            label6.TabIndex = 15;
-            label6.Text = "해상도 필터";
+            label3.AutoSize = true;
+            label3.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            label3.Location = new Point(70, 141);
+            label3.Name = "label3";
+            label3.Size = new Size(16, 14);
+            label3.TabIndex = 10;
+            label3.Text = "~";
+            label3.Click += label3_Click;
             // 
-            // comboBox1
+            // numericUpDown2
             // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(7, 292);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(121, 23);
-            comboBox1.TabIndex = 16;
-            comboBox1.Text = "(전체)";
+            numericUpDown2.DecimalPlaces = 2;
+            numericUpDown2.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            numericUpDown2.Location = new Point(93, 136);
+            numericUpDown2.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            numericUpDown2.Name = "numericUpDown2";
+            numericUpDown2.Size = new Size(55, 23);
+            numericUpDown2.TabIndex = 9;
+            numericUpDown2.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            // 
+            // numericUpDown1
+            // 
+            numericUpDown1.DecimalPlaces = 2;
+            numericUpDown1.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
+            numericUpDown1.Location = new Point(7, 136);
+            numericUpDown1.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(55, 23);
+            numericUpDown1.TabIndex = 8;
+            numericUpDown1.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            label1.Location = new Point(7, 112);
+            label1.Name = "label1";
+            label1.Size = new Size(111, 14);
+            label1.TabIndex = 7;
+            label1.Text = "Angle 범위 (Rad)";
+            label1.Click += label1_Click;
+            // 
+            // checkBox2
+            // 
+            checkBox2.AutoSize = true;
+            checkBox2.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold);
+            checkBox2.Location = new Point(7, 64);
+            checkBox2.Name = "checkBox2";
+            checkBox2.Size = new Size(146, 18);
+            checkBox2.TabIndex = 6;
+            checkBox2.Text = "기본 반전 이미지 제외";
+            checkBox2.UseVisualStyleBackColor = true;
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold);
+            checkBox1.Location = new Point(7, 37);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(117, 18);
+            checkBox1.TabIndex = 5;
+            checkBox1.Text = "Throttle 0 제외";
+            checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // lblFilterBasic
+            // 
+            lblFilterBasic.AutoSize = true;
+            lblFilterBasic.Font = new Font("나눔고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            lblFilterBasic.ForeColor = Color.RoyalBlue;
+            lblFilterBasic.Location = new Point(7, 7);
+            lblFilterBasic.Name = "lblFilterBasic";
+            lblFilterBasic.Size = new Size(73, 17);
+            lblFilterBasic.TabIndex = 4;
+            lblFilterBasic.Text = "기본 필터";
+            // 
+            // lblFilterSetting
+            // 
+            lblFilterSetting.AutoSize = true;
+            lblFilterSetting.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            lblFilterSetting.ForeColor = Color.RoyalBlue;
+            lblFilterSetting.Location = new Point(9, 12);
+            lblFilterSetting.Name = "lblFilterSetting";
+            lblFilterSetting.Size = new Size(155, 21);
+            lblFilterSetting.TabIndex = 0;
+            lblFilterSetting.Text = "필터링 조건 설정";
+            // 
+            // pnlImageView
+            // 
+            pnlImageView.BackColor = Color.FromArgb(248, 248, 248);
+            pnlImageView.BorderStyle = BorderStyle.FixedSingle;
+            pnlImageView.Location = new Point(625, 3);
+            pnlImageView.Margin = new Padding(4);
+            pnlImageView.Name = "pnlImageView";
+            pnlImageView.Size = new Size(547, 431);
+            pnlImageView.TabIndex = 0;
+            // 
+            // pnlFilterResult
+            // 
+            pnlFilterResult.BackColor = Color.FromArgb(248, 248, 248);
+            pnlFilterResult.BorderStyle = BorderStyle.FixedSingle;
+            pnlFilterResult.Location = new Point(721, 442);
+            pnlFilterResult.Margin = new Padding(4);
+            pnlFilterResult.Name = "pnlFilterResult";
+            pnlFilterResult.Size = new Size(452, 155);
+            pnlFilterResult.TabIndex = 3;
+            // 
+            // button1
+            // 
+            button1.FlatAppearance.BorderColor = Color.DodgerBlue;
+            button1.FlatAppearance.MouseOverBackColor = Color.Azure;
+            button1.FlatStyle = FlatStyle.Flat;
+            button1.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            button1.ForeColor = SystemColors.Highlight;
+            button1.Location = new Point(275, 491);
+            button1.Name = "button1";
+            button1.Size = new Size(149, 50);
+            button1.TabIndex = 4;
+            button1.Text = "◎ 필터 미리보기";
+            button1.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            button2.FlatAppearance.BorderColor = Color.DodgerBlue;
+            button2.FlatAppearance.MouseOverBackColor = Color.Azure;
+            button2.FlatStyle = FlatStyle.Flat;
+            button2.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            button2.ForeColor = SystemColors.Highlight;
+            button2.Location = new Point(575, 491);
+            button2.Name = "button2";
+            button2.Size = new Size(139, 50);
+            button2.TabIndex = 5;
+            button2.Text = "필터 초기화";
+            button2.UseVisualStyleBackColor = true;
+            // 
+            // button3
+            // 
+            button3.FlatAppearance.BorderColor = Color.DodgerBlue;
+            button3.FlatAppearance.MouseOverBackColor = Color.Azure;
+            button3.FlatStyle = FlatStyle.Flat;
+            button3.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            button3.ForeColor = SystemColors.Highlight;
+            button3.Location = new Point(430, 491);
+            button3.Name = "button3";
+            button3.Size = new Size(139, 50);
+            button3.TabIndex = 6;
+            button3.Text = "▷ 필터 적용";
+            button3.UseVisualStyleBackColor = true;
             // 
             // DataFilterControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
+            Controls.Add(button3);
+            Controls.Add(button2);
+            Controls.Add(button1);
             Controls.Add(pnlFilterResult);
             Controls.Add(pnlImageView);
-            Controls.Add(pnlDataPreview);
             Controls.Add(pnlFilterSet);
             Controls.Add(pnlFrameList);
             Name = "DataFilterControl";
@@ -354,17 +390,16 @@
             pnlFilterAutoDel.PerformLayout();
             pnlFilterSetBasic.ResumeLayout(false);
             pnlFilterSetBasic.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown3).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown4).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
         private Panel pnlFrameList;
         private Panel pnlFilterSet;
-        private Panel pnlDataPreview;
         private Panel pnlImageView;
         private Panel pnlFilterResult;
         private Label lblFilterSetting;
@@ -386,5 +421,8 @@
         private NumericUpDown numericUpDown3;
         private NumericUpDown numericUpDown4;
         private Label label5;
+        private Button button1;
+        private Button button2;
+        private Button button3;
     }
 }
