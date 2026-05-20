@@ -146,6 +146,7 @@
             pnlButtons.Controls.Add(btnTraningCon);
             pnlButtons.Controls.Add(btnResultCon);
             pnlButtons.Controls.Add(btnDataFilterCon);
+            pnlButtons.ForeColor = Color.RoyalBlue;
             pnlButtons.Location = new Point(0, 3);
             pnlButtons.Name = "pnlButtons";
             pnlButtons.Size = new Size(1184, 60);
@@ -153,42 +154,48 @@
             // 
             // btnDataLoadCon
             // 
-            btnDataLoadCon.Location = new Point(31, 9);
+            btnDataLoadCon.Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnDataLoadCon.ForeColor = Color.RoyalBlue;
+            btnDataLoadCon.Location = new Point(105, 8);
             btnDataLoadCon.Margin = new Padding(2);
             btnDataLoadCon.Name = "btnDataLoadCon";
-            btnDataLoadCon.Size = new Size(153, 43);
+            btnDataLoadCon.Size = new Size(200, 43);
             btnDataLoadCon.TabIndex = 2;
-            btnDataLoadCon.Text = "파일 로드";
+            btnDataLoadCon.Text = "📂 데이터 불러오기";
             btnDataLoadCon.UseVisualStyleBackColor = true;
             // 
             // btnTraningCon
             // 
-            btnTraningCon.Location = new Point(400, 9);
+            btnTraningCon.Font = new Font("맑은 고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnTraningCon.Location = new Point(605, 8);
             btnTraningCon.Margin = new Padding(2);
             btnTraningCon.Name = "btnTraningCon";
-            btnTraningCon.Size = new Size(153, 43);
+            btnTraningCon.Size = new Size(200, 43);
             btnTraningCon.TabIndex = 5;
-            btnTraningCon.Text = "트레이닝";
+            btnTraningCon.Text = "▶ 학습 실행";
             btnTraningCon.UseVisualStyleBackColor = true;
             // 
             // btnResultCon
             // 
-            btnResultCon.Location = new Point(597, 9);
+            btnResultCon.Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnResultCon.Location = new Point(855, 8);
             btnResultCon.Margin = new Padding(2);
             btnResultCon.Name = "btnResultCon";
-            btnResultCon.Size = new Size(153, 43);
+            btnResultCon.Size = new Size(200, 43);
             btnResultCon.TabIndex = 4;
-            btnResultCon.Text = "결과";
+            btnResultCon.Text = "📈 학습 결과 확인";
             btnResultCon.UseVisualStyleBackColor = true;
             // 
             // btnDataFilterCon
             // 
-            btnDataFilterCon.Location = new Point(215, 9);
+            btnDataFilterCon.Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnDataFilterCon.ForeColor = Color.RoyalBlue;
+            btnDataFilterCon.Location = new Point(355, 8);
             btnDataFilterCon.Margin = new Padding(2);
             btnDataFilterCon.Name = "btnDataFilterCon";
-            btnDataFilterCon.Size = new Size(153, 43);
+            btnDataFilterCon.Size = new Size(200, 43);
             btnDataFilterCon.TabIndex = 1;
-            btnDataFilterCon.Text = "파일 필터";
+            btnDataFilterCon.Text = "🔍 데이터 필터링";
             btnDataFilterCon.UseVisualStyleBackColor = true;
             // 
             // pnlConditionView
