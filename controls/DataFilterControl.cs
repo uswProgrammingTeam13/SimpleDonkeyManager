@@ -31,12 +31,18 @@ namespace SimpleDonkeyManager
 
             SetSummaryData("12,345", "9,876", "2,469 (20.0%)", "80.0%");
 
+            // ImageList 설정
             imageList.Dock = DockStyle.Fill;
+            imageList.AutoSize = false;
             imageList.Visible = true;
+            pnlFrameList.Controls.Clear();
             pnlFrameList.Controls.Add(imageList);
 
+            // ImageViewer 설정
             imageViewer.Dock = DockStyle.Fill;
+            imageViewer.AutoSize = false;
             imageViewer.Visible = true;
+            pnlImageView.Controls.Clear();
             pnlImageView.Controls.Add(imageViewer);
 
         }
