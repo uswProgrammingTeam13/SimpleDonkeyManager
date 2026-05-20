@@ -48,10 +48,82 @@ namespace SimpleDonkeyManager
             initialScreen.BringToFront();
 
             // 버튼 클릭 이벤트 연결
-            btnDebugControlChanger.Click += BtnDebugControlChanger_Click;
+            btnDataLoadCon.Click += BtnDataLoadCon_Click;
+            btnDataFilterCon.Click += BtnDataFilterCon_Click;
+            btnTraningCon.Click += BtnTraningCon_Click;
+            btnResultCon.Click += BtnResultCon_Click;
         }
 
-        private void BtnDebugControlChanger_Click(object sender, EventArgs e)
+        private void ShowControl(int index)
+        {
+            initialScreen.Visible = false;
+            if (currentControlIndex != -1)
+            {
+                controls[currentControlIndex].Visible = false;
+            }
+            currentControlIndex = index;
+            controls[currentControlIndex].Visible = true;
+            controls[currentControlIndex].BringToFront();
+
+            UpdateButtonIndicator(index);
+        }
+
+        private void UpdateButtonIndicator(int index)
+        {
+            // 기본 상태로 텍스트와 배경색 초기화
+            btnDataLoadCon.Text = "파일 로드";
+            btnDataFilterCon.Text = "파일 필터";
+            btnTraningCon.Text = "트레이닝";
+            btnResultCon.Text = "결과";
+
+            btnDataLoadCon.BackColor = SystemColors.Control;
+            btnDataFilterCon.BackColor = SystemColors.Control;
+            btnTraningCon.BackColor = SystemColors.Control;
+            btnResultCon.BackColor = SystemColors.Control;
+
+            // 활성화된 버튼에만 아이콘(●) 표시 및 색상 변경
+            switch (index)
+            {
+                case 0:
+                    btnDataLoadCon.Text = "● 파일 로드";
+                    btnDataLoadCon.BackColor = Color.LightSkyBlue;
+                    break;
+                case 1:
+                    btnDataFilterCon.Text = "● 파일 필터";
+                    btnDataFilterCon.BackColor = Color.LightSkyBlue;
+                    break;
+                case 2:
+                    btnTraningCon.Text = "● 트레이닝";
+                    btnTraningCon.BackColor = Color.LightSkyBlue;
+                    break;
+                case 3:
+                    btnResultCon.Text = "● 결과";
+                    btnResultCon.BackColor = Color.LightSkyBlue;
+                    break;
+            }
+        }
+
+        private void BtnDataLoadCon_Click(object? sender, EventArgs e)
+        {
+            ShowControl(0); // DataLoadControl
+        }
+
+        private void BtnDataFilterCon_Click(object? sender, EventArgs e)
+        {
+            ShowControl(1); // DataFilterControl
+        }
+
+        private void BtnTraningCon_Click(object? sender, EventArgs e)
+        {
+            ShowControl(2); // TrainingControl
+        }
+
+        private void BtnResultCon_Click(object? sender, EventArgs e)
+        {
+            ShowControl(3); // ResultControl
+        }
+
+        private void BtnDebugControlChanger_Click(object? sender, EventArgs e)
         {
             // InitialScreen에서 첫 번째 컨트롤로 이동
             if (currentControlIndex == -1)
@@ -88,5 +160,7 @@ namespace SimpleDonkeyManager
                 e.Graphics.DrawLine(pen, 0, 0, pnlConditionView.Width, 0);
             }
         }
+
+
     }
 }
