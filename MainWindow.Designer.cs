@@ -31,17 +31,17 @@
             pnlMainContent = new Panel();
             splLogHelp = new SplitContainer();
             pnlSplitPanel1 = new Panel();
+            richTxtLog = new RichTextBox();
             LblLog = new Label();
             pnlSplitPanel2 = new Panel();
+            richTxtHelp = new RichTextBox();
+            LblHelp = new Label();
             pnlButtons = new Panel();
             btnDataLoadCon = new Button();
             btnTraningCon = new Button();
             btnResultCon = new Button();
             btnDataFilterCon = new Button();
             pnlConditionView = new Panel();
-            LblHelp = new Label();
-            richTxtLog = new RichTextBox();
-            richTxtHelp = new RichTextBox();
             ((System.ComponentModel.ISupportInitialize)splLogHelp).BeginInit();
             splLogHelp.Panel1.SuspendLayout();
             splLogHelp.Panel2.SuspendLayout();
@@ -53,7 +53,7 @@
             // 
             // pnlMainContent
             // 
-            pnlMainContent.BackColor = SystemColors.ControlLight;
+            pnlMainContent.BackColor = SystemColors.ControlLightLight;
             pnlMainContent.Location = new Point(4, 69);
             pnlMainContent.Name = "pnlMainContent";
             pnlMainContent.Size = new Size(1176, 600);
@@ -61,6 +61,7 @@
             // 
             // splLogHelp
             // 
+            splLogHelp.BackColor = Color.FromArgb(248, 248, 248);
             splLogHelp.Location = new Point(4, 675);
             splLogHelp.Name = "splLogHelp";
             // 
@@ -82,6 +83,7 @@
             // 
             // pnlSplitPanel1
             // 
+            pnlSplitPanel1.BackColor = Color.FromArgb(242, 242, 242);
             pnlSplitPanel1.Controls.Add(richTxtLog);
             pnlSplitPanel1.Controls.Add(LblLog);
             pnlSplitPanel1.Dock = DockStyle.Fill;
@@ -90,6 +92,14 @@
             pnlSplitPanel1.Name = "pnlSplitPanel1";
             pnlSplitPanel1.Size = new Size(584, 178);
             pnlSplitPanel1.TabIndex = 0;
+            // 
+            // richTxtLog
+            // 
+            richTxtLog.Location = new Point(8, 29);
+            richTxtLog.Name = "richTxtLog";
+            richTxtLog.Size = new Size(560, 137);
+            richTxtLog.TabIndex = 1;
+            richTxtLog.Text = "";
             // 
             // LblLog
             // 
@@ -102,6 +112,7 @@
             // 
             // pnlSplitPanel2
             // 
+            pnlSplitPanel2.BackColor = Color.FromArgb(242, 242, 242);
             pnlSplitPanel2.Controls.Add(richTxtHelp);
             pnlSplitPanel2.Controls.Add(LblHelp);
             pnlSplitPanel2.Dock = DockStyle.Fill;
@@ -111,9 +122,26 @@
             pnlSplitPanel2.Size = new Size(584, 178);
             pnlSplitPanel2.TabIndex = 0;
             // 
+            // richTxtHelp
+            // 
+            richTxtHelp.Location = new Point(13, 29);
+            richTxtHelp.Name = "richTxtHelp";
+            richTxtHelp.Size = new Size(560, 137);
+            richTxtHelp.TabIndex = 2;
+            richTxtHelp.Text = "";
+            // 
+            // LblHelp
+            // 
+            LblHelp.AutoSize = true;
+            LblHelp.Location = new Point(13, 11);
+            LblHelp.Name = "LblHelp";
+            LblHelp.Size = new Size(43, 15);
+            LblHelp.TabIndex = 0;
+            LblHelp.Text = "도움말";
+            // 
             // pnlButtons
             // 
-            pnlButtons.BackColor = Color.LightGray;
+            pnlButtons.BackColor = Color.FromArgb(248, 248, 248);
             pnlButtons.Controls.Add(btnDataLoadCon);
             pnlButtons.Controls.Add(btnTraningCon);
             pnlButtons.Controls.Add(btnResultCon);
@@ -165,49 +193,17 @@
             // 
             // pnlConditionView
             // 
-            pnlConditionView.BackColor = Color.LightGray;
+            pnlConditionView.BackColor = Color.FromArgb(230, 230, 230);
             pnlConditionView.Location = new Point(0, 859);
             pnlConditionView.Name = "pnlConditionView";
-            pnlConditionView.Size = new Size(1184, 28);
-            pnlConditionView.TabIndex = 3;
-            // 
-            // LblHelp
-            // 
-            LblHelp.AutoSize = true;
-            LblHelp.Location = new Point(13, 11);
-            LblHelp.Name = "LblHelp";
-            LblHelp.Size = new Size(43, 15);
-            LblHelp.TabIndex = 0;
-            LblHelp.Text = "도움말";
-            // 
-            // richTxtLog
-            // 
-            richTxtLog.Location = new Point(8, 29);
-            richTxtLog.Name = "richTxtLog";
-            richTxtLog.Size = new Size(560, 137);
-            richTxtLog.TabIndex = 1;
-            richTxtLog.Text = "";
-            // 
-            // richTxtHelp
-            // 
-            richTxtHelp.Location = new Point(13, 29);
-            richTxtHelp.Name = "richTxtHelp";
-            richTxtHelp.Size = new Size(560, 137);
-            richTxtHelp.TabIndex = 2;
-            richTxtHelp.Text = "";
-            // 
-            // pnlConditionView
-            // 
-            pnlConditionView.BackColor = Color.LightGray;
-            pnlConditionView.Location = new Point(0, 859);
-            pnlConditionView.Name = "pnlConditionView";
-            pnlConditionView.Size = new Size(1184, 28);
+            pnlConditionView.Size = new Size(1184, 37);
             pnlConditionView.TabIndex = 3;
             // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1184, 896);
             Controls.Add(pnlConditionView);
             Controls.Add(pnlButtons);
