@@ -123,5 +123,7 @@ namespace SimpleDonkeyManager
                 e.Graphics.DrawLine(pen, 0, 0, pnlConditionView.Width, 0);
             }
         }
+
+
     }
 }
