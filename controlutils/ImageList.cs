@@ -14,5 +14,10 @@ namespace SimpleDonkeyManager.controlutils
         {
             InitializeComponent();
         }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
