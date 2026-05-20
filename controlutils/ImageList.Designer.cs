@@ -47,9 +47,10 @@
             // 
             lblTitle.AutoSize = true;
             lblTitle.Font = new Font("맑은 고딕", 12F, FontStyle.Regular, GraphicsUnit.Point, 129);
-            lblTitle.Location = new Point(30, 15);
+            lblTitle.Location = new Point(15, 7);
+            lblTitle.Margin = new Padding(2, 0, 2, 0);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(180, 45);
+            lblTitle.Size = new Size(90, 21);
             lblTitle.TabIndex = 0;
             lblTitle.Text = "이미지목록";
             // 
@@ -57,53 +58,59 @@
             // 
             txtSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtSearch.Font = new Font("맑은 고딕", 12F, FontStyle.Regular, GraphicsUnit.Point, 129);
-            txtSearch.Location = new Point(24, 83);
+            txtSearch.Location = new Point(12, 39);
+            txtSearch.Margin = new Padding(2, 1, 2, 1);
             txtSearch.Name = "txtSearch";
             txtSearch.PlaceholderText = "이미지 검색...";
-            txtSearch.Size = new Size(510, 50);
+            txtSearch.Size = new Size(258, 29);
             txtSearch.TabIndex = 1;
             // 
             // listBoxImages
             // 
             listBoxImages.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             listBoxImages.FormattingEnabled = true;
-            listBoxImages.Location = new Point(24, 173);
+            listBoxImages.Location = new Point(12, 81);
+            listBoxImages.Margin = new Padding(2, 1, 2, 1);
             listBoxImages.Name = "listBoxImages";
-            listBoxImages.Size = new Size(510, 772);
+            listBoxImages.Size = new Size(255, 439);
             listBoxImages.TabIndex = 2;
             // 
             // btnPrev
             // 
-            btnPrev.Location = new Point(15, 16);
+            btnPrev.Location = new Point(8, 8);
+            btnPrev.Margin = new Padding(2, 1, 2, 1);
             btnPrev.Name = "btnPrev";
-            btnPrev.Size = new Size(55, 56);
+            btnPrev.Size = new Size(28, 26);
             btnPrev.TabIndex = 0;
             btnPrev.Text = "<";
             btnPrev.UseVisualStyleBackColor = true;
             // 
             // btn1
             // 
-            btn1.Location = new Point(76, 13);
+            btn1.Location = new Point(38, 6);
+            btn1.Margin = new Padding(2, 1, 2, 1);
             btn1.Name = "btn1";
-            btn1.Size = new Size(66, 59);
+            btn1.Size = new Size(33, 28);
             btn1.TabIndex = 1;
             btn1.Text = "1";
             btn1.UseVisualStyleBackColor = true;
             // 
             // btn2
             // 
-            btn2.Location = new Point(148, 13);
+            btn2.Location = new Point(74, 6);
+            btn2.Margin = new Padding(2, 1, 2, 1);
             btn2.Name = "btn2";
-            btn2.Size = new Size(68, 59);
+            btn2.Size = new Size(34, 28);
             btn2.TabIndex = 2;
             btn2.Text = "2";
             btn2.UseVisualStyleBackColor = true;
             // 
             // btn3
             // 
-            btn3.Location = new Point(222, 13);
+            btn3.Location = new Point(111, 6);
+            btn3.Margin = new Padding(2, 1, 2, 1);
             btn3.Name = "btn3";
-            btn3.Size = new Size(58, 59);
+            btn3.Size = new Size(29, 28);
             btn3.TabIndex = 3;
             btn3.Text = "3";
             btn3.UseVisualStyleBackColor = true;
@@ -111,27 +118,30 @@
             // btnDots
             // 
             btnDots.Enabled = false;
-            btnDots.Location = new Point(286, 13);
+            btnDots.Location = new Point(143, 6);
+            btnDots.Margin = new Padding(2, 1, 2, 1);
             btnDots.Name = "btnDots";
-            btnDots.Size = new Size(60, 59);
+            btnDots.Size = new Size(30, 28);
             btnDots.TabIndex = 4;
             btnDots.Text = "...";
             btnDots.UseVisualStyleBackColor = true;
             // 
             // btnLast
             // 
-            btnLast.Location = new Point(352, 13);
+            btnLast.Location = new Point(176, 6);
+            btnLast.Margin = new Padding(2, 1, 2, 1);
             btnLast.Name = "btnLast";
-            btnLast.Size = new Size(70, 59);
+            btnLast.Size = new Size(35, 28);
             btnLast.TabIndex = 5;
             btnLast.Text = "999";
             btnLast.UseVisualStyleBackColor = true;
             // 
             // btnNext
             // 
-            btnNext.Location = new Point(428, 13);
+            btnNext.Location = new Point(214, 6);
+            btnNext.Margin = new Padding(2, 1, 2, 1);
             btnNext.Name = "btnNext";
-            btnNext.Size = new Size(59, 59);
+            btnNext.Size = new Size(30, 28);
             btnNext.TabIndex = 6;
             btnNext.Text = ">";
             btnNext.UseVisualStyleBackColor = true;
@@ -140,9 +150,10 @@
             // btnSearch
             // 
             btnSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            btnSearch.Location = new Point(459, 91);
+            btnSearch.Location = new Point(233, 43);
+            btnSearch.Margin = new Padding(2, 1, 2, 1);
             btnSearch.Name = "btnSearch";
-            btnSearch.Size = new Size(64, 42);
+            btnSearch.Size = new Size(32, 20);
             btnSearch.TabIndex = 4;
             btnSearch.Text = "⌕";
             btnSearch.UseVisualStyleBackColor = true;
@@ -158,14 +169,15 @@
             panel1.Controls.Add(btnDots);
             panel1.Controls.Add(btnNext);
             panel1.Controls.Add(btnLast);
-            panel1.Location = new Point(24, 983);
+            panel1.Location = new Point(12, 532);
+            panel1.Margin = new Padding(2, 1, 2, 1);
             panel1.Name = "panel1";
-            panel1.Size = new Size(503, 75);
+            panel1.Size = new Size(250, 35);
             panel1.TabIndex = 7;
             // 
             // ImageList
             // 
-            AutoScaleDimensions = new SizeF(14F, 32F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -175,11 +187,8 @@
             Controls.Add(listBoxImages);
             Controls.Add(txtSearch);
             Controls.Add(lblTitle);
-            Margin = new Padding(6);
             Name = "ImageList";
-            Size = new Size(558, 1225);
-            Load += ImageList_Load;
-            Layout += ImageList_Layout;
+            Size = new Size(279, 579);
             panel1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
