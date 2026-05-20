@@ -64,6 +64,43 @@ namespace SimpleDonkeyManager
             currentControlIndex = index;
             controls[currentControlIndex].Visible = true;
             controls[currentControlIndex].BringToFront();
+
+            UpdateButtonIndicator(index);
+        }
+
+        private void UpdateButtonIndicator(int index)
+        {
+            // 기본 상태로 텍스트와 배경색 초기화
+            btnDataLoadCon.Text = "파일 로드";
+            btnDataFilterCon.Text = "파일 필터";
+            btnTraningCon.Text = "트레이닝";
+            btnResultCon.Text = "결과";
+
+            btnDataLoadCon.BackColor = SystemColors.Control;
+            btnDataFilterCon.BackColor = SystemColors.Control;
+            btnTraningCon.BackColor = SystemColors.Control;
+            btnResultCon.BackColor = SystemColors.Control;
+
+            // 활성화된 버튼에만 아이콘(●) 표시 및 색상 변경
+            switch (index)
+            {
+                case 0:
+                    btnDataLoadCon.Text = "● 파일 로드";
+                    btnDataLoadCon.BackColor = Color.LightSkyBlue;
+                    break;
+                case 1:
+                    btnDataFilterCon.Text = "● 파일 필터";
+                    btnDataFilterCon.BackColor = Color.LightSkyBlue;
+                    break;
+                case 2:
+                    btnTraningCon.Text = "● 트레이닝";
+                    btnTraningCon.BackColor = Color.LightSkyBlue;
+                    break;
+                case 3:
+                    btnResultCon.Text = "● 결과";
+                    btnResultCon.BackColor = Color.LightSkyBlue;
+                    break;
+            }
         }
 
         private void BtnDataLoadCon_Click(object? sender, EventArgs e)
