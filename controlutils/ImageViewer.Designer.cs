@@ -1,6 +1,6 @@
-﻿namespace SimpleDonkeyManager
+﻿namespace SimpleDonkeyManager.controlutils
 {
-    partial class DataLoadControl
+    partial class ImageViewer
     {
         /// <summary> 
         /// 필수 디자이너 변수입니다.
@@ -28,31 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            label1 = new Label();
             SuspendLayout();
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(1133, 576);
-            label1.Name = "label1";
-            label1.Size = new Size(58, 15);
-            label1.TabIndex = 0;
-            label1.Text = "DataLoad";
-            // 
-            // DataLoadControl
+            // ImageViewer
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(label1);
-            Name = "DataLoadControl";
-            Size = new Size(1176, 600);
+            Name = "ImageViewer";
+            Size = new Size(393, 508);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
-
-        private Label label1;
     }
 }
