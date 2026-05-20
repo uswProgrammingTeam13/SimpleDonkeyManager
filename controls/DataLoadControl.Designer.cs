@@ -33,18 +33,18 @@
             mainPan = new Panel();
             panelBottomInfo = new Panel();
             btnSelectFolder = new Button();
-            lblFileSize1 = new Label();
-            lblResolution1 = new Label();
-            lblImageFormat1 = new Label();
-            lblFolderPath1 = new Label();
-            lblTotalImages1 = new Label();
-            btnDataReroad = new Button();
-            btnRefresh = new Button();
-            lblFileSize = new Label();
-            lblResolution = new Label();
+            lblFileSizeValue = new Label();
+            lblResolutionValue = new Label();
             lblImageFormat = new Label();
             lblFolderPath = new Label();
-            lblTotalImages = new Label();
+            lblTotalImagesValue = new Label();
+            btnLoadStart = new Button();
+            btnRefresh = new Button();
+            lblFileSizeTitle = new Label();
+            lblResolutionTitle = new Label();
+            lblFormatTitle = new Label();
+            lblFolderTitle = new Label();
+            lblTotalImagesTitle = new Label();
             lblSummary = new Label();
             panelBottomInfo.SuspendLayout();
             SuspendLayout();
@@ -80,18 +80,18 @@
             // 
             panelBottomInfo.BackColor = Color.FromArgb(248, 248, 248);
             panelBottomInfo.Controls.Add(btnSelectFolder);
-            panelBottomInfo.Controls.Add(lblFileSize1);
-            panelBottomInfo.Controls.Add(lblResolution1);
-            panelBottomInfo.Controls.Add(lblImageFormat1);
-            panelBottomInfo.Controls.Add(lblFolderPath1);
-            panelBottomInfo.Controls.Add(lblTotalImages1);
-            panelBottomInfo.Controls.Add(btnDataReroad);
-            panelBottomInfo.Controls.Add(btnRefresh);
-            panelBottomInfo.Controls.Add(lblFileSize);
-            panelBottomInfo.Controls.Add(lblResolution);
+            panelBottomInfo.Controls.Add(lblFileSizeValue);
+            panelBottomInfo.Controls.Add(lblResolutionValue);
             panelBottomInfo.Controls.Add(lblImageFormat);
             panelBottomInfo.Controls.Add(lblFolderPath);
-            panelBottomInfo.Controls.Add(lblTotalImages);
+            panelBottomInfo.Controls.Add(lblTotalImagesValue);
+            panelBottomInfo.Controls.Add(btnLoadStart);
+            panelBottomInfo.Controls.Add(btnRefresh);
+            panelBottomInfo.Controls.Add(lblFileSizeTitle);
+            panelBottomInfo.Controls.Add(lblResolutionTitle);
+            panelBottomInfo.Controls.Add(lblFormatTitle);
+            panelBottomInfo.Controls.Add(lblFolderTitle);
+            panelBottomInfo.Controls.Add(lblTotalImagesTitle);
             panelBottomInfo.Controls.Add(lblSummary);
             panelBottomInfo.Location = new Point(17, 964);
             panelBottomInfo.Name = "panelBottomInfo";
@@ -111,66 +111,67 @@
             btnSelectFolder.TabIndex = 0;
             btnSelectFolder.Text = "폴더선택";
             btnSelectFolder.UseVisualStyleBackColor = true;
+            btnSelectFolder.Click += btnSelectFolder_Click;
             // 
-            // lblFileSize1
+            // lblFileSizeValue
             // 
-            lblFileSize1.AutoSize = true;
-            lblFileSize1.Location = new Point(1629, 149);
-            lblFileSize1.Name = "lblFileSize1";
-            lblFileSize1.Size = new Size(75, 32);
-            lblFileSize1.TabIndex = 12;
-            lblFileSize1.Text = "2.45G";
+            lblFileSizeValue.AutoSize = true;
+            lblFileSizeValue.Location = new Point(1629, 149);
+            lblFileSizeValue.Name = "lblFileSizeValue";
+            lblFileSizeValue.Size = new Size(75, 32);
+            lblFileSizeValue.TabIndex = 12;
+            lblFileSizeValue.Text = "2.45G";
             // 
-            // lblResolution1
+            // lblResolutionValue
             // 
-            lblResolution1.AutoSize = true;
-            lblResolution1.Location = new Point(1297, 154);
-            lblResolution1.Name = "lblResolution1";
-            lblResolution1.Size = new Size(132, 32);
-            lblResolution1.TabIndex = 11;
-            lblResolution1.Text = "1280 x 720";
+            lblResolutionValue.AutoSize = true;
+            lblResolutionValue.Location = new Point(1297, 154);
+            lblResolutionValue.Name = "lblResolutionValue";
+            lblResolutionValue.Size = new Size(132, 32);
+            lblResolutionValue.TabIndex = 11;
+            lblResolutionValue.Text = "1280 x 720";
             // 
-            // lblImageFormat1
+            // lblImageFormat
             // 
-            lblImageFormat1.AutoSize = true;
-            lblImageFormat1.Location = new Point(988, 149);
-            lblImageFormat1.Name = "lblImageFormat1";
-            lblImageFormat1.Size = new Size(53, 32);
-            lblImageFormat1.TabIndex = 10;
-            lblImageFormat1.Text = ".jpg";
+            lblImageFormat.AutoSize = true;
+            lblImageFormat.Location = new Point(988, 149);
+            lblImageFormat.Name = "lblImageFormat";
+            lblImageFormat.Size = new Size(53, 32);
+            lblImageFormat.TabIndex = 10;
+            lblImageFormat.Text = ".jpg";
             // 
-            // lblFolderPath1
+            // lblFolderPath
             // 
-            lblFolderPath1.AutoSize = true;
-            lblFolderPath1.Location = new Point(635, 154);
-            lblFolderPath1.Name = "lblFolderPath1";
-            lblFolderPath1.Size = new Size(34, 32);
-            lblFolderPath1.TabIndex = 9;
-            lblFolderPath1.Text = "C:";
-            lblFolderPath1.Click += label3_Click;
+            lblFolderPath.AutoSize = true;
+            lblFolderPath.Location = new Point(635, 154);
+            lblFolderPath.Name = "lblFolderPath";
+            lblFolderPath.Size = new Size(34, 32);
+            lblFolderPath.TabIndex = 9;
+            lblFolderPath.Text = "C:";
+            lblFolderPath.Click += label3_Click;
             // 
-            // lblTotalImages1
+            // lblTotalImagesValue
             // 
-            lblTotalImages1.AutoSize = true;
-            lblTotalImages1.Location = new Point(304, 154);
-            lblTotalImages1.Name = "lblTotalImages1";
-            lblTotalImages1.Size = new Size(116, 32);
-            lblTotalImages1.TabIndex = 8;
-            lblTotalImages1.Text = "12,345 장";
+            lblTotalImagesValue.AutoSize = true;
+            lblTotalImagesValue.Location = new Point(304, 154);
+            lblTotalImagesValue.Name = "lblTotalImagesValue";
+            lblTotalImagesValue.Size = new Size(116, 32);
+            lblTotalImagesValue.TabIndex = 8;
+            lblTotalImagesValue.Text = "12,345 장";
             // 
-            // btnDataReroad
+            // btnLoadStart
             // 
-            btnDataReroad.FlatAppearance.BorderColor = Color.DodgerBlue;
-            btnDataReroad.FlatAppearance.MouseOverBackColor = Color.Azure;
-            btnDataReroad.FlatStyle = FlatStyle.Flat;
-            btnDataReroad.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            btnDataReroad.ForeColor = SystemColors.Highlight;
-            btnDataReroad.Location = new Point(2105, 39);
-            btnDataReroad.Name = "btnDataReroad";
-            btnDataReroad.Size = new Size(213, 147);
-            btnDataReroad.TabIndex = 7;
-            btnDataReroad.Text = "데이터 로드";
-            btnDataReroad.UseVisualStyleBackColor = true;
+            btnLoadStart.FlatAppearance.BorderColor = Color.DodgerBlue;
+            btnLoadStart.FlatAppearance.MouseOverBackColor = Color.Azure;
+            btnLoadStart.FlatStyle = FlatStyle.Flat;
+            btnLoadStart.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnLoadStart.ForeColor = SystemColors.Highlight;
+            btnLoadStart.Location = new Point(2105, 39);
+            btnLoadStart.Name = "btnLoadStart";
+            btnLoadStart.Size = new Size(213, 147);
+            btnLoadStart.TabIndex = 7;
+            btnLoadStart.Text = "데이터 로드";
+            btnLoadStart.UseVisualStyleBackColor = true;
             // 
             // btnRefresh
             // 
@@ -191,62 +192,62 @@
             btnRefresh.UseVisualStyleBackColor = true;
             btnRefresh.Click += btnRefresh_Click;
             // 
-            // lblFileSize
+            // lblFileSizeTitle
             // 
-            lblFileSize.AutoSize = true;
-            lblFileSize.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblFileSize.ForeColor = Color.RoyalBlue;
-            lblFileSize.Location = new Point(1609, 88);
-            lblFileSize.Name = "lblFileSize";
-            lblFileSize.Size = new Size(143, 40);
-            lblFileSize.TabIndex = 5;
-            lblFileSize.Text = "파일 크기";
-            lblFileSize.Click += label6_Click;
+            lblFileSizeTitle.AutoSize = true;
+            lblFileSizeTitle.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            lblFileSizeTitle.ForeColor = Color.RoyalBlue;
+            lblFileSizeTitle.Location = new Point(1609, 88);
+            lblFileSizeTitle.Name = "lblFileSizeTitle";
+            lblFileSizeTitle.Size = new Size(143, 40);
+            lblFileSizeTitle.TabIndex = 5;
+            lblFileSizeTitle.Text = "파일 크기";
+            lblFileSizeTitle.Click += label6_Click;
             // 
-            // lblResolution
+            // lblResolutionTitle
             // 
-            lblResolution.AutoSize = true;
-            lblResolution.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblResolution.ForeColor = Color.RoyalBlue;
-            lblResolution.Location = new Point(1297, 88);
-            lblResolution.Name = "lblResolution";
-            lblResolution.Size = new Size(104, 40);
-            lblResolution.TabIndex = 4;
-            lblResolution.Text = "해상도";
+            lblResolutionTitle.AutoSize = true;
+            lblResolutionTitle.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            lblResolutionTitle.ForeColor = Color.RoyalBlue;
+            lblResolutionTitle.Location = new Point(1297, 88);
+            lblResolutionTitle.Name = "lblResolutionTitle";
+            lblResolutionTitle.Size = new Size(104, 40);
+            lblResolutionTitle.TabIndex = 4;
+            lblResolutionTitle.Text = "해상도";
             // 
-            // lblImageFormat
+            // lblFormatTitle
             // 
-            lblImageFormat.AutoSize = true;
-            lblImageFormat.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblImageFormat.ForeColor = Color.RoyalBlue;
-            lblImageFormat.Location = new Point(979, 88);
-            lblImageFormat.Name = "lblImageFormat";
-            lblImageFormat.Size = new Size(172, 40);
-            lblImageFormat.TabIndex = 3;
-            lblImageFormat.Text = "이미지 형식";
+            lblFormatTitle.AutoSize = true;
+            lblFormatTitle.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            lblFormatTitle.ForeColor = Color.RoyalBlue;
+            lblFormatTitle.Location = new Point(979, 88);
+            lblFormatTitle.Name = "lblFormatTitle";
+            lblFormatTitle.Size = new Size(172, 40);
+            lblFormatTitle.TabIndex = 3;
+            lblFormatTitle.Text = "이미지 형식";
             // 
-            // lblFolderPath
+            // lblFolderTitle
             // 
-            lblFolderPath.AutoSize = true;
-            lblFolderPath.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblFolderPath.ForeColor = Color.RoyalBlue;
-            lblFolderPath.Location = new Point(635, 90);
-            lblFolderPath.Name = "lblFolderPath";
-            lblFolderPath.Size = new Size(172, 40);
-            lblFolderPath.TabIndex = 2;
-            lblFolderPath.Text = "선택된 폴더";
+            lblFolderTitle.AutoSize = true;
+            lblFolderTitle.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            lblFolderTitle.ForeColor = Color.RoyalBlue;
+            lblFolderTitle.Location = new Point(635, 90);
+            lblFolderTitle.Name = "lblFolderTitle";
+            lblFolderTitle.Size = new Size(172, 40);
+            lblFolderTitle.TabIndex = 2;
+            lblFolderTitle.Text = "선택된 폴더";
             // 
-            // lblTotalImages
+            // lblTotalImagesTitle
             // 
-            lblTotalImages.AutoSize = true;
-            lblTotalImages.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblTotalImages.ForeColor = Color.RoyalBlue;
-            lblTotalImages.Location = new Point(291, 88);
-            lblTotalImages.Name = "lblTotalImages";
-            lblTotalImages.Size = new Size(162, 40);
-            lblTotalImages.TabIndex = 1;
-            lblTotalImages.Text = "전체이미지";
-            lblTotalImages.Click += label2_Click;
+            lblTotalImagesTitle.AutoSize = true;
+            lblTotalImagesTitle.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            lblTotalImagesTitle.ForeColor = Color.RoyalBlue;
+            lblTotalImagesTitle.Location = new Point(291, 88);
+            lblTotalImagesTitle.Name = "lblTotalImagesTitle";
+            lblTotalImagesTitle.Size = new Size(162, 40);
+            lblTotalImagesTitle.TabIndex = 1;
+            lblTotalImagesTitle.Text = "전체이미지";
+            lblTotalImagesTitle.Click += label2_Click;
             // 
             // lblSummary
             // 
@@ -284,18 +285,18 @@
         private Panel mainPan;
         private Panel panelBottomInfo;
         private Label lblSummary;
-        private Label lblFileSize;
-        private Label lblResolution;
+        private Label lblFileSizeTitle;
+        private Label lblResolutionTitle;
+        private Label lblFormatTitle;
+        private Label lblFolderTitle;
+        private Label lblTotalImagesTitle;
+        private Button btnLoadStart;
+        private Button btnRefresh;
+        private Label lblFileSizeValue;
+        private Label lblResolutionValue;
         private Label lblImageFormat;
         private Label lblFolderPath;
-        private Label lblTotalImages;
-        private Button btnDataReroad;
-        private Button btnRefresh;
-        private Label lblFileSize1;
-        private Label lblResolution1;
-        private Label lblImageFormat1;
-        private Label lblFolderPath1;
-        private Label lblTotalImages1;
+        private Label lblTotalImagesValue;
         private PictureBox pictureBox1;
         private Button btnSelectFolder;
     }
