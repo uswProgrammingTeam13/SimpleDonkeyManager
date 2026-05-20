@@ -60,7 +60,7 @@
             txtSearch.Location = new Point(24, 83);
             txtSearch.Name = "txtSearch";
             txtSearch.PlaceholderText = "이미지 검색...";
-            txtSearch.Size = new Size(512, 50);
+            txtSearch.Size = new Size(510, 50);
             txtSearch.TabIndex = 1;
             // 
             // listBoxImages
@@ -69,7 +69,7 @@
             listBoxImages.FormattingEnabled = true;
             listBoxImages.Location = new Point(24, 173);
             listBoxImages.Name = "listBoxImages";
-            listBoxImages.Size = new Size(506, 484);
+            listBoxImages.Size = new Size(510, 772);
             listBoxImages.TabIndex = 2;
             // 
             // btnPrev
@@ -140,7 +140,7 @@
             // btnSearch
             // 
             btnSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            btnSearch.Location = new Point(466, 91);
+            btnSearch.Location = new Point(459, 91);
             btnSearch.Name = "btnSearch";
             btnSearch.Size = new Size(64, 42);
             btnSearch.TabIndex = 4;
@@ -158,15 +158,17 @@
             panel1.Controls.Add(btnDots);
             panel1.Controls.Add(btnNext);
             panel1.Controls.Add(btnLast);
-            panel1.Location = new Point(24, 677);
+            panel1.Location = new Point(24, 983);
             panel1.Name = "panel1";
-            panel1.Size = new Size(499, 75);
+            panel1.Size = new Size(503, 75);
             panel1.TabIndex = 7;
             // 
             // ImageList
             // 
             AutoScaleDimensions = new SizeF(14F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
+            AutoSize = true;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             BackColor = SystemColors.Control;
             Controls.Add(panel1);
             Controls.Add(btnSearch);
@@ -176,6 +178,8 @@
             Margin = new Padding(6);
             Name = "ImageList";
             Size = new Size(558, 1225);
+            Load += ImageList_Load;
+            Layout += ImageList_Layout;
             panel1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
