@@ -71,33 +71,33 @@ namespace SimpleDonkeyManager
         private void UpdateButtonIndicator(int index)
         {
             // 기본 상태로 텍스트와 배경색 초기화
-            btnDataLoadCon.Text = "파일 로드";
-            btnDataFilterCon.Text = "파일 필터";
-            btnTraningCon.Text = "트레이닝";
-            btnResultCon.Text = "결과";
+            btnDataLoadCon.Text = "📂 데이터 불러오기";
+            btnDataFilterCon.Text = "🔍 데이터 필터링";
+            btnTraningCon.Text = "▶ 학습 실행";
+            btnResultCon.Text = "📈 학습 결과 확인";
 
             btnDataLoadCon.BackColor = SystemColors.Control;
             btnDataFilterCon.BackColor = SystemColors.Control;
             btnTraningCon.BackColor = SystemColors.Control;
             btnResultCon.BackColor = SystemColors.Control;
 
-            // 활성화된 버튼에만 아이콘(●) 표시 및 색상 변경
+            // 활성화된 버튼에만 색상 변경
             switch (index)
             {
                 case 0:
-                    btnDataLoadCon.Text = "● 파일 로드";
+                    btnDataLoadCon.Text = "📂 데이터 불러오기";
                     btnDataLoadCon.BackColor = Color.LightSkyBlue;
                     break;
                 case 1:
-                    btnDataFilterCon.Text = "● 파일 필터";
+                    btnDataFilterCon.Text = "🔍 데이터 필터링";
                     btnDataFilterCon.BackColor = Color.LightSkyBlue;
                     break;
                 case 2:
-                    btnTraningCon.Text = "● 트레이닝";
+                    btnTraningCon.Text = "▶ 학습 실행";
                     btnTraningCon.BackColor = Color.LightSkyBlue;
                     break;
                 case 3:
-                    btnResultCon.Text = "● 결과";
+                    btnResultCon.Text = "📈 학습 결과 확인";
                     btnResultCon.BackColor = Color.LightSkyBlue;
                     break;
             }
