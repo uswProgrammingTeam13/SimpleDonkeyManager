@@ -64,7 +64,7 @@
             imgListPan.BackColor = Color.FromArgb(248, 248, 248);
             imgListPan.Location = new Point(17, 29);
             imgListPan.Name = "imgListPan";
-            imgListPan.Size = new Size(438, 849);
+            imgListPan.Size = new Size(438, 910);
             imgListPan.TabIndex = 1;
             // 
             // mainPan
@@ -72,7 +72,7 @@
             mainPan.BackColor = Color.FromArgb(248, 248, 248);
             mainPan.Location = new Point(489, 29);
             mainPan.Name = "mainPan";
-            mainPan.Size = new Size(1860, 849);
+            mainPan.Size = new Size(1860, 910);
             mainPan.TabIndex = 0;
             // 
             // panelBottomInfo
@@ -92,9 +92,9 @@
             panelBottomInfo.Controls.Add(lblFolderPath);
             panelBottomInfo.Controls.Add(lblTotalImages);
             panelBottomInfo.Controls.Add(lblSummary);
-            panelBottomInfo.Location = new Point(17, 898);
+            panelBottomInfo.Location = new Point(17, 964);
             panelBottomInfo.Name = "panelBottomInfo";
-            panelBottomInfo.Size = new Size(2332, 284);
+            panelBottomInfo.Size = new Size(2332, 297);
             panelBottomInfo.TabIndex = 1;
             // 
             // btnSelecFolder
