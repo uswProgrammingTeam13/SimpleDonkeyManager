@@ -162,7 +162,7 @@
             // 
             // panel1
             // 
-            panel1.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            panel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panel1.BackColor = Color.White;
             panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(btnPrev);
@@ -180,6 +180,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             groupBox1.BackColor = SystemColors.ControlLightLight;
             groupBox1.Controls.Add(checkBox1);
             groupBox1.Controls.Add(panel1);
@@ -209,8 +210,7 @@
             // ImageList
             // 
             AutoScaleMode = AutoScaleMode.Inherit;
-            AutoSize = true;
-            AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            AutoSize = false;
             BackColor = SystemColors.ControlLightLight;
             Controls.Add(groupBox1);
             Name = "ImageList";
