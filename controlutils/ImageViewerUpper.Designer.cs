@@ -1,6 +1,6 @@
 ﻿namespace SimpleDonkeyManager.controlutils
 {
-    partial class ImageViewer
+    partial class ImageViewerUpper
     {
         /// <summary> 
         /// 필수 디자이너 변수입니다.
@@ -30,12 +30,12 @@
         {
             SuspendLayout();
             // 
-            // ImageViewer
+            // ImageViewerUpper
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Name = "ImageViewer";
-            Size = new Size(647, 403);
+            Name = "ImageViewerUpper";
+            Size = new Size(389, 594);
             ResumeLayout(false);
         }
 

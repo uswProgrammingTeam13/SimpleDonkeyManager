@@ -59,7 +59,6 @@
             pnlImageView = new Panel();
             tableLayoutPanel4 = new TableLayoutPanel();
             pnlFilterResult = new GroupBox();
-            listView1 = new ListView();
             pnlFrameList = new Panel();
             pnlFilterAdditional.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -450,7 +449,6 @@
             // pnlFilterResult
             // 
             pnlFilterResult.BackColor = Color.FromArgb(248, 248, 248);
-            pnlFilterResult.Controls.Add(listView1);
             pnlFilterResult.Controls.Add(lstFilterSummary);
             pnlFilterResult.Dock = DockStyle.Fill;
             pnlFilterResult.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
@@ -461,22 +459,6 @@
             pnlFilterResult.TabIndex = 0;
             pnlFilterResult.TabStop = false;
             pnlFilterResult.Text = "필터링 결과 요약";
-            // 
-            // listView1
-            // 
-            listView1.BorderStyle = BorderStyle.FixedSingle;
-            listView1.Dock = DockStyle.Fill;
-            listView1.FullRowSelect = true;
-            listView1.GridLines = true;
-            listView1.HeaderStyle = ColumnHeaderStyle.None;
-            listView1.HideSelection = true;
-            listView1.Location = new Point(3, 25);
-            listView1.Name = "listView1";
-            listView1.Size = new Size(435, 139);
-            listView1.TabIndex = 1;
-            listView1.UseCompatibleStateImageBehavior = false;
-            listView1.View = View.Details;
-            listView1.SelectedIndexChanged += listView1_SelectedIndexChanged;
             // 
             // pnlFrameList
             // 
@@ -548,6 +530,5 @@
         private Label lblFilterBasic;
         private Panel pnlImageView;
         private Panel pnlFrameList;
-        private ListView listView1;
     }
 }
