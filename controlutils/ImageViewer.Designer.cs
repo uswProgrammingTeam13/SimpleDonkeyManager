@@ -71,8 +71,8 @@
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 2;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 60F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 69.97519F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 30.0248146F));
             tableLayoutPanel1.Size = new Size(647, 403);
             tableLayoutPanel1.TabIndex = 20;
             // 
@@ -90,7 +90,7 @@
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Size = new Size(641, 235);
+            tableLayoutPanel2.Size = new Size(641, 276);
             tableLayoutPanel2.TabIndex = 15;
             // 
             // pnlLeftThumbnail
@@ -101,7 +101,7 @@
             pnlLeftThumbnail.Dock = DockStyle.Fill;
             pnlLeftThumbnail.Location = new Point(3, 3);
             pnlLeftThumbnail.Name = "pnlLeftThumbnail";
-            pnlLeftThumbnail.Size = new Size(109, 229);
+            pnlLeftThumbnail.Size = new Size(109, 270);
             pnlLeftThumbnail.TabIndex = 16;
             // 
             // label1
@@ -122,7 +122,7 @@
             pictureBox2.BorderStyle = BorderStyle.FixedSingle;
             pictureBox2.Location = new Point(0, 25);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(109, 154);
+            pictureBox2.Size = new Size(109, 195);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox2.TabIndex = 2;
             pictureBox2.TabStop = false;
@@ -133,7 +133,7 @@
             button1.FlatStyle = FlatStyle.Flat;
             button1.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 129);
             button1.ForeColor = Color.RoyalBlue;
-            button1.Location = new Point(0, 202);
+            button1.Location = new Point(0, 243);
             button1.Name = "button1";
             button1.Size = new Size(109, 27);
             button1.TabIndex = 4;
@@ -146,7 +146,7 @@
             pnlCenterMain.Dock = DockStyle.Fill;
             pnlCenterMain.Location = new Point(118, 3);
             pnlCenterMain.Name = "pnlCenterMain";
-            pnlCenterMain.Size = new Size(405, 229);
+            pnlCenterMain.Size = new Size(405, 270);
             pnlCenterMain.TabIndex = 17;
             // 
             // pictureBox1
@@ -155,7 +155,7 @@
             pictureBox1.Dock = DockStyle.Fill;
             pictureBox1.Location = new Point(0, 0);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(405, 229);
+            pictureBox1.Size = new Size(405, 270);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
@@ -168,7 +168,7 @@
             pnlRightThumbnail.Dock = DockStyle.Fill;
             pnlRightThumbnail.Location = new Point(529, 3);
             pnlRightThumbnail.Name = "pnlRightThumbnail";
-            pnlRightThumbnail.Size = new Size(109, 229);
+            pnlRightThumbnail.Size = new Size(109, 270);
             pnlRightThumbnail.TabIndex = 18;
             // 
             // label2
@@ -189,7 +189,7 @@
             pictureBox3.BorderStyle = BorderStyle.FixedSingle;
             pictureBox3.Location = new Point(0, 25);
             pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(109, 154);
+            pictureBox3.Size = new Size(109, 195);
             pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox3.TabIndex = 3;
             pictureBox3.TabStop = false;
@@ -200,7 +200,7 @@
             button2.FlatStyle = FlatStyle.Flat;
             button2.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 129);
             button2.ForeColor = Color.RoyalBlue;
-            button2.Location = new Point(0, 202);
+            button2.Location = new Point(0, 243);
             button2.Name = "button2";
             button2.Size = new Size(109, 27);
             button2.TabIndex = 5;
@@ -217,9 +217,9 @@
             pnlControlBar.Controls.Add(lstJSONSummary);
             pnlControlBar.Dock = DockStyle.Fill;
             pnlControlBar.ForeColor = Color.RoyalBlue;
-            pnlControlBar.Location = new Point(3, 244);
+            pnlControlBar.Location = new Point(3, 285);
             pnlControlBar.Name = "pnlControlBar";
-            pnlControlBar.Size = new Size(641, 156);
+            pnlControlBar.Size = new Size(641, 115);
             pnlControlBar.TabIndex = 19;
             // 
             // comboBox1
@@ -285,9 +285,9 @@
             lstJSONSummary.GridLines = true;
             lstJSONSummary.HeaderStyle = ColumnHeaderStyle.None;
             lstJSONSummary.HideSelection = true;
-            lstJSONSummary.Location = new Point(411, 56);
+            lstJSONSummary.Location = new Point(426, 50);
             lstJSONSummary.Name = "lstJSONSummary";
-            lstJSONSummary.Size = new Size(212, 85);
+            lstJSONSummary.Size = new Size(212, 62);
             lstJSONSummary.TabIndex = 14;
             lstJSONSummary.UseCompatibleStateImageBehavior = false;
             lstJSONSummary.View = View.Details;
