@@ -5,6 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
+using System.Text.Json;
 
 namespace SimpleDonkeyManager
 {
@@ -72,6 +74,10 @@ namespace SimpleDonkeyManager
 
                     // .jpg 이미지 파일 수집
                     string[] imageFiles = Directory.GetFiles(folderPath, "*.jpg");
+
+                    string[] jsonFiles = Directory.GetFiles(folderPath, "*.json");
+
+                    MessageBox.Show($"JSON 파일 {jsonFiles.Length}개를 찾았습니다.");
 
                     // 총 이미지 수 업데이트
                     lblTotalImagesValue.Text = $"{imageFiles.Length:N0} 장";
