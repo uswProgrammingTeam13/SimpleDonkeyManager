@@ -198,7 +198,7 @@
             AutoScaleMode = AutoScaleMode.Inherit;
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            BackColor = SystemColors.Control;
+            BackColor = SystemColors.ControlLightLight;
             Controls.Add(groupBox1);
             Name = "ImageList";
             Size = new Size(273, 577);

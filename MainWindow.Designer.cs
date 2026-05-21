@@ -86,7 +86,7 @@
             // 
             // pnlSplitPanel1
             // 
-            pnlSplitPanel1.BackColor = Color.FromArgb(242, 242, 242);
+            pnlSplitPanel1.BackColor = Color.FromArgb(248, 248, 248);
             pnlSplitPanel1.Controls.Add(richTxtLog);
             pnlSplitPanel1.Controls.Add(LblLog);
             pnlSplitPanel1.Dock = DockStyle.Fill;
@@ -98,9 +98,11 @@
             // 
             // richTxtLog
             // 
+            richTxtLog.BackColor = SystemColors.ControlLightLight;
             richTxtLog.BorderStyle = BorderStyle.FixedSingle;
             richTxtLog.Location = new Point(8, 29);
             richTxtLog.Name = "richTxtLog";
+            richTxtLog.ReadOnly = true;
             richTxtLog.Size = new Size(560, 137);
             richTxtLog.TabIndex = 1;
             richTxtLog.Text = "";
@@ -109,7 +111,7 @@
             // 
             LblLog.AutoSize = true;
             LblLog.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
-            LblLog.ForeColor = SystemColors.Highlight;
+            LblLog.ForeColor = Color.RoyalBlue;
             LblLog.Location = new Point(8, 7);
             LblLog.Name = "LblLog";
             LblLog.Size = new Size(78, 19);
@@ -118,7 +120,7 @@
             // 
             // pnlSplitPanel2
             // 
-            pnlSplitPanel2.BackColor = Color.FromArgb(242, 242, 242);
+            pnlSplitPanel2.BackColor = Color.FromArgb(248, 248, 248);
             pnlSplitPanel2.Controls.Add(richTxtHelp);
             pnlSplitPanel2.Controls.Add(LblHelp);
             pnlSplitPanel2.Dock = DockStyle.Fill;
@@ -141,7 +143,7 @@
             // 
             LblHelp.AutoSize = true;
             LblHelp.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
-            LblHelp.ForeColor = SystemColors.Highlight;
+            LblHelp.ForeColor = Color.RoyalBlue;
             LblHelp.Location = new Point(13, 7);
             LblHelp.Name = "LblHelp";
             LblHelp.Size = new Size(72, 19);

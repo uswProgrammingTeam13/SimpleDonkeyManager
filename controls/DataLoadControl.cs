@@ -83,7 +83,7 @@ namespace SimpleDonkeyManager
                             folderPath,
                             imageFiles.Length,
                             0,  // 현재는 로드된 프레임이 0
-                            "데이터 폴더 로드 완료"
+                            "데이터 필터링 필요"
                         );
                     }
                 }

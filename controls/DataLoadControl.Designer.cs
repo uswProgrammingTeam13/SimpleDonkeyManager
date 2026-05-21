@@ -64,6 +64,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.BackColor = SystemColors.ControlLightLight;
             groupBox1.Controls.Add(btnSelectFolder);
             groupBox1.Controls.Add(lblFileSizeValue);
             groupBox1.Controls.Add(lblResolutionValue);
@@ -76,7 +77,7 @@
             groupBox1.Controls.Add(lblFormatTitle);
             groupBox1.Controls.Add(lblTotalImagesTitle);
             groupBox1.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            groupBox1.ForeColor = SystemColors.Highlight;
+            groupBox1.ForeColor = Color.RoyalBlue;
             groupBox1.Location = new Point(273, 454);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(900, 143);
@@ -229,6 +230,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlLightLight;
             Controls.Add(groupBox1);
             Controls.Add(pnlFrameList);
             Controls.Add(mainPan);

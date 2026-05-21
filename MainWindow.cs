@@ -11,13 +11,21 @@ namespace SimpleDonkeyManager
         private ResultControl resultControl;
         private int currentControlIndex = -1;
         private UserControl[] controls;
+        private Logger logger;
 
         public MainWindow()
         {
             InitializeComponent();
+            logger = new Logger();
+
+            // Logger의 LogAdded 이벤트 구독
+            logger.LogAdded += Logger_LogAdded;
+
             pnlButtons.Paint += PnlButtons_Paint;
             pnlConditionView.Paint += PnlConditionView_Paint;
             InitializeControls();
+
+            logger.AppendLog("프로그램이 실행되었습니다. 환영합니다!");
         }
 
         private void InitializeControls()
@@ -174,6 +182,28 @@ namespace SimpleDonkeyManager
             }
 
             lblProgramCon.Text = $"📂 현재 폴더 : {displayPath}    |    프레임 수 : {loadedFrames} / {totalImages}    |    상태 : {status}";
+        }
+
+        /// <summary>
+        /// Logger의 LogAdded 이벤트 핸들러
+        /// </summary>
+        private void Logger_LogAdded(object sender, LogAddedEventArgs e)
+        {
+            // richTxtLog에 로그 추가 (UI 스레드 안전)
+            if (richTxtLog != null)
+            {
+                if (richTxtLog.InvokeRequired)
+                {
+                    richTxtLog.Invoke(new Action(() =>
+                    {
+                        richTxtLog.AppendText(e.LogMessage + Environment.NewLine);
+                    }));
+                }
+                else
+                {
+                    richTxtLog.AppendText(e.LogMessage + Environment.NewLine);
+                }
+            }
         }
 
 
