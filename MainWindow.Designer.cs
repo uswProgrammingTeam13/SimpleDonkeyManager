@@ -146,9 +146,9 @@
             LblHelp.ForeColor = Color.RoyalBlue;
             LblHelp.Location = new Point(13, 7);
             LblHelp.Name = "LblHelp";
-            LblHelp.Size = new Size(72, 19);
+            LblHelp.Size = new Size(57, 19);
             LblHelp.TabIndex = 0;
-            LblHelp.Text = "도움말 ?";
+            LblHelp.Text = "도움말";
             // 
             // pnlButtons
             // 

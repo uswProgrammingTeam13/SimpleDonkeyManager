@@ -45,6 +45,18 @@ namespace SimpleDonkeyManager
             pnlImageView.Controls.Clear();
             pnlImageView.Controls.Add(imageViewer);
 
+            // 이미지 선택 이벤트 구독
+            imageList.ImageSelected += ImageList_ImageSelected;
+        }
+
+        private void ImageList_ImageSelected(object sender, string imagePath)
+        {
+            imageViewer.DisplayImage(imagePath);
+        }
+
+        public void LoadImages(string[] imageFiles)
+        {
+            imageList.LoadImages(imageFiles);
         }
 
         private void SetSummaryData(string frame, string filterframe, string delframe, string activeframe)
@@ -72,6 +84,14 @@ namespace SimpleDonkeyManager
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        public void DisplayImage(string imagePath)
+        {
+            if (imageViewer != null)
+            {
+                imageViewer.DisplayImage(imagePath);
+            }
         }
     }
 }

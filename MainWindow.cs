@@ -184,6 +184,14 @@ namespace SimpleDonkeyManager
             lblProgramCon.Text = $"📂 현재 폴더 : {displayPath}    |    프레임 수 : {loadedFrames} / {totalImages}    |    상태 : {status}";
         }
 
+        public void LoadImagesToControls(string[] imageFiles)
+        {
+            if (dataFilterControl != null)
+            {
+                dataFilterControl.LoadImages(imageFiles);
+            }
+        }
+
         /// <summary>
         /// Logger의 LogAdded 이벤트 핸들러
         /// </summary>
@@ -207,5 +215,14 @@ namespace SimpleDonkeyManager
         }
 
 
+            public void NotifyImageSelected(string imagePath)
+            {
+                // DataFilterControl에도 선택된 이미지를 전달
+                if (dataFilterControl != null)
+                {
+                    dataFilterControl.DisplayImage(imagePath);
+                }
+            }
+
+        }
     }
-}

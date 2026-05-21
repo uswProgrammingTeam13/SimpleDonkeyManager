@@ -26,12 +26,23 @@ namespace SimpleDonkeyManager
             imageList.Visible = true;
             pnlFrameList.Controls.Add(imageList);
 
-            // ImageViewer 설정
             imageViewer.Dock = DockStyle.Fill;
-            imageViewer.AutoSize = false;
             imageViewer.Visible = true;
-            pnlImageView.Controls.Clear();
-            pnlImageView.Controls.Add(imageViewer);
+            mainPan.Controls.Add(imageViewer);
+
+            // 이미지 선택 이벤트 구독
+            imageList.ImageSelected += ImageList_ImageSelected;
+        }
+
+        private void ImageList_ImageSelected(object sender, string imagePath)
+        {
+            imageViewer.DisplayImage(imagePath);
+
+            // 필요하다면 MainWindow를 통해 DataFilterControl 등 다른 뷰에도 이미지 경로를 전달할 수 있습니다.
+            if (mainWindow != null)
+            {
+                mainWindow.NotifyImageSelected(imagePath);
+            }
         }
 
         private void DataLoadControl_Load(object sender, EventArgs e)
@@ -84,9 +95,8 @@ namespace SimpleDonkeyManager
                     // .jpg 이미지 파일 수집
                     string[] imageFiles = Directory.GetFiles(folderPath, "*.jpg");
 
-                    string[] jsonFiles = Directory.GetFiles(folderPath, "*.json");
-
-                    MessageBox.Show($"JSON 파일 {jsonFiles.Length}개를 찾았습니다.");
+                    // 리스트에 이미지 로드
+                    imageList.LoadImages(imageFiles);
 
                     // 총 이미지 수 업데이트
                     lblTotalImagesValue.Text = $"{imageFiles.Length:N0} 장";
@@ -100,6 +110,7 @@ namespace SimpleDonkeyManager
                             0,  // 현재는 로드된 프레임이 0
                             "데이터 필터링 필요"
                         );
+                        mainWindow.LoadImagesToControls(imageFiles); // 필터 컨트롤에도 이미지 전달
                     }
                 }
             }
