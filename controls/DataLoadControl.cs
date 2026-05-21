@@ -12,6 +12,7 @@ namespace SimpleDonkeyManager
     {
 
         private controlutils.ImageList imageList = new controlutils.ImageList();
+        private controlutils.ImageViewer imageViewer = new controlutils.ImageViewer();
         private MainWindow mainWindow;
 
         public DataLoadControl()
@@ -21,6 +22,24 @@ namespace SimpleDonkeyManager
             imageList.Dock = DockStyle.Fill;
             imageList.Visible = true;
             pnlFrameList.Controls.Add(imageList);
+
+            imageViewer.Dock = DockStyle.Fill;
+            imageViewer.Visible = true;
+            mainPan.Controls.Add(imageViewer);
+
+            // 이미지 선택 이벤트 구독
+            imageList.ImageSelected += ImageList_ImageSelected;
+        }
+
+        private void ImageList_ImageSelected(object sender, string imagePath)
+        {
+            imageViewer.DisplayImage(imagePath);
+
+            // 필요하다면 MainWindow를 통해 DataFilterControl 등 다른 뷰에도 이미지 경로를 전달할 수 있습니다.
+            if (mainWindow != null)
+            {
+                mainWindow.NotifyImageSelected(imagePath);
+            }
         }
 
         private void DataLoadControl_Load(object sender, EventArgs e)
@@ -73,6 +92,9 @@ namespace SimpleDonkeyManager
                     // .jpg 이미지 파일 수집
                     string[] imageFiles = Directory.GetFiles(folderPath, "*.jpg");
 
+                    // 리스트에 이미지 로드
+                    imageList.LoadImages(imageFiles);
+
                     // 총 이미지 수 업데이트
                     lblTotalImagesValue.Text = $"{imageFiles.Length:N0} 장";
 
@@ -85,6 +107,7 @@ namespace SimpleDonkeyManager
                             0,  // 현재는 로드된 프레임이 0
                             "데이터 필터링 필요"
                         );
+                        mainWindow.LoadImagesToControls(imageFiles); // 필터 컨트롤에도 이미지 전달
                     }
                 }
             }
