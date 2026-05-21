@@ -54,6 +54,7 @@
             // pnlMainContent
             // 
             pnlMainContent.BackColor = SystemColors.ControlLightLight;
+            pnlMainContent.BackgroundImageLayout = ImageLayout.Stretch;
             pnlMainContent.Location = new Point(4, 69);
             pnlMainContent.Name = "pnlMainContent";
             pnlMainContent.Size = new Size(1176, 600);
