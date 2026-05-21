@@ -59,8 +59,8 @@
             pnlImageView = new Panel();
             tableLayoutPanel4 = new TableLayoutPanel();
             pnlFilterResult = new GroupBox();
-            pnlFrameList = new Panel();
             listView1 = new ListView();
+            pnlFrameList = new Panel();
             pnlFilterAdditional.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
@@ -277,9 +277,9 @@
             pnlFilterSetBasic.Controls.Add(chkThrottle);
             pnlFilterSetBasic.Controls.Add(lblFilterBasic);
             pnlFilterSetBasic.ForeColor = SystemColors.ControlText;
-            pnlFilterSetBasic.Location = new Point(6, 22);
+            pnlFilterSetBasic.Location = new Point(6, 29);
             pnlFilterSetBasic.Name = "pnlFilterSetBasic";
-            pnlFilterSetBasic.Size = new Size(223, 279);
+            pnlFilterSetBasic.Size = new Size(223, 270);
             pnlFilterSetBasic.TabIndex = 1;
             // 
             // comboBox1
@@ -462,15 +462,6 @@
             pnlFilterResult.TabStop = false;
             pnlFilterResult.Text = "필터링 결과 요약";
             // 
-            // pnlFrameList
-            // 
-            pnlFrameList.BackColor = Color.FromArgb(248, 248, 248);
-            pnlFrameList.Dock = DockStyle.Fill;
-            pnlFrameList.Location = new Point(3, 3);
-            pnlFrameList.Name = "pnlFrameList";
-            pnlFrameList.Size = new Size(264, 594);
-            pnlFrameList.TabIndex = 1;
-            // 
             // listView1
             // 
             listView1.BorderStyle = BorderStyle.FixedSingle;
@@ -486,6 +477,15 @@
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
             listView1.SelectedIndexChanged += listView1_SelectedIndexChanged;
+            // 
+            // pnlFrameList
+            // 
+            pnlFrameList.BackColor = Color.FromArgb(248, 248, 248);
+            pnlFrameList.Dock = DockStyle.Fill;
+            pnlFrameList.Location = new Point(3, 3);
+            pnlFrameList.Name = "pnlFrameList";
+            pnlFrameList.Size = new Size(264, 594);
+            pnlFrameList.TabIndex = 1;
             // 
             // DataFilterControl
             // 

@@ -12,6 +12,7 @@ namespace SimpleDonkeyManager
     {
 
         private controlutils.ImageList imageList = new controlutils.ImageList();
+        private MainWindow mainWindow;
 
         public DataLoadControl()
         {
@@ -19,12 +20,13 @@ namespace SimpleDonkeyManager
 
             imageList.Dock = DockStyle.Fill;
             imageList.Visible = true;
-            imgListPan.Controls.Add(imageList);
+            pnlFrameList.Controls.Add(imageList);
         }
 
         private void DataLoadControl_Load(object sender, EventArgs e)
         {
-
+            // 부모 폼(MainWindow) 찾기
+            mainWindow = this.FindForm() as MainWindow;
         }
 
 
@@ -68,14 +70,24 @@ namespace SimpleDonkeyManager
                 {
                     string folderPath = dialog.SelectedPath;
 
-                    lblFolderPath.Text = folderPath;
-
+                    // .jpg 이미지 파일 수집
                     string[] imageFiles = Directory.GetFiles(folderPath, "*.jpg");
 
+                    // 총 이미지 수 업데이트
                     lblTotalImagesValue.Text = $"{imageFiles.Length:N0} 장";
+
+                    // MainWindow의 상태 라벨 업데이트
+                    if (mainWindow != null)
+                    {
+                        mainWindow.UpdateProgramStatus(
+                            folderPath,
+                            imageFiles.Length,
+                            0,  // 현재는 로드된 프레임이 0
+                            "데이터 폴더 로드 완료"
+                        );
+                    }
                 }
             }
+        }
     }
 }
-    }
-

@@ -161,6 +161,21 @@ namespace SimpleDonkeyManager
             }
         }
 
+        /// <summary>
+        /// 프로그램 상태 라벨 업데이트
+        /// </summary>
+        public void UpdateProgramStatus(string folderPath, int totalImages, int loadedFrames, string status)
+        {
+            // 폴더 경로가 길 경우 짧게 표시
+            string displayPath = folderPath;
+            if (displayPath.Length > 40)
+            {
+                displayPath = "..." + displayPath.Substring(displayPath.Length - 37);
+            }
+
+            lblProgramCon.Text = $"📂 현재 폴더 : {displayPath}    |    프레임 수 : {loadedFrames} / {totalImages}    |    상태 : {status}";
+        }
+
 
     }
 }
