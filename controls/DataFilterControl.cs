@@ -13,7 +13,7 @@ namespace SimpleDonkeyManager
 {
     public partial class DataFilterControl : UserControl
     {
-        private controlutils.ImageList imageList= new controlutils.ImageList();
+        private controlutils.ImageList imageList = new controlutils.ImageList();
         private controlutils.ImageViewer imageViewer = new controlutils.ImageViewer();
         public DataFilterControl()
         {
@@ -62,6 +62,16 @@ namespace SimpleDonkeyManager
             ListViewItem item = new ListViewItem(title);
             item.SubItems.Add(value);
             lstFilterSummary.Items.Add(item);
+        }
+
+        private void lstFilterSummary_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
