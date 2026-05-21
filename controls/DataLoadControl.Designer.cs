@@ -130,6 +130,7 @@
             // 
             // btnSelectFolder
             // 
+            btnSelectFolder.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnSelectFolder.FlatAppearance.BorderColor = Color.DodgerBlue;
             btnSelectFolder.FlatAppearance.MouseOverBackColor = Color.Azure;
             btnSelectFolder.FlatStyle = FlatStyle.Flat;
@@ -186,6 +187,7 @@
             // 
             // btnLoadStart
             // 
+            btnLoadStart.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnLoadStart.FlatAppearance.BorderColor = Color.DodgerBlue;
             btnLoadStart.FlatAppearance.MouseOverBackColor = Color.Azure;
             btnLoadStart.FlatStyle = FlatStyle.Flat;
@@ -201,6 +203,7 @@
             // 
             // btnRefresh
             // 
+            btnRefresh.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnRefresh.FlatAppearance.BorderColor = Color.DodgerBlue;
             btnRefresh.FlatAppearance.MouseOverBackColor = Color.Azure;
             btnRefresh.FlatStyle = FlatStyle.Flat;

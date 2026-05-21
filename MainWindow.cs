@@ -21,7 +21,7 @@ namespace SimpleDonkeyManager
             // Logger의 LogAdded 이벤트 구독
             logger.LogAdded += Logger_LogAdded;
 
-            pnlButtons.Paint += PnlButtons_Paint;
+            tableLayoutPanelButtons.Paint += TableLayoutPanelButtons_Paint;
             pnlConditionView.Paint += PnlConditionView_Paint;
             InitializeControls();
 
@@ -153,11 +153,11 @@ namespace SimpleDonkeyManager
             }
         }
 
-        private void PnlButtons_Paint(object sender, PaintEventArgs e)
+        private void TableLayoutPanelButtons_Paint(object sender, PaintEventArgs e)
         {
             using (Pen pen = new Pen(SystemColors.ControlDark, 1))
             {
-                e.Graphics.DrawLine(pen, 0, pnlButtons.Height - 1, pnlButtons.Width, pnlButtons.Height - 1);
+                e.Graphics.DrawLine(pen, 0, tableLayoutPanelButtons.Height - 1, tableLayoutPanelButtons.Width, tableLayoutPanelButtons.Height - 1);
             }
         }
 

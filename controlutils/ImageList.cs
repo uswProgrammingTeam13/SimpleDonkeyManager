@@ -13,7 +13,7 @@ namespace SimpleDonkeyManager.controlutils
         public ImageList()
         {
             InitializeComponent();
-            // 부모 컨트롤에 추가될 때 크기를 자동으로 채우도록 설정
+            // 부모 컨트롤의 크기 변경에 반응하도록 설정
             this.Dock = DockStyle.Fill;
             this.AutoSize = false;
 
