@@ -116,7 +116,7 @@
             // 
             label4.AutoSize = true;
             label4.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label4.Location = new Point(12, 101);
+            label4.Location = new Point(12, 88);
             label4.Name = "label4";
             label4.Size = new Size(150, 23);
             label4.TabIndex = 2;
@@ -126,7 +126,7 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label3.Location = new Point(12, 66);
+            label3.Location = new Point(12, 53);
             label3.Name = "label3";
             label3.Size = new Size(170, 23);
             label3.TabIndex = 1;
@@ -136,7 +136,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label2.Location = new Point(12, 33);
+            label2.Location = new Point(12, 20);
             label2.Name = "label2";
             label2.Size = new Size(233, 23);
             label2.TabIndex = 0;
