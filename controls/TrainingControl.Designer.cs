@@ -216,18 +216,19 @@
             label8.AutoSize = true;
             label8.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
             label8.ForeColor = SystemColors.ControlText;
-            label8.Location = new Point(31, 331);
+            label8.Location = new Point(31, 330);
             label8.Name = "label8";
             label8.Size = new Size(66, 15);
             label8.TabIndex = 7;
             label8.Text = "patience";
+            label8.Click += label8_Click;
             // 
             // label7
             // 
             label7.AutoSize = true;
             label7.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
             label7.ForeColor = SystemColors.ControlText;
-            label7.Location = new Point(31, 248);
+            label7.Location = new Point(29, 246);
             label7.Name = "label7";
             label7.Size = new Size(46, 15);
             label7.TabIndex = 6;
@@ -238,7 +239,7 @@
             label6.AutoSize = true;
             label6.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
             label6.ForeColor = SystemColors.ControlText;
-            label6.Location = new Point(31, 217);
+            label6.Location = new Point(31, 216);
             label6.Name = "label6";
             label6.Size = new Size(46, 15);
             label6.TabIndex = 5;
@@ -249,7 +250,7 @@
             label5.AutoSize = true;
             label5.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
             label5.ForeColor = SystemColors.ControlText;
-            label5.Location = new Point(29, 186);
+            label5.Location = new Point(31, 185);
             label5.Name = "label5";
             label5.Size = new Size(64, 15);
             label5.TabIndex = 4;
@@ -260,7 +261,7 @@
             label4.AutoSize = true;
             label4.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
             label4.ForeColor = SystemColors.ControlText;
-            label4.Location = new Point(31, 151);
+            label4.Location = new Point(31, 150);
             label4.Name = "label4";
             label4.Size = new Size(77, 15);
             label4.TabIndex = 3;
@@ -318,11 +319,11 @@
             // 
             button4.BackColor = Color.FromArgb(242, 242, 242);
             button4.FlatStyle = FlatStyle.Flat;
-            button4.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            button4.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
             button4.ForeColor = Color.DodgerBlue;
-            button4.Location = new Point(165, 121);
+            button4.Location = new Point(165, 122);
             button4.Name = "button4";
-            button4.Size = new Size(110, 30);
+            button4.Size = new Size(121, 39);
             button4.TabIndex = 3;
             button4.Text = "↻ 초기화";
             button4.UseVisualStyleBackColor = false;
@@ -331,11 +332,11 @@
             // 
             button3.BackColor = Color.FromArgb(242, 242, 242);
             button3.FlatStyle = FlatStyle.Flat;
-            button3.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            button3.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
             button3.ForeColor = Color.DodgerBlue;
-            button3.Location = new Point(29, 121);
+            button3.Location = new Point(29, 122);
             button3.Name = "button3";
-            button3.Size = new Size(110, 30);
+            button3.Size = new Size(121, 39);
             button3.TabIndex = 2;
             button3.Text = "■ 중지";
             button3.UseVisualStyleBackColor = false;
@@ -344,11 +345,11 @@
             // 
             button2.BackColor = Color.FromArgb(242, 242, 242);
             button2.FlatStyle = FlatStyle.Flat;
-            button2.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            button2.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
             button2.ForeColor = Color.DodgerBlue;
-            button2.Location = new Point(165, 58);
+            button2.Location = new Point(165, 59);
             button2.Name = "button2";
-            button2.Size = new Size(110, 30);
+            button2.Size = new Size(121, 39);
             button2.TabIndex = 1;
             button2.Text = "⏸ 일시정지";
             button2.UseVisualStyleBackColor = false;
@@ -357,11 +358,11 @@
             // 
             button1.BackColor = Color.FromArgb(242, 242, 242);
             button1.FlatStyle = FlatStyle.Flat;
-            button1.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            button1.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
             button1.ForeColor = Color.DodgerBlue;
-            button1.Location = new Point(29, 58);
+            button1.Location = new Point(29, 59);
             button1.Name = "button1";
-            button1.Size = new Size(110, 30);
+            button1.Size = new Size(121, 39);
             button1.TabIndex = 0;
             button1.Text = "▶ 시작";
             button1.UseVisualStyleBackColor = false;
@@ -450,7 +451,7 @@
             label12.AutoSize = true;
             label12.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
             label12.ForeColor = SystemColors.ControlText;
-            label12.Location = new Point(20, 136);
+            label12.Location = new Point(20, 141);
             label12.Name = "label12";
             label12.Size = new Size(90, 15);
             label12.TabIndex = 4;
@@ -461,7 +462,7 @@
             label11.AutoSize = true;
             label11.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
             label11.ForeColor = SystemColors.ControlText;
-            label11.Location = new Point(20, 112);
+            label11.Location = new Point(20, 113);
             label11.Name = "label11";
             label11.Size = new Size(64, 15);
             label11.TabIndex = 3;
@@ -508,7 +509,7 @@
             groupBox4.Size = new Size(434, 321);
             groupBox4.TabIndex = 1;
             groupBox4.TabStop = false;
-            groupBox4.Text = "로그 출력";
+            groupBox4.Text = "학습 로그";
             // 
             // richTextBox1
             // 

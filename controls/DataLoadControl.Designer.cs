@@ -104,7 +104,7 @@
             // lblFileSizeValue
             // 
             lblFileSizeValue.AutoSize = true;
-            lblFileSizeValue.Location = new Point(515, 74);
+            lblFileSizeValue.Location = new Point(515, 84);
             lblFileSizeValue.Margin = new Padding(2, 0, 2, 0);
             lblFileSizeValue.Name = "lblFileSizeValue";
             lblFileSizeValue.Size = new Size(72, 21);
@@ -114,7 +114,7 @@
             // lblResolutionValue
             // 
             lblResolutionValue.AutoSize = true;
-            lblResolutionValue.Location = new Point(355, 74);
+            lblResolutionValue.Location = new Point(355, 84);
             lblResolutionValue.Margin = new Padding(2, 0, 2, 0);
             lblResolutionValue.Name = "lblResolutionValue";
             lblResolutionValue.Size = new Size(124, 21);
@@ -124,7 +124,7 @@
             // lblImageFormat
             // 
             lblImageFormat.AutoSize = true;
-            lblImageFormat.Location = new Point(201, 74);
+            lblImageFormat.Location = new Point(201, 84);
             lblImageFormat.Margin = new Padding(2, 0, 2, 0);
             lblImageFormat.Name = "lblImageFormat";
             lblImageFormat.Size = new Size(49, 21);
@@ -134,7 +134,7 @@
             // lblTotalImagesValue
             // 
             lblTotalImagesValue.AutoSize = true;
-            lblTotalImagesValue.Location = new Point(24, 74);
+            lblTotalImagesValue.Location = new Point(24, 84);
             lblTotalImagesValue.Margin = new Padding(2, 0, 2, 0);
             lblTotalImagesValue.Name = "lblTotalImagesValue";
             lblTotalImagesValue.Size = new Size(107, 21);
@@ -181,7 +181,7 @@
             lblFileSizeTitle.AutoSize = true;
             lblFileSizeTitle.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
             lblFileSizeTitle.ForeColor = Color.RoyalBlue;
-            lblFileSizeTitle.Location = new Point(513, 41);
+            lblFileSizeTitle.Location = new Point(513, 51);
             lblFileSizeTitle.Margin = new Padding(2, 0, 2, 0);
             lblFileSizeTitle.Name = "lblFileSizeTitle";
             lblFileSizeTitle.Size = new Size(74, 20);
@@ -194,7 +194,7 @@
             lblResolutionTitle.AutoSize = true;
             lblResolutionTitle.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
             lblResolutionTitle.ForeColor = Color.RoyalBlue;
-            lblResolutionTitle.Location = new Point(355, 41);
+            lblResolutionTitle.Location = new Point(355, 51);
             lblResolutionTitle.Margin = new Padding(2, 0, 2, 0);
             lblResolutionTitle.Name = "lblResolutionTitle";
             lblResolutionTitle.Size = new Size(54, 20);
@@ -206,7 +206,7 @@
             lblFormatTitle.AutoSize = true;
             lblFormatTitle.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
             lblFormatTitle.ForeColor = Color.RoyalBlue;
-            lblFormatTitle.Location = new Point(201, 41);
+            lblFormatTitle.Location = new Point(201, 51);
             lblFormatTitle.Margin = new Padding(2, 0, 2, 0);
             lblFormatTitle.Name = "lblFormatTitle";
             lblFormatTitle.Size = new Size(89, 20);
@@ -218,7 +218,7 @@
             lblTotalImagesTitle.AutoSize = true;
             lblTotalImagesTitle.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
             lblTotalImagesTitle.ForeColor = Color.RoyalBlue;
-            lblTotalImagesTitle.Location = new Point(24, 41);
+            lblTotalImagesTitle.Location = new Point(24, 51);
             lblTotalImagesTitle.Margin = new Padding(2, 0, 2, 0);
             lblTotalImagesTitle.Name = "lblTotalImagesTitle";
             lblTotalImagesTitle.Size = new Size(89, 20);

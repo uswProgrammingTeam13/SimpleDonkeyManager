@@ -40,6 +40,7 @@
             btnSearch = new Button();
             panel1 = new Panel();
             groupBox1 = new GroupBox();
+            checkBox1 = new CheckBox();
             panel1.SuspendLayout();
             groupBox1.SuspendLayout();
             SuspendLayout();
@@ -180,18 +181,30 @@
             // groupBox1
             // 
             groupBox1.BackColor = SystemColors.ControlLightLight;
+            groupBox1.Controls.Add(checkBox1);
             groupBox1.Controls.Add(panel1);
             groupBox1.Controls.Add(btnSearch);
             groupBox1.Controls.Add(listBoxImages);
             groupBox1.Controls.Add(txtSearch);
             groupBox1.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            groupBox1.ForeColor = SystemColors.Highlight;
+            groupBox1.ForeColor = Color.RoyalBlue;
             groupBox1.Location = new Point(3, 5);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(267, 569);
             groupBox1.TabIndex = 8;
             groupBox1.TabStop = false;
             groupBox1.Text = "이미지 선택";
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            checkBox1.Location = new Point(6, 63);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(127, 19);
+            checkBox1.TabIndex = 8;
+            checkBox1.Text = "이미지 전체 선택";
+            checkBox1.UseVisualStyleBackColor = true;
             // 
             // ImageList
             // 
@@ -221,5 +234,6 @@
         private Button btnSearch;
         private Panel panel1;
         private GroupBox groupBox1;
+        private CheckBox checkBox1;
     }
 }
