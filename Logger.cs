@@ -4,9 +4,29 @@ using System.Text;
 
 namespace SimpleDonkeyManager
 {
+    /// <summary>
+    /// 로그가 추가되었을 때 발생하는 이벤트 인자
+    /// </summary>
+    public class LogAddedEventArgs : EventArgs
+    {
+        public string LogMessage { get; set; }
+        public DateTime Timestamp { get; set; }
+
+        public LogAddedEventArgs(string logMessage, DateTime timestamp)
+        {
+            LogMessage = logMessage;
+            Timestamp = timestamp;
+        }
+    }
+
     internal class Logger
     {
         private List<string> logs;
+
+        /// <summary>
+        /// 로그가 추가되었을 때 발생하는 이벤트
+        /// </summary>
+        public event EventHandler<LogAddedEventArgs> LogAdded;
 
         public Logger()
         {
@@ -21,6 +41,17 @@ namespace SimpleDonkeyManager
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             string logEntry = $"[{timestamp}] {message}";
             logs.Add(logEntry);
+
+            // LogAdded 이벤트 발생
+            OnLogAdded(new LogAddedEventArgs(logEntry, DateTime.Now));
+        }
+
+        /// <summary>
+        /// LogAdded 이벤트 발생 메서드
+        /// </summary>
+        protected virtual void OnLogAdded(LogAddedEventArgs e)
+        {
+            LogAdded?.Invoke(this, e);
         }
 
         /// 모든 로그를 List 형식으로 반환합니다.

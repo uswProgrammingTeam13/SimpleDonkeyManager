@@ -31,15 +31,15 @@
             label1 = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
             panel1 = new Panel();
-            panel2 = new Panel();
             tableLayoutPanel2 = new TableLayoutPanel();
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
+            panel2 = new Panel();
             groupBox3 = new GroupBox();
             tableLayoutPanel1.SuspendLayout();
             panel1.SuspendLayout();
-            panel2.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
+            panel2.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -76,16 +76,6 @@
             panel1.Size = new Size(775, 594);
             panel1.TabIndex = 0;
             // 
-            // panel2
-            // 
-            panel2.BackColor = Color.White;
-            panel2.Controls.Add(groupBox3);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(784, 3);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(389, 594);
-            panel2.TabIndex = 1;
-            // 
             // tableLayoutPanel2
             // 
             tableLayoutPanel2.ColumnCount = 1;
@@ -104,6 +94,8 @@
             // groupBox1
             // 
             groupBox1.Dock = DockStyle.Fill;
+            groupBox1.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
+            groupBox1.ForeColor = Color.RoyalBlue;
             groupBox1.Location = new Point(3, 3);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(769, 291);
@@ -114,6 +106,8 @@
             // groupBox2
             // 
             groupBox2.Dock = DockStyle.Fill;
+            groupBox2.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
+            groupBox2.ForeColor = Color.RoyalBlue;
             groupBox2.Location = new Point(3, 300);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(769, 291);
@@ -121,9 +115,21 @@
             groupBox2.TabStop = false;
             groupBox2.Text = "학습 결과 추이";
             // 
+            // panel2
+            // 
+            panel2.BackColor = Color.White;
+            panel2.Controls.Add(groupBox3);
+            panel2.Dock = DockStyle.Fill;
+            panel2.Location = new Point(784, 3);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(389, 594);
+            panel2.TabIndex = 1;
+            // 
             // groupBox3
             // 
             groupBox3.Dock = DockStyle.Fill;
+            groupBox3.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
+            groupBox3.ForeColor = Color.RoyalBlue;
             groupBox3.Location = new Point(0, 0);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(389, 594);
@@ -141,8 +147,8 @@
             Size = new Size(1176, 600);
             tableLayoutPanel1.ResumeLayout(false);
             panel1.ResumeLayout(false);
-            panel2.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
+            panel2.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }

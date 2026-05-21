@@ -42,6 +42,7 @@
             btnResultCon = new Button();
             btnDataFilterCon = new Button();
             pnlConditionView = new Panel();
+            lblProgramCon = new Label();
             ((System.ComponentModel.ISupportInitialize)splLogHelp).BeginInit();
             splLogHelp.Panel1.SuspendLayout();
             splLogHelp.Panel2.SuspendLayout();
@@ -49,6 +50,7 @@
             pnlSplitPanel1.SuspendLayout();
             pnlSplitPanel2.SuspendLayout();
             pnlButtons.SuspendLayout();
+            pnlConditionView.SuspendLayout();
             SuspendLayout();
             // 
             // pnlMainContent
@@ -84,7 +86,7 @@
             // 
             // pnlSplitPanel1
             // 
-            pnlSplitPanel1.BackColor = Color.FromArgb(242, 242, 242);
+            pnlSplitPanel1.BackColor = Color.FromArgb(248, 248, 248);
             pnlSplitPanel1.Controls.Add(richTxtLog);
             pnlSplitPanel1.Controls.Add(LblLog);
             pnlSplitPanel1.Dock = DockStyle.Fill;
@@ -96,8 +98,11 @@
             // 
             // richTxtLog
             // 
+            richTxtLog.BackColor = SystemColors.ControlLightLight;
+            richTxtLog.BorderStyle = BorderStyle.FixedSingle;
             richTxtLog.Location = new Point(8, 29);
             richTxtLog.Name = "richTxtLog";
+            richTxtLog.ReadOnly = true;
             richTxtLog.Size = new Size(560, 137);
             richTxtLog.TabIndex = 1;
             richTxtLog.Text = "";
@@ -105,15 +110,17 @@
             // LblLog
             // 
             LblLog.AutoSize = true;
-            LblLog.Location = new Point(8, 11);
+            LblLog.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
+            LblLog.ForeColor = Color.RoyalBlue;
+            LblLog.Location = new Point(8, 7);
             LblLog.Name = "LblLog";
-            LblLog.Size = new Size(31, 15);
+            LblLog.Size = new Size(78, 19);
             LblLog.TabIndex = 0;
-            LblLog.Text = "로그";
+            LblLog.Text = "실행 로그";
             // 
             // pnlSplitPanel2
             // 
-            pnlSplitPanel2.BackColor = Color.FromArgb(242, 242, 242);
+            pnlSplitPanel2.BackColor = Color.FromArgb(248, 248, 248);
             pnlSplitPanel2.Controls.Add(richTxtHelp);
             pnlSplitPanel2.Controls.Add(LblHelp);
             pnlSplitPanel2.Dock = DockStyle.Fill;
@@ -125,6 +132,7 @@
             // 
             // richTxtHelp
             // 
+            richTxtHelp.BorderStyle = BorderStyle.FixedSingle;
             richTxtHelp.Location = new Point(13, 29);
             richTxtHelp.Name = "richTxtHelp";
             richTxtHelp.Size = new Size(560, 137);
@@ -134,11 +142,13 @@
             // LblHelp
             // 
             LblHelp.AutoSize = true;
-            LblHelp.Location = new Point(13, 11);
+            LblHelp.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
+            LblHelp.ForeColor = Color.RoyalBlue;
+            LblHelp.Location = new Point(13, 7);
             LblHelp.Name = "LblHelp";
-            LblHelp.Size = new Size(43, 15);
+            LblHelp.Size = new Size(72, 19);
             LblHelp.TabIndex = 0;
-            LblHelp.Text = "도움말";
+            LblHelp.Text = "도움말 ?";
             // 
             // pnlButtons
             // 
@@ -202,10 +212,22 @@
             // pnlConditionView
             // 
             pnlConditionView.BackColor = Color.FromArgb(230, 230, 230);
+            pnlConditionView.Controls.Add(lblProgramCon);
             pnlConditionView.Location = new Point(0, 859);
             pnlConditionView.Name = "pnlConditionView";
             pnlConditionView.Size = new Size(1184, 37);
             pnlConditionView.TabIndex = 3;
+            // 
+            // lblProgramCon
+            // 
+            lblProgramCon.AutoSize = true;
+            lblProgramCon.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            lblProgramCon.ForeColor = SystemColors.ControlDarkDark;
+            lblProgramCon.Location = new Point(12, 9);
+            lblProgramCon.Name = "lblProgramCon";
+            lblProgramCon.Size = new Size(536, 19);
+            lblProgramCon.TabIndex = 0;
+            lblProgramCon.Text = "📂 현재 폴더 : -    |    프레임 수 : - / -    |    상태 : 데이터 폴더 로드 대기";
             // 
             // MainWindow
             // 
@@ -228,6 +250,8 @@
             pnlSplitPanel2.ResumeLayout(false);
             pnlSplitPanel2.PerformLayout();
             pnlButtons.ResumeLayout(false);
+            pnlConditionView.ResumeLayout(false);
+            pnlConditionView.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -247,5 +271,6 @@
         private Label LblHelp;
         private RichTextBox richTxtLog;
         private RichTextBox richTxtHelp;
+        private Label lblProgramCon;
     }
 }

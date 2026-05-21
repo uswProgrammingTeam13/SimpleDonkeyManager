@@ -32,5 +32,10 @@ namespace SimpleDonkeyManager.controlutils
         {
 
         }
+
+        private void lblTitle_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

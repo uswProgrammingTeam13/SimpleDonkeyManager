@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            lblTitle = new Label();
             txtSearch = new TextBox();
             listBoxImages = new ListBox();
             btnPrev = new Button();
@@ -40,54 +39,50 @@
             btnNext = new Button();
             btnSearch = new Button();
             panel1 = new Panel();
+            groupBox1 = new GroupBox();
+            checkBox1 = new CheckBox();
             panel1.SuspendLayout();
+            groupBox1.SuspendLayout();
             SuspendLayout();
-            // 
-            // lblTitle
-            // 
-            lblTitle.AutoSize = true;
-            lblTitle.Font = new Font("맑은 고딕", 12F, FontStyle.Regular, GraphicsUnit.Point, 129);
-            lblTitle.Location = new Point(15, 7);
-            lblTitle.Margin = new Padding(2, 0, 2, 0);
-            lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(90, 21);
-            lblTitle.TabIndex = 0;
-            lblTitle.Text = "이미지목록";
             // 
             // txtSearch
             // 
             txtSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtSearch.Font = new Font("맑은 고딕", 12F, FontStyle.Regular, GraphicsUnit.Point, 129);
-            txtSearch.Location = new Point(12, 39);
+            txtSearch.BorderStyle = BorderStyle.FixedSingle;
+            txtSearch.Font = new Font("나눔고딕", 12F, FontStyle.Regular, GraphicsUnit.Point, 129);
+            txtSearch.Location = new Point(8, 31);
             txtSearch.Margin = new Padding(2, 1, 2, 1);
             txtSearch.Name = "txtSearch";
             txtSearch.PlaceholderText = "이미지 검색...";
-            txtSearch.Size = new Size(258, 29);
+            txtSearch.Size = new Size(250, 26);
             txtSearch.TabIndex = 1;
             // 
             // listBoxImages
             // 
             listBoxImages.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            listBoxImages.Font = new Font("나눔고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
             listBoxImages.FormattingEnabled = true;
-            listBoxImages.Location = new Point(12, 81);
+            listBoxImages.Location = new Point(8, 86);
             listBoxImages.Margin = new Padding(2, 1, 2, 1);
             listBoxImages.Name = "listBoxImages";
-            listBoxImages.Size = new Size(255, 439);
+            listBoxImages.Size = new Size(250, 429);
             listBoxImages.TabIndex = 2;
             // 
             // btnPrev
             // 
-            btnPrev.Location = new Point(8, 8);
+            btnPrev.FlatStyle = FlatStyle.Flat;
+            btnPrev.Location = new Point(2, 2);
             btnPrev.Margin = new Padding(2, 1, 2, 1);
             btnPrev.Name = "btnPrev";
-            btnPrev.Size = new Size(28, 26);
+            btnPrev.Size = new Size(32, 28);
             btnPrev.TabIndex = 0;
             btnPrev.Text = "<";
             btnPrev.UseVisualStyleBackColor = true;
             // 
             // btn1
             // 
-            btn1.Location = new Point(38, 6);
+            btn1.FlatStyle = FlatStyle.Flat;
+            btn1.Location = new Point(36, 2);
             btn1.Margin = new Padding(2, 1, 2, 1);
             btn1.Name = "btn1";
             btn1.Size = new Size(33, 28);
@@ -97,7 +92,8 @@
             // 
             // btn2
             // 
-            btn2.Location = new Point(74, 6);
+            btn2.FlatStyle = FlatStyle.Flat;
+            btn2.Location = new Point(72, 2);
             btn2.Margin = new Padding(2, 1, 2, 1);
             btn2.Name = "btn2";
             btn2.Size = new Size(34, 28);
@@ -107,7 +103,8 @@
             // 
             // btn3
             // 
-            btn3.Location = new Point(111, 6);
+            btn3.FlatStyle = FlatStyle.Flat;
+            btn3.Location = new Point(109, 2);
             btn3.Margin = new Padding(2, 1, 2, 1);
             btn3.Name = "btn3";
             btn3.Size = new Size(29, 28);
@@ -118,7 +115,8 @@
             // btnDots
             // 
             btnDots.Enabled = false;
-            btnDots.Location = new Point(143, 6);
+            btnDots.FlatStyle = FlatStyle.Flat;
+            btnDots.Location = new Point(141, 2);
             btnDots.Margin = new Padding(2, 1, 2, 1);
             btnDots.Name = "btnDots";
             btnDots.Size = new Size(30, 28);
@@ -128,7 +126,8 @@
             // 
             // btnLast
             // 
-            btnLast.Location = new Point(176, 6);
+            btnLast.FlatStyle = FlatStyle.Flat;
+            btnLast.Location = new Point(174, 2);
             btnLast.Margin = new Padding(2, 1, 2, 1);
             btnLast.Name = "btnLast";
             btnLast.Size = new Size(35, 28);
@@ -138,7 +137,8 @@
             // 
             // btnNext
             // 
-            btnNext.Location = new Point(214, 6);
+            btnNext.FlatStyle = FlatStyle.Flat;
+            btnNext.Location = new Point(212, 2);
             btnNext.Margin = new Padding(2, 1, 2, 1);
             btnNext.Name = "btnNext";
             btnNext.Size = new Size(30, 28);
@@ -150,18 +150,21 @@
             // btnSearch
             // 
             btnSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            btnSearch.Location = new Point(233, 43);
+            btnSearch.FlatStyle = FlatStyle.Flat;
+            btnSearch.Font = new Font("나눔고딕", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnSearch.Location = new Point(222, 33);
             btnSearch.Margin = new Padding(2, 1, 2, 1);
             btnSearch.Name = "btnSearch";
             btnSearch.Size = new Size(32, 20);
             btnSearch.TabIndex = 4;
-            btnSearch.Text = "⌕";
+            btnSearch.Text = "q";
             btnSearch.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
             panel1.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             panel1.BackColor = Color.White;
+            panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(btnPrev);
             panel1.Controls.Add(btn1);
             panel1.Controls.Add(btn2);
@@ -169,34 +172,56 @@
             panel1.Controls.Add(btnDots);
             panel1.Controls.Add(btnNext);
             panel1.Controls.Add(btnLast);
-            panel1.Location = new Point(12, 532);
+            panel1.Location = new Point(7, 523);
             panel1.Margin = new Padding(2, 1, 2, 1);
             panel1.Name = "panel1";
             panel1.Size = new Size(250, 35);
             panel1.TabIndex = 7;
             // 
+            // groupBox1
+            // 
+            groupBox1.BackColor = SystemColors.ControlLightLight;
+            groupBox1.Controls.Add(checkBox1);
+            groupBox1.Controls.Add(panel1);
+            groupBox1.Controls.Add(btnSearch);
+            groupBox1.Controls.Add(listBoxImages);
+            groupBox1.Controls.Add(txtSearch);
+            groupBox1.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            groupBox1.ForeColor = Color.RoyalBlue;
+            groupBox1.Location = new Point(3, 5);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(267, 569);
+            groupBox1.TabIndex = 8;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "이미지 선택";
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            checkBox1.Location = new Point(6, 63);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(127, 19);
+            checkBox1.TabIndex = 8;
+            checkBox1.Text = "이미지 전체 선택";
+            checkBox1.UseVisualStyleBackColor = true;
+            // 
             // ImageList
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.Inherit;
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            BackColor = SystemColors.Control;
-            Controls.Add(panel1);
-            Controls.Add(btnSearch);
-            Controls.Add(listBoxImages);
-            Controls.Add(txtSearch);
-            Controls.Add(lblTitle);
+            BackColor = SystemColors.ControlLightLight;
+            Controls.Add(groupBox1);
             Name = "ImageList";
-            Size = new Size(279, 579);
+            Size = new Size(273, 577);
             panel1.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
-
-        private Label lblTitle;
         private TextBox txtSearch;
         private ListBox listBoxImages;
         private Button btnPrev;
@@ -208,5 +233,7 @@
         private Button btnNext;
         private Button btnSearch;
         private Panel panel1;
+        private GroupBox groupBox1;
+        private CheckBox checkBox1;
     }
 }
