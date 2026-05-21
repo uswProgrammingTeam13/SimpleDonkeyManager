@@ -164,7 +164,7 @@
             comboBox1.Font = new Font("나눔고딕", 11.999999F, FontStyle.Bold, GraphicsUnit.Point, 129);
             comboBox1.FormattingEnabled = true;
             comboBox1.Items.AddRange(new object[] { "0.5x", "1.0x", "2.0x" });
-            comboBox1.Location = new Point(408, 27);
+            comboBox1.Location = new Point(411, 7);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(86, 36);
             comboBox1.TabIndex = 8;
@@ -174,7 +174,7 @@
             // 
             label9.AutoSize = true;
             label9.Font = new Font("나눔고딕", 14F, FontStyle.Bold);
-            label9.Location = new Point(340, 29);
+            label9.Location = new Point(343, 9);
             label9.Name = "label9";
             label9.Size = new Size(68, 32);
             label9.TabIndex = 7;
@@ -183,7 +183,7 @@
             // button6
             // 
             button6.Font = new Font("맑은 고딕", 16F);
-            button6.Location = new Point(92, 20);
+            button6.Location = new Point(95, 0);
             button6.Name = "button6";
             button6.Size = new Size(55, 55);
             button6.TabIndex = 6;
@@ -195,7 +195,7 @@
             button5.BackColor = Color.DodgerBlue;
             button5.Font = new Font("맑은 고딕", 16F);
             button5.ForeColor = SystemColors.ControlLightLight;
-            button5.Location = new Point(156, 20);
+            button5.Location = new Point(159, 0);
             button5.Name = "button5";
             button5.Size = new Size(55, 55);
             button5.TabIndex = 5;
@@ -205,7 +205,7 @@
             // button2
             // 
             button2.Font = new Font("맑은 고딕", 16F);
-            button2.Location = new Point(217, 20);
+            button2.Location = new Point(220, 0);
             button2.Name = "button2";
             button2.Size = new Size(55, 55);
             button2.TabIndex = 4;
@@ -215,7 +215,7 @@
             // button1
             // 
             button1.Font = new Font("맑은 고딕", 16F);
-            button1.Location = new Point(31, 21);
+            button1.Location = new Point(34, 1);
             button1.Name = "button1";
             button1.Size = new Size(55, 55);
             button1.TabIndex = 0;
