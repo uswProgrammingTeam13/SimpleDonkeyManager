@@ -12,15 +12,24 @@ namespace SimpleDonkeyManager
     {
 
         private controlutils.ImageList imageList = new controlutils.ImageList();
+        private controlutils.ImageViewer imageViewer = new controlutils.ImageViewer();
         private MainWindow mainWindow;
 
         public DataLoadControl()
         {
             InitializeComponent();
 
+            // ImageList 설정
             imageList.Dock = DockStyle.Fill;
             imageList.Visible = true;
             pnlFrameList.Controls.Add(imageList);
+
+            // ImageViewer 설정
+            imageViewer.Dock = DockStyle.Fill;
+            imageViewer.AutoSize = false;
+            imageViewer.Visible = true;
+            pnlImageView.Controls.Clear();
+            pnlImageView.Controls.Add(imageViewer);
         }
 
         private void DataLoadControl_Load(object sender, EventArgs e)
