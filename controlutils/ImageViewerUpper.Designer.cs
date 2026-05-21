@@ -29,31 +29,31 @@
         private void InitializeComponent()
         {
             tableLayoutPanel1 = new TableLayoutPanel();
+            trackBar2 = new TrackBar();
             pictureBox1 = new PictureBox();
             panel1 = new Panel();
-            label2 = new Label();
-            label3 = new Label();
             label4 = new Label();
-            panel2 = new Panel();
-            label5 = new Label();
-            label6 = new Label();
-            label7 = new Label();
+            label3 = new Label();
+            label2 = new Label();
             panel3 = new Panel();
-            button1 = new Button();
-            button2 = new Button();
-            button5 = new Button();
-            button6 = new Button();
-            trackBar2 = new TrackBar();
-            label9 = new Label();
             comboBox1 = new ComboBox();
+            label9 = new Label();
+            button6 = new Button();
+            button5 = new Button();
+            button2 = new Button();
+            button1 = new Button();
+            panel2 = new Panel();
+            label7 = new Label();
+            label6 = new Label();
+            label5 = new Label();
             panel4 = new Panel();
             label8 = new Label();
             tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             panel1.SuspendLayout();
-            panel2.SuspendLayout();
             panel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
+            panel2.SuspendLayout();
             panel4.SuspendLayout();
             SuspendLayout();
             // 
@@ -81,6 +81,17 @@
             tableLayoutPanel1.Size = new Size(556, 990);
             tableLayoutPanel1.TabIndex = 0;
             // 
+            // trackBar2
+            // 
+            trackBar2.Dock = DockStyle.Fill;
+            trackBar2.Location = new Point(3, 734);
+            trackBar2.Maximum = 12345;
+            trackBar2.Minimum = 1;
+            trackBar2.Name = "trackBar2";
+            trackBar2.Size = new Size(550, 80);
+            trackBar2.TabIndex = 6;
+            trackBar2.Value = 1;
+            // 
             // pictureBox1
             // 
             pictureBox1.Dock = DockStyle.Fill;
@@ -103,15 +114,15 @@
             panel1.Size = new Size(550, 155);
             panel1.TabIndex = 2;
             // 
-            // label2
+            // label4
             // 
-            label2.AutoSize = true;
-            label2.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label2.Location = new Point(12, 33);
-            label2.Name = "label2";
-            label2.Size = new Size(233, 23);
-            label2.TabIndex = 0;
-            label2.Text = "Frame: 0001 / 12,345";
+            label4.AutoSize = true;
+            label4.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            label4.Location = new Point(12, 101);
+            label4.Name = "label4";
+            label4.Size = new Size(150, 23);
+            label4.TabIndex = 2;
+            label4.Text = "Throttle: 0.18";
             // 
             // label3
             // 
@@ -123,56 +134,15 @@
             label3.TabIndex = 1;
             label3.Text = "Angle: 0.24 rad";
             // 
-            // label4
+            // label2
             // 
-            label4.AutoSize = true;
-            label4.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label4.Location = new Point(12, 101);
-            label4.Name = "label4";
-            label4.Size = new Size(150, 23);
-            label4.TabIndex = 2;
-            label4.Text = "Throttle: 0.18";
-            // 
-            // panel2
-            // 
-            panel2.Controls.Add(label7);
-            panel2.Controls.Add(label6);
-            panel2.Controls.Add(label5);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(3, 820);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(550, 58);
-            panel2.TabIndex = 4;
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label5.Location = new Point(3, 0);
-            label5.Name = "label5";
-            label5.Size = new Size(23, 23);
-            label5.TabIndex = 0;
-            label5.Text = "1";
-            // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label6.Location = new Point(195, 0);
-            label6.Name = "label6";
-            label6.Size = new Size(150, 23);
-            label6.TabIndex = 1;
-            label6.Text = "0001 / 12345";
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label7.Location = new Point(472, -3);
-            label7.Name = "label7";
-            label7.Size = new Size(75, 23);
-            label7.TabIndex = 2;
-            label7.Text = "12345";
+            label2.AutoSize = true;
+            label2.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            label2.Location = new Point(12, 33);
+            label2.Name = "label2";
+            label2.Size = new Size(233, 23);
+            label2.TabIndex = 0;
+            label2.Text = "Frame: 0001 / 12,345";
             // 
             // panel3
             // 
@@ -189,79 +159,110 @@
             panel3.TabIndex = 5;
             panel3.Paint += panel3_Paint;
             // 
+            // comboBox1
+            // 
+            comboBox1.Font = new Font("나눔고딕", 11.999999F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Items.AddRange(new object[] { "0.5x", "1.0x", "2.0x" });
+            comboBox1.Location = new Point(408, 27);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(86, 36);
+            comboBox1.TabIndex = 8;
+            comboBox1.Text = "1.0x";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Font = new Font("나눔고딕", 14F, FontStyle.Bold);
+            label9.Location = new Point(340, 29);
+            label9.Name = "label9";
+            label9.Size = new Size(68, 32);
+            label9.TabIndex = 7;
+            label9.Text = "배속";
+            // 
+            // button6
+            // 
+            button6.Font = new Font("맑은 고딕", 16F);
+            button6.Location = new Point(92, 20);
+            button6.Name = "button6";
+            button6.Size = new Size(55, 55);
+            button6.TabIndex = 6;
+            button6.Text = "◀";
+            button6.UseVisualStyleBackColor = true;
+            // 
+            // button5
+            // 
+            button5.BackColor = Color.DodgerBlue;
+            button5.Font = new Font("맑은 고딕", 16F);
+            button5.ForeColor = SystemColors.ControlLightLight;
+            button5.Location = new Point(156, 20);
+            button5.Name = "button5";
+            button5.Size = new Size(55, 55);
+            button5.TabIndex = 5;
+            button5.Text = "▶";
+            button5.UseVisualStyleBackColor = false;
+            // 
+            // button2
+            // 
+            button2.Font = new Font("맑은 고딕", 16F);
+            button2.Location = new Point(217, 20);
+            button2.Name = "button2";
+            button2.Size = new Size(55, 55);
+            button2.TabIndex = 4;
+            button2.Text = "⏭";
+            button2.UseVisualStyleBackColor = true;
+            // 
             // button1
             // 
-            button1.Font = new Font("맑은 고딕", 13F);
-            button1.Location = new Point(43, 28);
+            button1.Font = new Font("맑은 고딕", 16F);
+            button1.Location = new Point(31, 21);
             button1.Name = "button1";
-            button1.Size = new Size(45, 45);
+            button1.Size = new Size(55, 55);
             button1.TabIndex = 0;
             button1.Text = "⏮";
             button1.TextAlign = ContentAlignment.TopCenter;
             button1.UseVisualStyleBackColor = true;
             // 
-            // button2
+            // panel2
             // 
-            button2.Font = new Font("맑은 고딕", 13F);
-            button2.Location = new Point(200, 28);
-            button2.Name = "button2";
-            button2.Size = new Size(45, 45);
-            button2.TabIndex = 4;
-            button2.Text = "⏭";
-            button2.UseVisualStyleBackColor = true;
+            panel2.Controls.Add(label7);
+            panel2.Controls.Add(label6);
+            panel2.Controls.Add(label5);
+            panel2.Dock = DockStyle.Fill;
+            panel2.Location = new Point(3, 820);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(550, 58);
+            panel2.TabIndex = 4;
             // 
-            // button5
+            // label7
             // 
-            button5.BackColor = Color.DodgerBlue;
-            button5.Font = new Font("맑은 고딕", 13F);
-            button5.ForeColor = SystemColors.ControlLightLight;
-            button5.Location = new Point(149, 28);
-            button5.Name = "button5";
-            button5.Size = new Size(45, 45);
-            button5.TabIndex = 5;
-            button5.Text = "▶";
-            button5.UseVisualStyleBackColor = false;
+            label7.AutoSize = true;
+            label7.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            label7.Location = new Point(472, -3);
+            label7.Name = "label7";
+            label7.Size = new Size(75, 23);
+            label7.TabIndex = 2;
+            label7.Text = "12345";
             // 
-            // button6
+            // label6
             // 
-            button6.Font = new Font("맑은 고딕", 13F);
-            button6.Location = new Point(94, 28);
-            button6.Name = "button6";
-            button6.Size = new Size(45, 45);
-            button6.TabIndex = 6;
-            button6.Text = "◀";
-            button6.UseVisualStyleBackColor = true;
+            label6.AutoSize = true;
+            label6.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            label6.Location = new Point(195, 0);
+            label6.Name = "label6";
+            label6.Size = new Size(150, 23);
+            label6.TabIndex = 1;
+            label6.Text = "0001 / 12345";
             // 
-            // trackBar2
+            // label5
             // 
-            trackBar2.Dock = DockStyle.Fill;
-            trackBar2.Location = new Point(3, 734);
-            trackBar2.Maximum = 12345;
-            trackBar2.Minimum = 1;
-            trackBar2.Name = "trackBar2";
-            trackBar2.Size = new Size(550, 80);
-            trackBar2.TabIndex = 6;
-            trackBar2.Value = 1;
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label9.Location = new Point(352, 44);
-            label9.Name = "label9";
-            label9.Size = new Size(50, 23);
-            label9.TabIndex = 7;
-            label9.Text = "배속";
-            // 
-            // comboBox1
-            // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Items.AddRange(new object[] { "0.5x", "1.0x", "2.0x" });
-            comboBox1.Location = new Point(408, 38);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(86, 33);
-            comboBox1.TabIndex = 8;
-            comboBox1.Text = "1.0x";
+            label5.AutoSize = true;
+            label5.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            label5.Location = new Point(3, 0);
+            label5.Name = "label5";
+            label5.Size = new Size(23, 23);
+            label5.TabIndex = 0;
+            label5.Text = "1";
             // 
             // panel4
             // 
@@ -293,14 +294,14 @@
             Size = new Size(556, 990);
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)trackBar2).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
-            panel2.ResumeLayout(false);
-            panel2.PerformLayout();
             panel3.ResumeLayout(false);
             panel3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)trackBar2).EndInit();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
             ResumeLayout(false);
