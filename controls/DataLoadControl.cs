@@ -5,6 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
+using System.Text.Json;
 
 namespace SimpleDonkeyManager
 {
@@ -19,6 +21,7 @@ namespace SimpleDonkeyManager
         {
             InitializeComponent();
 
+            // ImageList 설정
             imageList.Dock = DockStyle.Fill;
             imageList.Visible = true;
             pnlFrameList.Controls.Add(imageList);

@@ -67,6 +67,7 @@
             richTextBox1 = new RichTextBox();
             panel3 = new Panel();
             groupBox5 = new GroupBox();
+            imageViewerUpper1 = new SimpleDonkeyManager.controlutils.ImageViewerUpper();
             tableLayoutPanel1.SuspendLayout();
             panel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
@@ -535,6 +536,7 @@
             // groupBox5
             // 
             groupBox5.BackColor = Color.FromArgb(248, 248, 248);
+            groupBox5.Controls.Add(imageViewerUpper1);
             groupBox5.Dock = DockStyle.Fill;
             groupBox5.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
             groupBox5.ForeColor = Color.RoyalBlue;
@@ -544,6 +546,14 @@
             groupBox5.TabIndex = 0;
             groupBox5.TabStop = false;
             groupBox5.Text = "이미지 미리보기";
+            // 
+            // imageViewerUpper1
+            // 
+            imageViewerUpper1.Dock = DockStyle.Fill;
+            imageViewerUpper1.Location = new Point(3, 25);
+            imageViewerUpper1.Name = "imageViewerUpper1";
+            imageViewerUpper1.Size = new Size(389, 566);
+            imageViewerUpper1.TabIndex = 0;
             // 
             // TrainingControl
             // 
@@ -604,6 +614,7 @@
         private ProgressBar progressBar1;
         private RichTextBox richTextBox1;
         private GroupBox groupBox5;
+        private SimpleDonkeyManager.controlutils.ImageViewerUpper imageViewerUpper1;
         private GroupBox groupBox1;
         private GroupBox groupBox2;
         private Button button4;

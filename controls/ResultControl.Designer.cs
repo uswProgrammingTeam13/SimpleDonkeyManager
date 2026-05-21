@@ -36,6 +36,7 @@
             groupBox2 = new GroupBox();
             panel2 = new Panel();
             groupBox3 = new GroupBox();
+            imageViewerUpper1 = new SimpleDonkeyManager.controlutils.ImageViewerUpper();
             tableLayoutPanel1.SuspendLayout();
             panel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
@@ -127,6 +128,7 @@
             // 
             // groupBox3
             // 
+            groupBox3.Controls.Add(imageViewerUpper1);
             groupBox3.Dock = DockStyle.Fill;
             groupBox3.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
             groupBox3.ForeColor = Color.RoyalBlue;
@@ -136,6 +138,14 @@
             groupBox3.TabIndex = 0;
             groupBox3.TabStop = false;
             groupBox3.Text = "이미지 미리보기";
+            // 
+            // imageViewerUpper1
+            // 
+            imageViewerUpper1.Dock = DockStyle.Fill;
+            imageViewerUpper1.Location = new Point(3, 25);
+            imageViewerUpper1.Name = "imageViewerUpper1";
+            imageViewerUpper1.Size = new Size(383, 566);
+            imageViewerUpper1.TabIndex = 0;
             // 
             // ResultControl
             // 
@@ -163,5 +173,6 @@
         private GroupBox groupBox1;
         private GroupBox groupBox2;
         private GroupBox groupBox3;
+        private SimpleDonkeyManager.controlutils.ImageViewerUpper imageViewerUpper1;
     }
 }
