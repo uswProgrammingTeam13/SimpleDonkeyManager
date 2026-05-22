@@ -29,10 +29,9 @@
         private void InitializeComponent()
         {
             tableLayoutPanel1 = new TableLayoutPanel();
-            tableLayoutPanel2 = new TableLayoutPanel();
-            tableLayoutPanel3 = new TableLayoutPanel();
-            pnlImageView = new Panel();
             pnlFrameList = new Panel();
+            tableLayoutPanel2 = new TableLayoutPanel();
+            pnlImageView = new Panel();
             groupBox1 = new GroupBox();
             btnSelectFolder = new Button();
             lblFileSizeValue = new Label();
@@ -45,13 +44,13 @@
             lblResolutionTitle = new Label();
             lblFormatTitle = new Label();
             lblTotalImagesTitle = new Label();
+            tableLayoutPanel3 = new TableLayoutPanel();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
-            tableLayoutPanel3.SuspendLayout();
             groupBox1.SuspendLayout();
             SuspendLayout();
             // 
-            // tableLayoutPanel1 (메인 2열: 좌측 이미지 리스트, 우측 컨텐츠)
+            // tableLayoutPanel1
             // 
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 23F));
@@ -66,7 +65,16 @@
             tableLayoutPanel1.Size = new Size(1176, 600);
             tableLayoutPanel1.TabIndex = 14;
             // 
-            // tableLayoutPanel2 (우측 2행: 위 이미지, 아래 정보)
+            // pnlFrameList
+            // 
+            pnlFrameList.BackColor = Color.FromArgb(248, 248, 248);
+            pnlFrameList.Dock = DockStyle.Fill;
+            pnlFrameList.Location = new Point(3, 3);
+            pnlFrameList.Name = "pnlFrameList";
+            pnlFrameList.Size = new Size(264, 594);
+            pnlFrameList.TabIndex = 2;
+            // 
+            // tableLayoutPanel2
             // 
             tableLayoutPanel2.ColumnCount = 1;
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
@@ -76,32 +84,19 @@
             tableLayoutPanel2.Location = new Point(273, 3);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 2;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 70F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 77.27273F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 22.727272F));
             tableLayoutPanel2.Size = new Size(900, 594);
             tableLayoutPanel2.TabIndex = 0;
-            // 
-            // tableLayoutPanel3 (사용하지 않음 - pnlImageView가 직접 포함됨)
             // 
             // pnlImageView
             // 
             pnlImageView.BackColor = Color.FromArgb(248, 248, 248);
             pnlImageView.Dock = DockStyle.Fill;
             pnlImageView.Location = new Point(3, 3);
-            pnlImageView.Margin = new Padding(3);
             pnlImageView.Name = "pnlImageView";
-            pnlImageView.Size = new Size(894, 409);
+            pnlImageView.Size = new Size(894, 453);
             pnlImageView.TabIndex = 1;
-            // 
-            // pnlFrameList
-            // 
-            pnlFrameList.BackColor = Color.FromArgb(248, 248, 248);
-            pnlFrameList.Dock = DockStyle.Fill;
-            pnlFrameList.Location = new Point(3, 3);
-            pnlFrameList.Margin = new Padding(3);
-            pnlFrameList.Name = "pnlFrameList";
-            pnlFrameList.Size = new Size(264, 594);
-            pnlFrameList.TabIndex = 2;
             // 
             // groupBox1
             // 
@@ -120,10 +115,9 @@
             groupBox1.Dock = DockStyle.Fill;
             groupBox1.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold, GraphicsUnit.Point, 129);
             groupBox1.ForeColor = Color.RoyalBlue;
-            groupBox1.Location = new Point(3, 415);
-            groupBox1.Margin = new Padding(3);
+            groupBox1.Location = new Point(3, 462);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(894, 173);
+            groupBox1.Size = new Size(894, 129);
             groupBox1.TabIndex = 3;
             groupBox1.TabStop = false;
             groupBox1.Text = "데이터 폴더 로드";
@@ -272,6 +266,13 @@
             lblTotalImagesTitle.Text = "전체 이미지";
             lblTotalImagesTitle.Click += label2_Click;
             // 
+            // tableLayoutPanel3
+            // 
+            tableLayoutPanel3.Location = new Point(0, 0);
+            tableLayoutPanel3.Name = "tableLayoutPanel3";
+            tableLayoutPanel3.Size = new Size(200, 100);
+            tableLayoutPanel3.TabIndex = 0;
+            // 
             // DataLoadControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -283,7 +284,6 @@
             Load += DataLoadControl_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
-            tableLayoutPanel3.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ResumeLayout(false);

@@ -38,9 +38,9 @@
             LblHelp = new Label();
             tableLayoutPanelButtons = new TableLayoutPanel();
             btnDataLoadCon = new Button();
+            btnDataFilterCon = new Button();
             btnTraningCon = new Button();
             btnResultCon = new Button();
-            btnDataFilterCon = new Button();
             pnlConditionView = new Panel();
             lblProgramCon = new Label();
             ((System.ComponentModel.ISupportInitialize)splLogHelp).BeginInit();
@@ -61,19 +61,15 @@
             pnlMainContent.Location = new Point(0, 60);
             pnlMainContent.Margin = new Padding(0);
             pnlMainContent.Name = "pnlMainContent";
-            pnlMainContent.Size = new Size(1184, 799);
+            pnlMainContent.Size = new Size(1184, 690);
             pnlMainContent.TabIndex = 0;
             // 
             // splLogHelp
             // 
             splLogHelp.BackColor = Color.FromArgb(248, 248, 248);
             splLogHelp.Dock = DockStyle.Bottom;
-            splLogHelp.Location = new Point(0, 733);
+            splLogHelp.Location = new Point(0, 750);
             splLogHelp.Name = "splLogHelp";
-            splLogHelp.Size = new Size(1184, 103);
-            splLogHelp.TabIndex = 1;
-            splLogHelp.SplitterDistance = 584;
-            splLogHelp.SplitterWidth = 8;
             // 
             // splLogHelp.Panel1
             // 
@@ -86,6 +82,10 @@
             splLogHelp.Panel2.BackColor = SystemColors.ControlLight;
             splLogHelp.Panel2.Controls.Add(pnlSplitPanel2);
             splLogHelp.Panel2MinSize = 350;
+            splLogHelp.Size = new Size(1184, 103);
+            splLogHelp.SplitterDistance = 584;
+            splLogHelp.SplitterWidth = 8;
+            splLogHelp.TabIndex = 1;
             // 
             // pnlSplitPanel1
             // 
@@ -97,7 +97,7 @@
             pnlSplitPanel1.Margin = new Padding(0);
             pnlSplitPanel1.MinimumSize = new Size(300, 150);
             pnlSplitPanel1.Name = "pnlSplitPanel1";
-            pnlSplitPanel1.Size = new Size(584, 178);
+            pnlSplitPanel1.Size = new Size(584, 150);
             pnlSplitPanel1.TabIndex = 0;
             // 
             // richTxtLog
@@ -105,11 +105,11 @@
             richTxtLog.BackColor = SystemColors.ControlLightLight;
             richTxtLog.BorderStyle = BorderStyle.FixedSingle;
             richTxtLog.Dock = DockStyle.Fill;
-            richTxtLog.Location = new Point(8, 29);
+            richTxtLog.Location = new Point(0, 19);
             richTxtLog.Margin = new Padding(0);
             richTxtLog.Name = "richTxtLog";
             richTxtLog.ReadOnly = true;
-            richTxtLog.Size = new Size(568, 141);
+            richTxtLog.Size = new Size(584, 131);
             richTxtLog.TabIndex = 1;
             richTxtLog.Text = "";
             // 
@@ -119,7 +119,7 @@
             LblLog.Dock = DockStyle.Top;
             LblLog.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
             LblLog.ForeColor = Color.RoyalBlue;
-            LblLog.Location = new Point(8, 7);
+            LblLog.Location = new Point(0, 0);
             LblLog.Name = "LblLog";
             LblLog.Size = new Size(78, 19);
             LblLog.TabIndex = 0;
@@ -135,17 +135,17 @@
             pnlSplitPanel2.Margin = new Padding(0);
             pnlSplitPanel2.MinimumSize = new Size(300, 150);
             pnlSplitPanel2.Name = "pnlSplitPanel2";
-            pnlSplitPanel2.Size = new Size(584, 178);
+            pnlSplitPanel2.Size = new Size(592, 150);
             pnlSplitPanel2.TabIndex = 0;
             // 
             // richTxtHelp
             // 
             richTxtHelp.BorderStyle = BorderStyle.FixedSingle;
             richTxtHelp.Dock = DockStyle.Fill;
-            richTxtHelp.Location = new Point(13, 29);
+            richTxtHelp.Location = new Point(0, 19);
             richTxtHelp.Margin = new Padding(0);
             richTxtHelp.Name = "richTxtHelp";
-            richTxtHelp.Size = new Size(568, 141);
+            richTxtHelp.Size = new Size(592, 131);
             richTxtHelp.TabIndex = 2;
             richTxtHelp.Text = "";
             // 
@@ -155,13 +155,11 @@
             LblHelp.Dock = DockStyle.Top;
             LblHelp.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
             LblHelp.ForeColor = Color.RoyalBlue;
-            LblHelp.Location = new Point(13, 7);
+            LblHelp.Location = new Point(0, 0);
             LblHelp.Name = "LblHelp";
             LblHelp.Size = new Size(57, 19);
             LblHelp.TabIndex = 0;
             LblHelp.Text = "도움말";
-            // 
-            // pnlButtons (이제 사용 안 함 - tableLayoutPanelButtons로 대체)
             // 
             // tableLayoutPanelButtons
             // 
@@ -189,18 +187,35 @@
             btnDataLoadCon.Dock = DockStyle.Fill;
             btnDataLoadCon.Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
             btnDataLoadCon.ForeColor = Color.RoyalBlue;
+            btnDataLoadCon.Location = new Point(5, 5);
             btnDataLoadCon.Margin = new Padding(5);
             btnDataLoadCon.Name = "btnDataLoadCon";
+            btnDataLoadCon.Size = new Size(286, 50);
             btnDataLoadCon.TabIndex = 2;
             btnDataLoadCon.Text = "📂 데이터 불러오기";
             btnDataLoadCon.UseVisualStyleBackColor = true;
+            // 
+            // btnDataFilterCon
+            // 
+            btnDataFilterCon.Dock = DockStyle.Fill;
+            btnDataFilterCon.Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnDataFilterCon.ForeColor = Color.RoyalBlue;
+            btnDataFilterCon.Location = new Point(301, 5);
+            btnDataFilterCon.Margin = new Padding(5);
+            btnDataFilterCon.Name = "btnDataFilterCon";
+            btnDataFilterCon.Size = new Size(286, 50);
+            btnDataFilterCon.TabIndex = 1;
+            btnDataFilterCon.Text = "🔍 데이터 필터링";
+            btnDataFilterCon.UseVisualStyleBackColor = true;
             // 
             // btnTraningCon
             // 
             btnTraningCon.Dock = DockStyle.Fill;
             btnTraningCon.Font = new Font("맑은 고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnTraningCon.Location = new Point(597, 5);
             btnTraningCon.Margin = new Padding(5);
             btnTraningCon.Name = "btnTraningCon";
+            btnTraningCon.Size = new Size(286, 50);
             btnTraningCon.TabIndex = 5;
             btnTraningCon.Text = "▶ 학습 실행";
             btnTraningCon.UseVisualStyleBackColor = true;
@@ -209,41 +224,32 @@
             // 
             btnResultCon.Dock = DockStyle.Fill;
             btnResultCon.Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnResultCon.Location = new Point(893, 5);
             btnResultCon.Margin = new Padding(5);
             btnResultCon.Name = "btnResultCon";
+            btnResultCon.Size = new Size(286, 50);
             btnResultCon.TabIndex = 4;
             btnResultCon.Text = "📈 학습 결과 확인";
             btnResultCon.UseVisualStyleBackColor = true;
-            // 
-            // btnDataFilterCon
-            // 
-            btnDataFilterCon.Dock = DockStyle.Fill;
-            btnDataFilterCon.Font = new Font("맑은 고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            btnDataFilterCon.ForeColor = Color.RoyalBlue;
-            btnDataFilterCon.Margin = new Padding(5);
-            btnDataFilterCon.Name = "btnDataFilterCon";
-            btnDataFilterCon.TabIndex = 1;
-            btnDataFilterCon.Text = "🔍 데이터 필터링";
-            btnDataFilterCon.UseVisualStyleBackColor = true;
             // 
             // pnlConditionView
             // 
             pnlConditionView.BackColor = Color.FromArgb(230, 230, 230);
             pnlConditionView.Controls.Add(lblProgramCon);
             pnlConditionView.Dock = DockStyle.Bottom;
-            pnlConditionView.Location = new Point(0, 836);
+            pnlConditionView.Location = new Point(0, 853);
             pnlConditionView.Margin = new Padding(0);
             pnlConditionView.Name = "pnlConditionView";
-            pnlConditionView.Size = new Size(1184, 37);
+            pnlConditionView.Size = new Size(1184, 20);
             pnlConditionView.TabIndex = 3;
             // 
             // lblProgramCon
             // 
             lblProgramCon.AutoSize = true;
-            lblProgramCon.Dock = DockStyle.Left;
+            lblProgramCon.Dock = DockStyle.Bottom;
             lblProgramCon.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
             lblProgramCon.ForeColor = SystemColors.ControlDarkDark;
-            lblProgramCon.Location = new Point(12, 9);
+            lblProgramCon.Location = new Point(0, 1);
             lblProgramCon.Name = "lblProgramCon";
             lblProgramCon.Size = new Size(536, 19);
             lblProgramCon.TabIndex = 0;

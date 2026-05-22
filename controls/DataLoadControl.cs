@@ -28,7 +28,7 @@ namespace SimpleDonkeyManager
 
             imageViewer.Dock = DockStyle.Fill;
             imageViewer.Visible = true;
-            mainPan.Controls.Add(imageViewer);
+            pnlImageView.Controls.Add(imageViewer);
 
             // 이미지 선택 이벤트 구독
             imageList.ImageSelected += ImageList_ImageSelected;
