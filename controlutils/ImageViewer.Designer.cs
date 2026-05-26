@@ -251,7 +251,7 @@
             button3.Name = "button3";
             button3.Size = new Size(64, 26);
             button3.TabIndex = 11;
-            button3.Text = "▶ 재생";
+            button3.Text = "재생";
             button3.UseVisualStyleBackColor = true;
             // 
             // button4

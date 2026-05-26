@@ -16,6 +16,7 @@ namespace SimpleDonkeyManager
         private controlutils.ImageList imageList = new controlutils.ImageList();
         private controlutils.ImageViewer imageViewer = new controlutils.ImageViewer();
         private MainWindow mainWindow;
+        private ImageManager imageManager = new ImageManager();
 
         public DataLoadControl()
         {
@@ -49,6 +50,20 @@ namespace SimpleDonkeyManager
         {
             // 부모 폼(MainWindow) 찾기
             mainWindow = this.FindForm() as MainWindow;
+
+            // 초기 상태 - 데이터 폴더 선택 전
+            InitializeDefaultState();
+        }
+
+        /// <summary>
+        /// 초기 상태 설정
+        /// </summary>
+        private void InitializeDefaultState()
+        {
+            lblTotalImagesValue.Text = "- 장";
+            lblImageFormat.Text = "-";
+            lblResolutionValue.Text = "- x -";
+            lblFileSizeValue.Text = "- byte";
         }
 
 
@@ -92,27 +107,70 @@ namespace SimpleDonkeyManager
                 {
                     string folderPath = dialog.SelectedPath;
 
-                    // .jpg 이미지 파일 수집
-                    string[] imageFiles = Directory.GetFiles(folderPath, "*.jpg");
+                    // 폴더 스캔 (이미지 및 JSON 파일)
+                    if (!imageManager.ScanFolder(folderPath))
+                    {
+                        MessageBox.Show("폴더 스캔에 실패했습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
-                    // 리스트에 이미지 로드
-                    imageList.LoadImages(imageFiles);
+                    // 폴더 통계 정보 가져오기
+                    FolderStatistics stats = imageManager.GetFolderStatistics();
 
-                    // 총 이미지 수 업데이트
-                    lblTotalImagesValue.Text = $"{imageFiles.Length:N0} 장";
+                    // UI 업데이트 - 이미지 정보 표시
+                    lblTotalImagesValue.Text = $"{stats.TotalImageCount:N0} 장";
+                    lblImageFormat.Text = stats.ImageFormats.Length > 0 ? string.Join(", ", stats.ImageFormats) : "Unknown";
+                    lblResolutionValue.Text = stats.Resolutions.Count > 0 ? string.Join(", ", stats.Resolutions) : "Unknown";
+                    lblFileSizeValue.Text = stats.GetFormattedFileSize();
 
                     // MainWindow의 상태 라벨 업데이트
                     if (mainWindow != null)
                     {
                         mainWindow.UpdateProgramStatus(
                             folderPath,
-                            imageFiles.Length,
+                            stats.TotalImageCount,
                             0,  // 현재는 로드된 프레임이 0
-                            "데이터 필터링 필요"
+                            "데이터 로드 준비 완료"
                         );
-                        mainWindow.LoadImagesToControls(imageFiles); // 필터 컨트롤에도 이미지 전달
                     }
                 }
+            }
+        }
+
+        private void btnLoadStart_Click(object sender, EventArgs e)
+        {
+            // 폴더가 선택되었는지 확인
+            if (imageManager.GetAllFrameData().Count == 0)
+            {
+                MessageBox.Show("먼저 이미지 폴더를 선택하세요.", "정보", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // ImageList에 프레임 정보 표시
+            List<FrameData> allFrames = imageManager.GetAllFrameData();
+            imageList.LoadFrames(allFrames);
+
+            // ImageList와 ImageViewer에 데이터 전달
+            imageList.SetImageManager(imageManager);
+            imageViewer.SetImageManager(imageManager);
+
+            // 첫 번째 프레임 표시
+            if (allFrames.Count > 0)
+            {
+                imageList.SelectFrame(0);
+            }
+
+            // MainWindow의 DataFilterControl에도 동일한 데이터 전달
+            if (mainWindow != null)
+            {
+                mainWindow.SetFilterControlData(imageManager, allFrames);
+
+                mainWindow.UpdateProgramStatus(
+                    imageManager.SelectedFolderPath,
+                    allFrames.Count,
+                    allFrames.Count,
+                    "데이터 로드 완료"
+                );
             }
         }
     }

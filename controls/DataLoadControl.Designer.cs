@@ -194,6 +194,7 @@
             btnLoadStart.TabIndex = 7;
             btnLoadStart.Text = "데이터 로드";
             btnLoadStart.UseVisualStyleBackColor = true;
+            btnLoadStart.Click += btnLoadStart_Click;
             // 
             // btnRefresh
             // 
