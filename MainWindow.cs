@@ -13,6 +13,14 @@ namespace SimpleDonkeyManager
         private UserControl[] controls;
         private Logger logger;
 
+        /// <summary>
+        /// Logger 인스턴스를 공개적으로 노출합니다.
+        /// </summary>
+        public Logger GetLogger()
+        {
+            return logger;
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,6 +44,10 @@ namespace SimpleDonkeyManager
             dataFilterControl = new DataFilterControl();
             trainingControl = new TrainingControl();
             resultControl = new ResultControl();
+
+            // Logger 주입
+            dataLoadControl.SetLogger(logger);
+            dataFilterControl.SetLogger(logger);
 
             // 배열에 저장 (InitialScreen은 배열에 포함 안 함)
             controls = new UserControl[] { dataLoadControl, dataFilterControl, trainingControl, resultControl };
@@ -86,7 +98,7 @@ namespace SimpleDonkeyManager
 
             btnDataLoadCon.BackColor = SystemColors.Control;
             btnDataFilterCon.BackColor = SystemColors.Control;
-            btnTraningCon.BackColor = SystemColors.Control;
+
             btnResultCon.BackColor = SystemColors.Control;
 
             // 활성화된 버튼에만 색상 변경

@@ -18,6 +18,7 @@ namespace SimpleDonkeyManager.controlutils
         private bool isPlaying = false;
         private double playbackSpeed = 1.0;
         private const int FRAMES_PER_SECOND = 20;
+        private SimpleDonkeyManager.Logger logger;
 
         public ImageViewer()
         {
@@ -45,6 +46,16 @@ namespace SimpleDonkeyManager.controlutils
             playTimer.Tick += PlayTimer_Tick;
 
             UpdateCurrentFrameDisplay();
+
+            logger = null;
+        }
+
+        /// <summary>
+        /// Logger를 설정합니다.
+        /// </summary>
+        public void SetLogger(SimpleDonkeyManager.Logger log)
+        {
+            logger = log;
         }
 
         private void InitializeListView()
@@ -56,132 +67,378 @@ namespace SimpleDonkeyManager.controlutils
 
         public void SetImageManager(SimpleDonkeyManager.ImageManager manager)
         {
-            imageManager = manager;
-            frameDataList = new List<SimpleDonkeyManager.FrameData>(imageManager.GetAllFrameData());
-
-            if (frameDataList.Count > 0)
+            try
             {
-                trackBar1.Maximum = frameDataList.Count - 1;
-                currentFrameIndex = 0;
-                UpdateCurrentFrameDisplay();
+                imageManager = manager;
+
+                if (imageManager == null)
+                {
+                    LogWarning("SetImageManager: ImageManager가 null입니다");
+                    frameDataList = new List<SimpleDonkeyManager.FrameData>();
+                    return;
+                }
+
+                // ImageManager에서 프레임 데이터 가져오기
+                frameDataList = imageManager.GetAllFrameData();
+
+                if (frameDataList == null)
+                {
+                    frameDataList = new List<SimpleDonkeyManager.FrameData>();
+                }
+
+                // TrackBar 설정
+                if (trackBar1 != null && frameDataList.Count > 0)
+                {
+                    trackBar1.Minimum = 0;
+                    trackBar1.Maximum = frameDataList.Count - 1;
+                    trackBar1.Value = 0;
+                    currentFrameIndex = 0;
+                    UpdateCurrentFrameDisplay();
+
+                    // 첫 번째 프레임 자동 표시
+                    try
+                    {
+                        DisplayFrameAtIndex(0);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogWarning($"첫 번째 프레임 자동 표시 오류: {ex.Message}");
+                    }
+                }
+                else if (trackBar1 != null)
+                {
+                    trackBar1.Minimum = 0;
+                    trackBar1.Maximum = 0;
+                    trackBar1.Value = 0;
+                }
+
+                LogInfo($"ImageManager 설정: {frameDataList.Count}개 프레임");
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"SetImageManager 예외: {ex.Message}");
+                frameDataList = new List<SimpleDonkeyManager.FrameData>();
             }
         }
 
         public void DisplayImage(string imagePath)
         {
-            if (File.Exists(imagePath))
+            try
             {
+                if (frameDataList == null || frameDataList.Count == 0)
+                {
+                    LogWarning("DisplayImage: 프레임 데이터가 없습니다");
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(imagePath) || !File.Exists(imagePath))
+                {
+                    LogWarning($"DisplayImage: 이미지 파일 없음: {imagePath}");
+                    return;
+                }
+
+                // imagePath와 일치하는 프레임 찾기
+                int foundIndex = -1;
                 for (int i = 0; i < frameDataList.Count; i++)
                 {
-                    if (frameDataList[i].ImagePath == imagePath)
+                    if (frameDataList[i] != null && frameDataList[i].ImagePath == imagePath)
                     {
-                        currentFrameIndex = i;
+                        foundIndex = i;
                         break;
                     }
                 }
 
+                // 일치하는 프레임을 찾지 못하면 경고 후 반환
+                if (foundIndex < 0)
+                {
+                    LogWarning($"DisplayImage: 프레임 데이터에서 경로를 찾을 수 없음: {imagePath}");
+                    return;
+                }
+
+                currentFrameIndex = foundIndex;
                 DisplayFrameAtIndex(currentFrameIndex);
+
+                if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count && frameDataList[currentFrameIndex] != null)
+                {
+                    LogInfo($"프레임 표시: {frameDataList[currentFrameIndex].FrameNumber}");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"이미지 표시 예외: {ex.Message}");
             }
         }
 
         private void DisplayFrameAtIndex(int index)
         {
-            if (index < 0 || index >= frameDataList.Count)
-                return;
-
-            currentFrameIndex = index;
-            var frameData = frameDataList[index];
-
-            if (File.Exists(frameData.ImagePath))
+            try
             {
-                if (pictureBox1.Image != null)
+                if (frameDataList == null || frameDataList.Count == 0)
                 {
-                    var oldImage = pictureBox1.Image;
-                    pictureBox1.Image = null;
-                    oldImage.Dispose();
+                    LogWarning("DisplayFrameAtIndex: 프레임 데이터가 없습니다");
+                    return;
                 }
 
-                using (var stream = new FileStream(frameData.ImagePath, FileMode.Open, FileAccess.Read))
+                if (index < 0 || index >= frameDataList.Count)
                 {
-                    pictureBox1.Image = Image.FromStream(stream);
+                    LogWarning($"DisplayFrameAtIndex: 인덱스 {index}가 범위를 벗어났습니다 (총 {frameDataList.Count}개)");
+                    return;
+                }
+
+                currentFrameIndex = index;
+                var frameData = frameDataList[index];
+
+                if (frameData == null)
+                {
+                    LogWarning($"DisplayFrameAtIndex: 프레임 데이터가 null입니다 (인덱스 {index})");
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(frameData.ImagePath) || !File.Exists(frameData.ImagePath))
+                {
+                    LogWarning($"DisplayFrameAtIndex: 이미지 파일 없음: {frameData.ImagePath}");
+                    return;
+                }
+
+                try
+                {
+                    if (pictureBox1 != null)
+                    {
+                        // 기존 이미지 정리
+                        if (pictureBox1.Image != null)
+                        {
+                            try
+                            {
+                                var oldImage = pictureBox1.Image;
+                                pictureBox1.Image = null;
+                                oldImage?.Dispose();
+                            }
+                            catch
+                            {
+                                // 이미지 해제 실패 시 계속
+                            }
+                        }
+
+                        // 새 이미지 로드
+                        using (var stream = new FileStream(frameData.ImagePath, FileMode.Open, FileAccess.Read))
+                        {
+                            pictureBox1.Image = Image.FromStream(stream);
+                        }
+                    }
+                }
+                catch (IOException ex)
+                {
+                    LogWarning($"이미지 파일 읽기 오류: {ex.Message}");
+                    return;
+                }
+                catch (OutOfMemoryException ex)
+                {
+                    LogWarning($"이미지 메모리 오류: {ex.Message}");
+                    return;
+                }
+
+                DisplayThumbnails();
+                UpdateJSONInfo(frameData);
+                UpdateCurrentFrameDisplay();
+
+                if (trackBar1 != null && frameDataList.Count > 0)
+                {
+                    try
+                    {
+                        trackBar1.Value = Math.Min(index, trackBar1.Maximum);
+                    }
+                    catch
+                    {
+                        // 트랙바 값 설정 실패 시 계속
+                    }
                 }
             }
-
-            DisplayThumbnails();
-            UpdateJSONInfo(frameData);
-            UpdateCurrentFrameDisplay();
-            trackBar1.Value = index;
+            catch (Exception ex)
+            {
+                LogWarning($"프레임 표시 예외: {ex.Message}");
+            }
         }
 
         private void DisplayThumbnails()
         {
-            if (currentFrameIndex > 0)
+            try
             {
-                var prevFrame = frameDataList[currentFrameIndex - 1];
-                if (File.Exists(prevFrame.ImagePath))
-                {
-                    if (pictureBox2.Image != null)
-                    {
-                        pictureBox2.Image.Dispose();
-                    }
-                    pictureBox2.Image = Image.FromFile(prevFrame.ImagePath);
-                }
-            }
-            else
-            {
-                pictureBox2.Image = null;
-            }
+                if (frameDataList == null || frameDataList.Count == 0)
+                    return;
 
-            if (currentFrameIndex < frameDataList.Count - 1)
-            {
-                var nextFrame = frameDataList[currentFrameIndex + 1];
-                if (File.Exists(nextFrame.ImagePath))
+                // 이전 프레임 썸네일
+                if (currentFrameIndex > 0)
                 {
-                    if (pictureBox3.Image != null)
+                    var prevFrame = frameDataList[currentFrameIndex - 1];
+                    if (prevFrame != null && !string.IsNullOrEmpty(prevFrame.ImagePath) && File.Exists(prevFrame.ImagePath))
                     {
-                        pictureBox3.Image.Dispose();
+                        try
+                        {
+                            if (pictureBox2 != null)
+                            {
+                                if (pictureBox2.Image != null)
+                                {
+                                    pictureBox2.Image?.Dispose();
+                                }
+                                pictureBox2.Image = Image.FromFile(prevFrame.ImagePath);
+                            }
+                        }
+                        catch
+                        {
+                            // 이전 썸네일 로드 실패 시 계속
+                            if (pictureBox2 != null)
+                                pictureBox2.Image = null;
+                        }
                     }
-                    pictureBox3.Image = Image.FromFile(nextFrame.ImagePath);
+                    else if (pictureBox2 != null)
+                    {
+                        pictureBox2.Image = null;
+                    }
+                }
+                else if (pictureBox2 != null)
+                {
+                    pictureBox2.Image = null;
+                }
+
+                // 다음 프레임 썸네일
+                if (currentFrameIndex < frameDataList.Count - 1)
+                {
+                    var nextFrame = frameDataList[currentFrameIndex + 1];
+                    if (nextFrame != null && !string.IsNullOrEmpty(nextFrame.ImagePath) && File.Exists(nextFrame.ImagePath))
+                    {
+                        try
+                        {
+                            if (pictureBox3 != null)
+                            {
+                                if (pictureBox3.Image != null)
+                                {
+                                    pictureBox3.Image?.Dispose();
+                                }
+                                pictureBox3.Image = Image.FromFile(nextFrame.ImagePath);
+                            }
+                        }
+                        catch
+                        {
+                            // 다음 썸네일 로드 실패 시 계속
+                            if (pictureBox3 != null)
+                                pictureBox3.Image = null;
+                        }
+                    }
+                    else if (pictureBox3 != null)
+                    {
+                        pictureBox3.Image = null;
+                    }
+                }
+                else if (pictureBox3 != null)
+                {
+                    pictureBox3.Image = null;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                pictureBox3.Image = null;
+                LogWarning($"썸네일 표시 예외: {ex.Message}");
             }
         }
 
         private void UpdateJSONInfo(SimpleDonkeyManager.FrameData frameData)
         {
-            lstJSONSummary.Items.Clear();
-
-            // 스로틀 정보
-            if (frameData.Metadata.ContainsKey("user/throttle"))
+            try
             {
-                var item = new ListViewItem("스로틀");
-                item.SubItems.Add(frameData.Metadata["user/throttle"].ToString());
-                lstJSONSummary.Items.Add(item);
-            }
+                if (frameData == null)
+                {
+                    if (lstJSONSummary != null)
+                    {
+                        lstJSONSummary.Items.Clear();
+                    }
+                    return;
+                }
 
-            // 앵글 정보
-            if (frameData.Metadata.ContainsKey("user/angle"))
+                if (lstJSONSummary == null)
+                    return;
+
+                lstJSONSummary.Items.Clear();
+
+                if (frameData.Metadata != null)
+                {
+                    // 스로틀 정보
+                    if (frameData.Metadata.ContainsKey("user/throttle"))
+                    {
+                        try
+                        {
+                            var item = new ListViewItem("스로틀");
+                            item.SubItems.Add(frameData.Metadata["user/throttle"]?.ToString() ?? "");
+                            lstJSONSummary.Items.Add(item);
+                        }
+                        catch
+                        {
+                            // 항목 추가 실패 시 계속
+                        }
+                    }
+
+                    // 앵글 정보
+                    if (frameData.Metadata.ContainsKey("user/angle"))
+                    {
+                        try
+                        {
+                            var item = new ListViewItem("앵글");
+                            item.SubItems.Add(frameData.Metadata["user/angle"]?.ToString() ?? "");
+                            lstJSONSummary.Items.Add(item);
+                        }
+                        catch
+                        {
+                            // 항목 추가 실패 시 계속
+                        }
+                    }
+                }
+
+                // 이미지 이름
+                if (!string.IsNullOrEmpty(frameData.ImageFileName))
+                {
+                    try
+                    {
+                        var imgItem = new ListViewItem("이미지");
+                        imgItem.SubItems.Add(frameData.ImageFileName);
+                        lstJSONSummary.Items.Add(imgItem);
+                    }
+                    catch
+                    {
+                        // 항목 추가 실패 시 계속
+                    }
+                }
+            }
+            catch (Exception ex)
             {
-                var item = new ListViewItem("앵글");
-                item.SubItems.Add(frameData.Metadata["user/angle"].ToString());
-                lstJSONSummary.Items.Add(item);
+                LogWarning($"JSON 정보 업데이트 예외: {ex.Message}");
             }
-
-            // 이미지 이름
-            var imgItem = new ListViewItem("이미지");
-            imgItem.SubItems.Add(frameData.ImageFileName);
-            lstJSONSummary.Items.Add(imgItem);
         }
 
         private void UpdateCurrentFrameDisplay()
         {
-            if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count)
+            try
             {
-                var currentFrame = frameDataList[currentFrameIndex];
-                label5.Text = $"현재 : Frame {currentFrame.FrameNumber}";
+                if (label5 == null)
+                    return;
+
+                if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count)
+                {
+                    var currentFrame = frameDataList[currentFrameIndex];
+                    if (currentFrame != null)
+                    {
+                        label5.Text = $"현재 : Frame {currentFrame.FrameNumber}";
+                    }
+                    else
+                    {
+                        label5.Text = "현재 : 프레임 없음";
+                    }
+                }
+                else
+                {
+                    label5.Text = "현재 : 프레임 없음";
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"현재 프레임 표시 업데이트 예외: {ex.Message}");
             }
         }
 
@@ -221,66 +478,193 @@ namespace SimpleDonkeyManager.controlutils
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            if (currentFrameIndex > 0)
+            try
             {
-                DisplayFrameAtIndex(currentFrameIndex - 1);
+                if (frameDataList == null || frameDataList.Count == 0)
+                {
+                    LogWarning("이전 프레임 이동 실패: 프레임 데이터 없음");
+                    return;
+                }
+
+                if (currentFrameIndex > 0)
+                {
+                    DisplayFrameAtIndex(currentFrameIndex - 1);
+                    if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count && frameDataList[currentFrameIndex] != null)
+                    {
+                        LogInfo($"이전 프레임으로 이동: {frameDataList[currentFrameIndex].FrameNumber}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"이전 프레임 이동 예외: {ex.Message}");
             }
         }
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            if (currentFrameIndex < frameDataList.Count - 1)
+            try
             {
-                DisplayFrameAtIndex(currentFrameIndex + 1);
+                if (frameDataList == null || frameDataList.Count == 0)
+                {
+                    LogWarning("다음 프레임 이동 실패: 프레임 데이터 없음");
+                    return;
+                }
+
+                if (currentFrameIndex < frameDataList.Count - 1)
+                {
+                    DisplayFrameAtIndex(currentFrameIndex + 1);
+                    if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count && frameDataList[currentFrameIndex] != null)
+                    {
+                        LogInfo($"다음 프레임으로 이동: {frameDataList[currentFrameIndex].FrameNumber}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"다음 프레임 이동 예외: {ex.Message}");
             }
         }
 
         private void Button3_Click(object sender, EventArgs e)
         {
-            if (!isPlaying)
+            try
             {
-                isPlaying = true;
-                playTimer.Start();
+                if (frameDataList == null || frameDataList.Count == 0)
+                {
+                    LogWarning("재생 실패: 프레임 데이터 없음");
+                    return;
+                }
+
+                if (!isPlaying && playTimer != null)
+                {
+                    isPlaying = true;
+                    playTimer.Start();
+                    LogInfo("재생 시작");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"재생 시작 예외: {ex.Message}");
             }
         }
 
         private void Button4_Click(object sender, EventArgs e)
         {
-            isPlaying = false;
-            playTimer.Stop();
-            currentFrameIndex = 0;
-            DisplayFrameAtIndex(0);
+            try
+            {
+                isPlaying = false;
+                if (playTimer != null)
+                {
+                    playTimer.Stop();
+                }
+                currentFrameIndex = 0;
+                DisplayFrameAtIndex(0);
+                LogInfo("재생 정지 및 초기화");
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"재생 정지 예외: {ex.Message}");
+            }
         }
 
         private void PlayTimer_Tick(object sender, EventArgs e)
         {
-            if (isPlaying && currentFrameIndex < frameDataList.Count - 1)
+            try
             {
-                DisplayFrameAtIndex(currentFrameIndex + 1);
+                if (isPlaying && frameDataList != null && frameDataList.Count > 0)
+                {
+                    if (currentFrameIndex < frameDataList.Count - 1)
+                    {
+                        DisplayFrameAtIndex(currentFrameIndex + 1);
+                    }
+                    else if (isPlaying && playTimer != null)
+                    {
+                        isPlaying = false;
+                        playTimer.Stop();
+                    }
+                }
             }
-            else if (isPlaying)
+            catch (Exception ex)
             {
+                LogWarning($"재생 타이머 예외: {ex.Message}");
                 isPlaying = false;
-                playTimer.Stop();
+                if (playTimer != null)
+                    playTimer.Stop();
             }
         }
 
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string speedText = comboBox1.SelectedItem?.ToString() ?? "1.0";
-            if (double.TryParse(speedText, out double speed))
+            try
             {
-                playbackSpeed = speed;
-                playTimer.Interval = (int)(1000.0 / (FRAMES_PER_SECOND * playbackSpeed));
+                if (comboBox1 == null)
+                    return;
+
+                string speedText = comboBox1.SelectedItem?.ToString() ?? "1.0";
+                if (double.TryParse(speedText, out double speed))
+                {
+                    if (speed > 0)
+                    {
+                        playbackSpeed = speed;
+                        if (playTimer != null)
+                        {
+                            playTimer.Interval = (int)(1000.0 / (FRAMES_PER_SECOND * playbackSpeed));
+                        }
+                        LogInfo($"재생 속도 변경: {speed}x");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"재생 속도 변경 예외: {ex.Message}");
             }
         }
 
         private void TrackBar1_ValueChanged(object sender, EventArgs e)
         {
-            if (!isPlaying)
+            try
             {
-                DisplayFrameAtIndex(trackBar1.Value);
+                if (!isPlaying && trackBar1 != null)
+                {
+                    int value = trackBar1.Value;
+                    if (value >= 0 && value < frameDataList.Count)
+                    {
+                        DisplayFrameAtIndex(value);
+                        if (frameDataList[value] != null)
+                        {
+                            LogInfo($"트랙바로 프레임 이동: {frameDataList[value].FrameNumber}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"트랙바 값 변경 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 정보 로그를 기록합니다.
+        /// </summary>
+        private void LogInfo(string message)
+        {
+            if (logger != null)
+            {
+                logger.AppendLog($"[이미지뷰어] {message}");
+            }
+        }
+
+        /// <summary>
+        /// 경고 로그를 기록합니다.
+        /// </summary>
+        private void LogWarning(string message)
+        {
+            if (logger != null)
+            {
+                logger.AppendLog($"[이미지뷰어 경고] {message}");
             }
         }
     }
 }
+

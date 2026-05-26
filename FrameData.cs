@@ -48,6 +48,45 @@ namespace SimpleDonkeyManager
             Metadata = new Dictionary<string, object>();
         }
 
+        /// <summary>
+        /// Metadata에서 throttle 값을 추출합니다.
+        /// </summary>
+        public double GetThrottle()
+        {
+            if (Metadata.TryGetValue("throttle", out var throttleObj))
+            {
+                if (double.TryParse(throttleObj.ToString(), out double throttle))
+                    return throttle;
+            }
+            return 0.0;
+        }
+
+        /// <summary>
+        /// Metadata에서 angle 값을 추출합니다.
+        /// </summary>
+        public double GetAngle()
+        {
+            if (Metadata.TryGetValue("angle", out var angleObj))
+            {
+                if (double.TryParse(angleObj.ToString(), out double angle))
+                    return angle;
+            }
+            return 0.0;
+        }
+
+        /// <summary>
+        /// Metadata에서 disable 값을 추출합니다.
+        /// </summary>
+        public bool GetDisable()
+        {
+            if (Metadata.TryGetValue("disable", out var disableObj))
+            {
+                if (bool.TryParse(disableObj.ToString(), out bool disable))
+                    return disable;
+            }
+            return false;
+        }
+
         public override string ToString()
         {
             return $"Frame {FrameNumber}: {ImageFileName}";
