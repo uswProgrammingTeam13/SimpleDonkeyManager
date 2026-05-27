@@ -19,7 +19,7 @@ namespace SimpleDonkeyManager
         }
     }
 
-    internal class Logger
+    public class Logger
     {
         private List<string> logs;
 
@@ -32,18 +32,48 @@ namespace SimpleDonkeyManager
         {
             logs = new List<string>();
         }
+        /// <summary>
         /// 로그 메시지를 추가합니다.
+        /// </summary>
         public void AppendLog(string message)
         {
-            if (string.IsNullOrEmpty(message))
-                return;
+            try
+            {
+                if (logs == null)
+                {
+                    logs = new List<string>();
+                }
 
-            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            string logEntry = $"[{timestamp}] {message}";
-            logs.Add(logEntry);
+                if (string.IsNullOrEmpty(message))
+                    return;
 
-            // LogAdded 이벤트 발생
-            OnLogAdded(new LogAddedEventArgs(logEntry, DateTime.Now));
+                try
+                {
+                    string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    string logEntry = $"[{timestamp}] {message}";
+                    logs.Add(logEntry);
+                }
+                catch (ArgumentException)
+                {
+                    // 로그 추가 실패 시 기본 메시지 추가
+                    logs.Add($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [로그 추가 오류]");
+                }
+
+                // LogAdded 이벤트 발생 (이벤트 호출 실패는 무시)
+                try
+                {
+                    OnLogAdded(new LogAddedEventArgs(logs[logs.Count - 1], DateTime.Now));
+                }
+                catch
+                {
+                    // 이벤트 호출 실패는 무시
+                }
+            }
+            catch (Exception ex)
+            {
+                // 최상위 예외도 무시 (로깅 자체가 실패하면 할 수 있는 게 없음)
+                System.Diagnostics.Debug.WriteLine($"Logger 오류: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -51,30 +81,92 @@ namespace SimpleDonkeyManager
         /// </summary>
         protected virtual void OnLogAdded(LogAddedEventArgs e)
         {
-            LogAdded?.Invoke(this, e);
+            try
+            {
+                if (e == null)
+                    return;
+
+                LogAdded?.Invoke(this, e);
+            }
+            catch (Exception ex)
+            {
+                // 이벤트 핸들러 예외는 무시 (로깅 시스템이 중단되면 안 됨)
+                System.Diagnostics.Debug.WriteLine($"LogAdded 이벤트 처리 오류: {ex.Message}");
+            }
         }
 
+        /// <summary>
         /// 모든 로그를 List 형식으로 반환합니다.
+        /// </summary>
         public List<string> GetLogs()
         {
-            return new List<string>(logs);
+            try
+            {
+                if (logs == null)
+                    return new List<string>();
+
+                return new List<string>(logs);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"로그 조회 오류: {ex.Message}");
+                return new List<string>();
+            }
         }
 
+        /// <summary>
         /// 특정 인덱스의 로그를 반환합니다.
+        /// </summary>
         public string GetLog(int index)
         {
-            if (index >= 0 && index < logs.Count)
-                return logs[index];
-            return null;
+            try
+            {
+                if (logs == null || logs.Count == 0)
+                    return null;
+
+                if (index >= 0 && index < logs.Count)
+                    return logs[index];
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"로그 항목 조회 오류: {ex.Message}");
+                return null;
+            }
         }
+
+        /// <summary>
+        /// 로그 개수를 반환합니다.
+        /// </summary>
         public int GetLogCount()
         {
-            return logs.Count;
+            try
+            {
+                return logs?.Count ?? 0;
+            }
+            catch
+            {
+                return 0;
+            }
         }
+
+        /// <summary>
         /// 모든 로그를 지웁니다.
+        /// </summary>
         public void ClearLogs()
         {
-            logs.Clear();
+            try
+            {
+                if (logs != null)
+                {
+                    logs.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"로그 삭제 오류: {ex.Message}");
+            }
         }
     }
 }

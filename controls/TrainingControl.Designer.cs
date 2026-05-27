@@ -1,16 +1,9 @@
-﻿namespace SimpleDonkeyManager
+namespace SimpleDonkeyManager
 {
     partial class TrainingControl
     {
-        /// <summary> 
-        /// 필수 디자이너 변수입니다.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
-        /// 사용 중인 모든 리소스를 정리합니다.
-        /// </summary>
-        /// <param name="disposing">관리되는 리소스를 삭제해야 하면 true이고, 그렇지 않으면 false입니다.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -20,606 +13,252 @@
             base.Dispose(disposing);
         }
 
-        #region 구성 요소 디자이너에서 생성한 코드
-
-        /// <summary> 
-        /// 디자이너 지원에 필요한 메서드입니다. 
-        /// 이 메서드의 내용을 코드 편집기로 수정하지 마세요.
-        /// </summary>
         private void InitializeComponent()
         {
-            label1 = new Label();
-            tableLayoutPanel1 = new TableLayoutPanel();
-            panel1 = new Panel();
-            tableLayoutPanel2 = new TableLayoutPanel();
-            groupBox1 = new GroupBox();
-            checkBox1 = new CheckBox();
-            comboBox6 = new ComboBox();
-            comboBox5 = new ComboBox();
-            comboBox4 = new ComboBox();
-            comboBox3 = new ComboBox();
-            comboBox2 = new ComboBox();
-            label8 = new Label();
-            label7 = new Label();
-            label6 = new Label();
-            label5 = new Label();
-            label4 = new Label();
-            label3 = new Label();
-            comboBox1 = new ComboBox();
-            label2 = new Label();
-            groupBox2 = new GroupBox();
-            button4 = new Button();
-            button3 = new Button();
-            button2 = new Button();
-            button1 = new Button();
-            panel2 = new Panel();
-            tableLayoutPanel3 = new TableLayoutPanel();
-            groupBox3 = new GroupBox();
-            label15 = new Label();
-            label14 = new Label();
-            label13 = new Label();
-            label12 = new Label();
-            label11 = new Label();
-            label10 = new Label();
-            label9 = new Label();
-            progressBar1 = new ProgressBar();
-            groupBox4 = new GroupBox();
-            richTextBox1 = new RichTextBox();
-            panel3 = new Panel();
-            groupBox5 = new GroupBox();
-            imageViewerUpper1 = new SimpleDonkeyManager.controlutils.ImageViewerUpper();
-            tableLayoutPanel1.SuspendLayout();
-            panel1.SuspendLayout();
-            tableLayoutPanel2.SuspendLayout();
-            groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
-            panel2.SuspendLayout();
-            tableLayoutPanel3.SuspendLayout();
-            groupBox3.SuspendLayout();
-            groupBox4.SuspendLayout();
-            panel3.SuspendLayout();
-            SuspendLayout();
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(1133, 576);
-            label1.Name = "label1";
-            label1.Size = new Size(50, 15);
-            label1.TabIndex = 0;
-            label1.Text = "Training";
-            // 
+            System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+            System.Windows.Forms.Panel pnlTrainSettings;
+            System.Windows.Forms.Label lblDataStatus;
+            System.Windows.Forms.Label lblModelType;
+            System.Windows.Forms.Label lblModelPath;
+            System.Windows.Forms.Panel pnlProgress;
+            System.Windows.Forms.Label lblProgressLabel;
+            System.Windows.Forms.ProgressBar prgTrainingProgress;
+            System.Windows.Forms.Label lblProgress;
+            System.Windows.Forms.Panel pnlTrainLog;
+            System.Windows.Forms.Label lblTrainingLog;
+            System.Windows.Forms.ListBox lstTrainingLog;
+            System.Windows.Forms.Panel pnlTrainButtons;
+            System.Windows.Forms.Button btnSelectModelPath;
+            System.Windows.Forms.Button btnStartTraining;
+            System.Windows.Forms.ComboBox cmbModelType;
+            System.Windows.Forms.TextBox txtModelPath;
+
+            tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            pnlTrainSettings = new System.Windows.Forms.Panel();
+            lblDataStatus = new System.Windows.Forms.Label();
+            lblModelType = new System.Windows.Forms.Label();
+            lblModelPath = new System.Windows.Forms.Label();
+            pnlProgress = new System.Windows.Forms.Panel();
+            lblProgressLabel = new System.Windows.Forms.Label();
+            prgTrainingProgress = new System.Windows.Forms.ProgressBar();
+            lblProgress = new System.Windows.Forms.Label();
+            pnlTrainLog = new System.Windows.Forms.Panel();
+            lblTrainingLog = new System.Windows.Forms.Label();
+            lstTrainingLog = new System.Windows.Forms.ListBox();
+            pnlTrainButtons = new System.Windows.Forms.Panel();
+            btnSelectModelPath = new System.Windows.Forms.Button();
+            btnStartTraining = new System.Windows.Forms.Button();
+            cmbModelType = new System.Windows.Forms.ComboBox();
+            txtModelPath = new System.Windows.Forms.TextBox();
+
+            this.SuspendLayout();
+            pnlTrainSettings.SuspendLayout();
+            pnlProgress.SuspendLayout();
+            pnlTrainLog.SuspendLayout();
+            pnlTrainButtons.SuspendLayout();
+
+            // Store references
+            this.lblDataStatus = lblDataStatus;
+            this.cmbModelType = cmbModelType;
+            this.txtModelPath = txtModelPath;
+            this.lstTrainingLog = lstTrainingLog;
+            this.btnStartTraining = btnStartTraining;
+            this.prgTrainingProgress = prgTrainingProgress;
+            this.lblProgress = lblProgress;
+            this.btnSelectModelPath = btnSelectModelPath;
+
             // tableLayoutPanel1
-            // 
-            tableLayoutPanel1.BackColor = SystemColors.ControlLightLight;
-            tableLayoutPanel1.ColumnCount = 3;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 28F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34F));
-            tableLayoutPanel1.Controls.Add(panel1, 0, 0);
-            tableLayoutPanel1.Controls.Add(panel2, 1, 0);
-            tableLayoutPanel1.Controls.Add(panel3, 2, 0);
-            tableLayoutPanel1.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Location = new Point(0, 0);
+            tableLayoutPanel1.ColumnCount = 1;
+            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            tableLayoutPanel1.Controls.Add(pnlTrainSettings, 0, 0);
+            tableLayoutPanel1.Controls.Add(pnlProgress, 0, 1);
+            tableLayoutPanel1.Controls.Add(pnlTrainLog, 0, 2);
+            tableLayoutPanel1.Controls.Add(pnlTrainButtons, 0, 3);
+            tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 1;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(1176, 600);
-            tableLayoutPanel1.TabIndex = 1;
-            // 
-            // panel1
-            // 
-            panel1.BackColor = Color.White;
-            panel1.Controls.Add(tableLayoutPanel2);
-            panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(3, 3);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(323, 594);
-            panel1.TabIndex = 0;
-            // 
-            // tableLayoutPanel2
-            // 
-            tableLayoutPanel2.ColumnCount = 1;
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Controls.Add(groupBox1, 0, 0);
-            tableLayoutPanel2.Controls.Add(groupBox2, 0, 1);
-            tableLayoutPanel2.Dock = DockStyle.Fill;
-            tableLayoutPanel2.Location = new Point(0, 0);
-            tableLayoutPanel2.Name = "tableLayoutPanel2";
-            tableLayoutPanel2.RowCount = 2;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 65F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
-            tableLayoutPanel2.Size = new Size(323, 594);
-            tableLayoutPanel2.TabIndex = 0;
-            // 
-            // groupBox1
-            // 
-            groupBox1.BackColor = Color.FromArgb(248, 248, 248);
-            groupBox1.Controls.Add(checkBox1);
-            groupBox1.Controls.Add(comboBox6);
-            groupBox1.Controls.Add(comboBox5);
-            groupBox1.Controls.Add(comboBox4);
-            groupBox1.Controls.Add(comboBox3);
-            groupBox1.Controls.Add(comboBox2);
-            groupBox1.Controls.Add(label8);
-            groupBox1.Controls.Add(label7);
-            groupBox1.Controls.Add(label6);
-            groupBox1.Controls.Add(label5);
-            groupBox1.Controls.Add(label4);
-            groupBox1.Controls.Add(label3);
-            groupBox1.Controls.Add(comboBox1);
-            groupBox1.Controls.Add(label2);
-            groupBox1.Dock = DockStyle.Fill;
-            groupBox1.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
-            groupBox1.ForeColor = Color.RoyalBlue;
-            groupBox1.Location = new Point(3, 3);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(317, 380);
-            groupBox1.TabIndex = 0;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "학습 설정";
-            groupBox1.Enter += groupBox1_Enter;
-            // 
-            // checkBox1
-            // 
-            checkBox1.AutoSize = true;
-            checkBox1.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            checkBox1.ForeColor = SystemColors.ControlText;
-            checkBox1.Location = new Point(31, 292);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(83, 19);
-            checkBox1.TabIndex = 13;
-            checkBox1.Text = "조기 종료";
-            checkBox1.UseVisualStyleBackColor = true;
-            // 
-            // comboBox6
-            // 
-            comboBox6.FormattingEnabled = true;
-            comboBox6.Location = new Point(135, 322);
-            comboBox6.Name = "comboBox6";
-            comboBox6.Size = new Size(121, 29);
-            comboBox6.TabIndex = 12;
-            // 
-            // comboBox5
-            // 
-            comboBox5.FormattingEnabled = true;
-            comboBox5.Location = new Point(135, 239);
-            comboBox5.Name = "comboBox5";
-            comboBox5.Size = new Size(121, 29);
-            comboBox5.TabIndex = 11;
-            // 
-            // comboBox4
-            // 
-            comboBox4.FormattingEnabled = true;
-            comboBox4.Location = new Point(135, 208);
-            comboBox4.Name = "comboBox4";
-            comboBox4.Size = new Size(121, 29);
-            comboBox4.TabIndex = 10;
-            // 
-            // comboBox3
-            // 
-            comboBox3.FormattingEnabled = true;
-            comboBox3.Location = new Point(135, 177);
-            comboBox3.Name = "comboBox3";
-            comboBox3.Size = new Size(121, 29);
-            comboBox3.TabIndex = 9;
-            // 
-            // comboBox2
-            // 
-            comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(135, 142);
-            comboBox2.Name = "comboBox2";
-            comboBox2.Size = new Size(121, 29);
-            comboBox2.TabIndex = 8;
-            // 
-            // label8
-            // 
-            label8.AutoSize = true;
-            label8.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label8.ForeColor = SystemColors.ControlText;
-            label8.Location = new Point(31, 330);
-            label8.Name = "label8";
-            label8.Size = new Size(66, 15);
-            label8.TabIndex = 7;
-            label8.Text = "patience";
-            label8.Click += label8_Click;
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label7.ForeColor = SystemColors.ControlText;
-            label7.Location = new Point(29, 246);
-            label7.Name = "label7";
-            label7.Size = new Size(46, 15);
-            label7.TabIndex = 6;
-            label7.Text = "학습률";
-            // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label6.ForeColor = SystemColors.ControlText;
-            label6.Location = new Point(31, 216);
-            label6.Name = "label6";
-            label6.Size = new Size(46, 15);
-            label6.TabIndex = 5;
-            label6.Text = "에포크";
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label5.ForeColor = SystemColors.ControlText;
-            label5.Location = new Point(31, 185);
-            label5.Name = "label5";
-            label5.Size = new Size(64, 15);
-            label5.TabIndex = 4;
-            label5.Text = "배치 크기";
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label4.ForeColor = SystemColors.ControlText;
-            label4.Location = new Point(31, 150);
-            label4.Name = "label4";
-            label4.Size = new Size(77, 15);
-            label4.TabIndex = 3;
-            label4.Text = "이미지 크기";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label3.ForeColor = SystemColors.ControlText;
-            label3.Location = new Point(31, 105);
-            label3.Name = "label3";
-            label3.Size = new Size(77, 15);
-            label3.TabIndex = 2;
-            label3.Text = "데이터 경로";
-            // 
-            // comboBox1
-            // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Items.AddRange(new object[] { "Behavior Cloning", "Linear", "Categorical" });
-            comboBox1.Location = new Point(135, 55);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(121, 29);
-            comboBox1.TabIndex = 1;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label2.ForeColor = SystemColors.ControlText;
-            label2.Location = new Point(31, 61);
-            label2.Name = "label2";
-            label2.Size = new Size(64, 15);
-            label2.TabIndex = 0;
-            label2.Text = "모델 선택";
-            // 
-            // groupBox2
-            // 
-            groupBox2.BackColor = Color.FromArgb(248, 248, 248);
-            groupBox2.Controls.Add(button4);
-            groupBox2.Controls.Add(button3);
-            groupBox2.Controls.Add(button2);
-            groupBox2.Controls.Add(button1);
-            groupBox2.Dock = DockStyle.Fill;
-            groupBox2.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
-            groupBox2.ForeColor = Color.RoyalBlue;
-            groupBox2.Location = new Point(3, 389);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(317, 202);
-            groupBox2.TabIndex = 1;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "학습 제어";
-            // 
-            // button4
-            // 
-            button4.BackColor = Color.FromArgb(242, 242, 242);
-            button4.FlatStyle = FlatStyle.Flat;
-            button4.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
-            button4.ForeColor = Color.DodgerBlue;
-            button4.Location = new Point(165, 122);
-            button4.Name = "button4";
-            button4.Size = new Size(121, 39);
-            button4.TabIndex = 3;
-            button4.Text = "↻ 초기화";
-            button4.UseVisualStyleBackColor = false;
-            // 
-            // button3
-            // 
-            button3.BackColor = Color.FromArgb(242, 242, 242);
-            button3.FlatStyle = FlatStyle.Flat;
-            button3.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
-            button3.ForeColor = Color.DodgerBlue;
-            button3.Location = new Point(29, 122);
-            button3.Name = "button3";
-            button3.Size = new Size(121, 39);
-            button3.TabIndex = 2;
-            button3.Text = "■ 중지";
-            button3.UseVisualStyleBackColor = false;
-            // 
-            // button2
-            // 
-            button2.BackColor = Color.FromArgb(242, 242, 242);
-            button2.FlatStyle = FlatStyle.Flat;
-            button2.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
-            button2.ForeColor = Color.DodgerBlue;
-            button2.Location = new Point(165, 59);
-            button2.Name = "button2";
-            button2.Size = new Size(121, 39);
-            button2.TabIndex = 1;
-            button2.Text = "⏸ 일시정지";
-            button2.UseVisualStyleBackColor = false;
-            // 
-            // button1
-            // 
-            button1.BackColor = Color.FromArgb(242, 242, 242);
-            button1.FlatStyle = FlatStyle.Flat;
-            button1.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
-            button1.ForeColor = Color.DodgerBlue;
-            button1.Location = new Point(29, 59);
-            button1.Name = "button1";
-            button1.Size = new Size(121, 39);
-            button1.TabIndex = 0;
-            button1.Text = "▶ 시작";
-            button1.UseVisualStyleBackColor = false;
-            // 
-            // panel2
-            // 
-            panel2.BackColor = Color.White;
-            panel2.Controls.Add(tableLayoutPanel3);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(332, 3);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(440, 594);
-            panel2.TabIndex = 1;
-            // 
-            // tableLayoutPanel3
-            // 
-            tableLayoutPanel3.ColumnCount = 1;
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.Controls.Add(groupBox3, 0, 0);
-            tableLayoutPanel3.Controls.Add(groupBox4, 0, 1);
-            tableLayoutPanel3.Dock = DockStyle.Fill;
-            tableLayoutPanel3.Location = new Point(0, 0);
-            tableLayoutPanel3.Name = "tableLayoutPanel3";
-            tableLayoutPanel3.RowCount = 2;
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
-            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
-            tableLayoutPanel3.Size = new Size(440, 594);
-            tableLayoutPanel3.TabIndex = 0;
-            // 
-            // groupBox3
-            // 
-            groupBox3.BackColor = Color.FromArgb(248, 248, 248);
-            groupBox3.Controls.Add(label15);
-            groupBox3.Controls.Add(label14);
-            groupBox3.Controls.Add(label13);
-            groupBox3.Controls.Add(label12);
-            groupBox3.Controls.Add(label11);
-            groupBox3.Controls.Add(label10);
-            groupBox3.Controls.Add(label9);
-            groupBox3.Controls.Add(progressBar1);
-            groupBox3.Dock = DockStyle.Fill;
-            groupBox3.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
-            groupBox3.ForeColor = Color.RoyalBlue;
-            groupBox3.Location = new Point(3, 3);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(434, 261);
-            groupBox3.TabIndex = 0;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "학습 진행 상태";
-            // 
-            // label15
-            // 
-            label15.AutoSize = true;
-            label15.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label15.ForeColor = SystemColors.ControlText;
-            label15.Location = new Point(20, 220);
-            label15.Name = "label15";
-            label15.Size = new Size(95, 15);
-            label15.TabIndex = 7;
-            label15.Text = "예상 완료 시간";
-            // 
-            // label14
-            // 
-            label14.AutoSize = true;
-            label14.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label14.ForeColor = SystemColors.ControlText;
-            label14.Location = new Point(20, 193);
-            label14.Name = "label14";
-            label14.Size = new Size(64, 15);
-            label14.TabIndex = 6;
-            label14.Text = "결과 시간";
-            // 
-            // label13
-            // 
-            label13.AutoSize = true;
-            label13.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label13.ForeColor = SystemColors.ControlText;
-            label13.Location = new Point(20, 168);
-            label13.Name = "label13";
-            label13.Size = new Size(64, 15);
-            label13.TabIndex = 5;
-            label13.Text = "남은 시간";
-            // 
-            // label12
-            // 
-            label12.AutoSize = true;
-            label12.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label12.ForeColor = SystemColors.ControlText;
-            label12.Location = new Point(20, 141);
-            label12.Name = "label12";
-            label12.Size = new Size(90, 15);
-            label12.TabIndex = 4;
-            label12.Text = "데이터 사용량";
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label11.ForeColor = SystemColors.ControlText;
-            label11.Location = new Point(20, 113);
-            label11.Name = "label11";
-            label11.Size = new Size(64, 15);
-            label11.TabIndex = 3;
-            label11.Text = "현재 단계";
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label10.ForeColor = SystemColors.ControlText;
-            label10.Location = new Point(20, 87);
-            label10.Name = "label10";
-            label10.Size = new Size(80, 15);
-            label10.TabIndex = 2;
-            label10.Text = "현재 epoch";
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label9.ForeColor = SystemColors.ControlText;
-            label9.Location = new Point(20, 34);
-            label9.Name = "label9";
-            label9.Size = new Size(46, 15);
-            label9.TabIndex = 1;
-            label9.Text = "진행률";
-            // 
-            // progressBar1
-            // 
-            progressBar1.Location = new Point(20, 52);
-            progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(392, 23);
-            progressBar1.TabIndex = 0;
-            // 
-            // groupBox4
-            // 
-            groupBox4.BackColor = Color.FromArgb(248, 248, 248);
-            groupBox4.Controls.Add(richTextBox1);
-            groupBox4.Dock = DockStyle.Fill;
-            groupBox4.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
-            groupBox4.ForeColor = Color.RoyalBlue;
-            groupBox4.Location = new Point(3, 270);
-            groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(434, 321);
-            groupBox4.TabIndex = 1;
-            groupBox4.TabStop = false;
-            groupBox4.Text = "학습 로그";
-            // 
-            // richTextBox1
-            // 
-            richTextBox1.BackColor = SystemColors.ControlLightLight;
-            richTextBox1.Dock = DockStyle.Fill;
-            richTextBox1.Location = new Point(3, 25);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.ReadOnly = true;
-            richTextBox1.Size = new Size(428, 293);
-            richTextBox1.TabIndex = 0;
-            richTextBox1.Text = "";
-            // 
-            // panel3
-            // 
-            panel3.BackColor = Color.White;
-            panel3.Controls.Add(groupBox5);
-            panel3.Dock = DockStyle.Fill;
-            panel3.Location = new Point(778, 3);
-            panel3.Name = "panel3";
-            panel3.Size = new Size(395, 594);
-            panel3.TabIndex = 2;
-            // 
-            // groupBox5
-            // 
-            groupBox5.BackColor = Color.FromArgb(248, 248, 248);
-            groupBox5.Controls.Add(imageViewerUpper1);
-            groupBox5.Dock = DockStyle.Fill;
-            groupBox5.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
-            groupBox5.ForeColor = Color.RoyalBlue;
-            groupBox5.Location = new Point(0, 0);
-            groupBox5.Name = "groupBox5";
-            groupBox5.Size = new Size(395, 594);
-            groupBox5.TabIndex = 0;
-            groupBox5.TabStop = false;
-            groupBox5.Text = "이미지 미리보기";
-            // 
-            // imageViewerUpper1
-            // 
-            imageViewerUpper1.Dock = DockStyle.Fill;
-            imageViewerUpper1.Location = new Point(3, 25);
-            imageViewerUpper1.Name = "imageViewerUpper1";
-            imageViewerUpper1.Size = new Size(389, 566);
-            imageViewerUpper1.TabIndex = 0;
-            // 
+            tableLayoutPanel1.RowCount = 4;
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 120F));
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 60F));
+            tableLayoutPanel1.Size = new System.Drawing.Size(600, 500);
+            tableLayoutPanel1.TabIndex = 0;
+
+            // pnlTrainSettings
+            pnlTrainSettings.BackColor = System.Drawing.Color.FromArgb(248, 248, 248);
+            pnlTrainSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            pnlTrainSettings.Controls.Add(lblDataStatus);
+            pnlTrainSettings.Controls.Add(lblModelType);
+            pnlTrainSettings.Controls.Add(cmbModelType);
+            pnlTrainSettings.Controls.Add(lblModelPath);
+            pnlTrainSettings.Controls.Add(txtModelPath);
+            pnlTrainSettings.Controls.Add(btnSelectModelPath);
+            pnlTrainSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            pnlTrainSettings.Location = new System.Drawing.Point(3, 3);
+            pnlTrainSettings.Name = "pnlTrainSettings";
+            pnlTrainSettings.Size = new System.Drawing.Size(594, 114);
+            pnlTrainSettings.TabIndex = 0;
+
+            // lblDataStatus
+            lblDataStatus.AutoSize = true;
+            lblDataStatus.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold);
+            lblDataStatus.Location = new System.Drawing.Point(10, 10);
+            lblDataStatus.Name = "lblDataStatus";
+            lblDataStatus.Size = new System.Drawing.Size(150, 14);
+            lblDataStatus.TabIndex = 0;
+            lblDataStatus.Text = "데이터셋: 준비되지 않음";
+            lblDataStatus.ForeColor = System.Drawing.Color.Red;
+
+            // lblModelType
+            lblModelType.AutoSize = true;
+            lblModelType.Font = new System.Drawing.Font("나눔고딕", 8.999999F, System.Drawing.FontStyle.Bold);
+            lblModelType.Location = new System.Drawing.Point(10, 35);
+            lblModelType.Name = "lblModelType";
+            lblModelType.Size = new System.Drawing.Size(86, 14);
+            lblModelType.TabIndex = 1;
+            lblModelType.Text = "모델 타입:";
+
+            // cmbModelType
+            cmbModelType.FormattingEnabled = true;
+            cmbModelType.Location = new System.Drawing.Point(100, 35);
+            cmbModelType.Name = "cmbModelType";
+            cmbModelType.Size = new System.Drawing.Size(120, 20);
+            cmbModelType.TabIndex = 2;
+
+            // lblModelPath
+            lblModelPath.AutoSize = true;
+            lblModelPath.Font = new System.Drawing.Font("나눔고딕", 8.999999F, System.Drawing.FontStyle.Bold);
+            lblModelPath.Location = new System.Drawing.Point(10, 60);
+            lblModelPath.Name = "lblModelPath";
+            lblModelPath.Size = new System.Drawing.Size(86, 14);
+            lblModelPath.TabIndex = 3;
+            lblModelPath.Text = "모델 경로:";
+
+            // txtModelPath
+            txtModelPath.Location = new System.Drawing.Point(100, 60);
+            txtModelPath.Name = "txtModelPath";
+            txtModelPath.ReadOnly = true;
+            txtModelPath.Size = new System.Drawing.Size(380, 20);
+            txtModelPath.TabIndex = 4;
+
+            // btnSelectModelPath
+            btnSelectModelPath.Location = new System.Drawing.Point(490, 60);
+            btnSelectModelPath.Name = "btnSelectModelPath";
+            btnSelectModelPath.Size = new System.Drawing.Size(90, 24);
+            btnSelectModelPath.TabIndex = 5;
+            btnSelectModelPath.Text = "경로 선택";
+            btnSelectModelPath.UseVisualStyleBackColor = true;
+
+            // pnlProgress
+            pnlProgress.BackColor = System.Drawing.Color.FromArgb(242, 242, 242);
+            pnlProgress.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            pnlProgress.Controls.Add(lblProgressLabel);
+            pnlProgress.Controls.Add(prgTrainingProgress);
+            pnlProgress.Controls.Add(lblProgress);
+            pnlProgress.Dock = System.Windows.Forms.DockStyle.Fill;
+            pnlProgress.Location = new System.Drawing.Point(3, 123);
+            pnlProgress.Name = "pnlProgress";
+            pnlProgress.Size = new System.Drawing.Size(594, 74);
+            pnlProgress.TabIndex = 1;
+
+            // lblProgressLabel
+            lblProgressLabel.AutoSize = true;
+            lblProgressLabel.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold);
+            lblProgressLabel.Location = new System.Drawing.Point(10, 5);
+            lblProgressLabel.Name = "lblProgressLabel";
+            lblProgressLabel.Size = new System.Drawing.Size(87, 14);
+            lblProgressLabel.TabIndex = 0;
+            lblProgressLabel.Text = "학습 진행도:";
+
+            // prgTrainingProgress
+            prgTrainingProgress.Location = new System.Drawing.Point(10, 25);
+            prgTrainingProgress.Name = "prgTrainingProgress";
+            prgTrainingProgress.Size = new System.Drawing.Size(530, 23);
+            prgTrainingProgress.TabIndex = 1;
+            prgTrainingProgress.Value = 0;
+
+            // lblProgress
+            lblProgress.AutoSize = true;
+            lblProgress.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold);
+            lblProgress.Location = new System.Drawing.Point(550, 25);
+            lblProgress.Name = "lblProgress";
+            lblProgress.Size = new System.Drawing.Size(30, 14);
+            lblProgress.TabIndex = 2;
+            lblProgress.Text = "0%";
+
+            // pnlTrainLog
+            pnlTrainLog.BackColor = System.Drawing.Color.FromArgb(242, 242, 242);
+            pnlTrainLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            pnlTrainLog.Controls.Add(lblTrainingLog);
+            pnlTrainLog.Controls.Add(lstTrainingLog);
+            pnlTrainLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            pnlTrainLog.Location = new System.Drawing.Point(3, 203);
+            pnlTrainLog.Name = "pnlTrainLog";
+            pnlTrainLog.Size = new System.Drawing.Size(594, 230);
+            pnlTrainLog.TabIndex = 2;
+
+            // lblTrainingLog
+            lblTrainingLog.AutoSize = true;
+            lblTrainingLog.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold);
+            lblTrainingLog.Location = new System.Drawing.Point(10, 5);
+            lblTrainingLog.Name = "lblTrainingLog";
+            lblTrainingLog.Size = new System.Drawing.Size(87, 14);
+            lblTrainingLog.TabIndex = 0;
+            lblTrainingLog.Text = "학습 로그:";
+
+            // lstTrainingLog
+            lstTrainingLog.FormattingEnabled = true;
+            lstTrainingLog.Location = new System.Drawing.Point(10, 25);
+            lstTrainingLog.Name = "lstTrainingLog";
+            lstTrainingLog.Size = new System.Drawing.Size(570, 200);
+            lstTrainingLog.TabIndex = 1;
+
+            // pnlTrainButtons
+            pnlTrainButtons.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
+            pnlTrainButtons.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            pnlTrainButtons.Controls.Add(btnStartTraining);
+            pnlTrainButtons.Dock = System.Windows.Forms.DockStyle.Fill;
+            pnlTrainButtons.Location = new System.Drawing.Point(3, 439);
+            pnlTrainButtons.Name = "pnlTrainButtons";
+            pnlTrainButtons.Size = new System.Drawing.Size(594, 54);
+            pnlTrainButtons.TabIndex = 3;
+
+            // btnStartTraining
+            btnStartTraining.BackColor = System.Drawing.SystemColors.Highlight;
+            btnStartTraining.Font = new System.Drawing.Font("나눔고딕", 10.2F, System.Drawing.FontStyle.Bold);
+            btnStartTraining.ForeColor = System.Drawing.Color.White;
+            btnStartTraining.Location = new System.Drawing.Point(150, 10);
+            btnStartTraining.Name = "btnStartTraining";
+            btnStartTraining.Size = new System.Drawing.Size(300, 35);
+            btnStartTraining.TabIndex = 0;
+            btnStartTraining.Text = "▷ 학습 시작";
+            btnStartTraining.UseVisualStyleBackColor = false;
+
             // TrainingControl
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(tableLayoutPanel1);
-            Controls.Add(label1);
-            Name = "TrainingControl";
-            Size = new Size(1176, 600);
-            tableLayoutPanel1.ResumeLayout(false);
-            panel1.ResumeLayout(false);
-            tableLayoutPanel2.ResumeLayout(false);
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
-            groupBox2.ResumeLayout(false);
-            panel2.ResumeLayout(false);
-            tableLayoutPanel3.ResumeLayout(false);
-            groupBox3.ResumeLayout(false);
-            groupBox3.PerformLayout();
-            groupBox4.ResumeLayout(false);
-            panel3.ResumeLayout(false);
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(tableLayoutPanel1);
+            this.Name = "TrainingControl";
+            this.Size = new System.Drawing.Size(600, 500);
+
+            this.ResumeLayout(false);
+            pnlTrainSettings.ResumeLayout(false);
+            pnlTrainSettings.PerformLayout();
+            pnlProgress.ResumeLayout(false);
+            pnlProgress.PerformLayout();
+            pnlTrainLog.ResumeLayout(false);
+            pnlTrainLog.PerformLayout();
+            pnlTrainButtons.ResumeLayout(false);
         }
 
-        #endregion
-
-        private Label label1;
-        private TableLayoutPanel tableLayoutPanel1;
-        private Panel panel1;
-        private TableLayoutPanel tableLayoutPanel2;
-        private Label label5;
-        private Label label4;
-        private Label label3;
-        private ComboBox comboBox1;
-        private Label label2;
-        private Panel panel2;
-        private Panel panel3;
-        private ComboBox comboBox6;
-        private ComboBox comboBox5;
-        private ComboBox comboBox4;
-        private ComboBox comboBox3;
-        private ComboBox comboBox2;
-        private Label label8;
-        private Label label7;
-        private Label label6;
-        private CheckBox checkBox1;
-        private TableLayoutPanel tableLayoutPanel3;
-        private GroupBox groupBox3;
-        private GroupBox groupBox4;
-        private Label label15;
-        private Label label14;
-        private Label label13;
-        private Label label12;
-        private Label label11;
-        private Label label10;
-        private Label label9;
-        private ProgressBar progressBar1;
-        private RichTextBox richTextBox1;
-        private GroupBox groupBox5;
-        private SimpleDonkeyManager.controlutils.ImageViewerUpper imageViewerUpper1;
-        private GroupBox groupBox1;
-        private GroupBox groupBox2;
-        private Button button4;
-        private Button button3;
-        private Button button2;
-        private Button button1;
+        private System.Windows.Forms.Label lblDataStatus;
+        private System.Windows.Forms.ComboBox cmbModelType;
+        private System.Windows.Forms.TextBox txtModelPath;
+        private System.Windows.Forms.ListBox lstTrainingLog;
+        private System.Windows.Forms.Button btnStartTraining;
+        private System.Windows.Forms.ProgressBar prgTrainingProgress;
+        private System.Windows.Forms.Label lblProgress;
+        private System.Windows.Forms.Button btnSelectModelPath;
     }
 }

@@ -1,0 +1,29 @@
+"""
+donkeycar configuration file
+"""
+
+# PATHS
+CAR_PATH = ""
+DATA_PATH = "./data"
+MODELS_PATH = "./models"
+
+# CAMERA
+CAMERA_TYPE = "PICAMERA"
+CAMERA_WIDTH = 160
+CAMERA_HEIGHT = 120
+CAMERA_FRAMERATE = 20
+CAMERA_ISO = 400
+CAMERA_EXPOSURE_MODE = "sports"
+
+# TRAINING
+TRAIN_TEST_SPLIT = 0.8
+BATCH_SIZE = 32
+EPOCHS = 100
+
+# MODEL TYPE
+MODEL_TYPE = "linear"  # linear, inferred, tensorrt_linear, tflite_linear
+
+# PATHS
+DEFAULT_MODEL_NAME = "mypilot"
+DEFAULT_THROTTLE = 0.0
+DEFAULT_STEERING = 0.0

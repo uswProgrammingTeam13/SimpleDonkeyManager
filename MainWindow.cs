@@ -13,6 +13,14 @@ namespace SimpleDonkeyManager
         private UserControl[] controls;
         private Logger logger;
 
+        /// <summary>
+        /// Logger 인스턴스를 공개적으로 노출합니다.
+        /// </summary>
+        public Logger GetLogger()
+        {
+            return logger;
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,6 +44,11 @@ namespace SimpleDonkeyManager
             dataFilterControl = new DataFilterControl();
             trainingControl = new TrainingControl();
             resultControl = new ResultControl();
+
+            // Logger 주입
+            dataLoadControl.SetLogger(logger);
+            dataFilterControl.SetLogger(logger);
+            trainingControl.SetLogger(logger);
 
             // 배열에 저장 (InitialScreen은 배열에 포함 안 함)
             controls = new UserControl[] { dataLoadControl, dataFilterControl, trainingControl, resultControl };
@@ -86,7 +99,7 @@ namespace SimpleDonkeyManager
 
             btnDataLoadCon.BackColor = SystemColors.Control;
             btnDataFilterCon.BackColor = SystemColors.Control;
-            btnTraningCon.BackColor = SystemColors.Control;
+
             btnResultCon.BackColor = SystemColors.Control;
 
             // 활성화된 버튼에만 색상 변경
@@ -170,6 +183,28 @@ namespace SimpleDonkeyManager
         }
 
         /// <summary>
+        /// TrainingControl에 전체 로드된 데이터를 전달합니다.
+        /// </summary>
+        public void SetTrainingFullData(ImageManager imageManager, List<FrameData> frameDataList)
+        {
+            if (trainingControl != null && imageManager != null)
+            {
+                trainingControl.SetFullFrameData(frameDataList, imageManager.SelectedFolderPath ?? "");
+            }
+        }
+
+        /// <summary>
+        /// TrainingControl에 필터된 데이터를 전달합니다.
+        /// </summary>
+        public void SetTrainingData(List<FrameData> frameDataList, string dataFolder)
+        {
+            if (trainingControl != null)
+            {
+                trainingControl.SetTrainData(frameDataList, dataFolder);
+            }
+        }
+
+        /// <summary>
         /// 프로그램 상태 라벨 업데이트
         /// </summary>
         public void UpdateProgramStatus(string folderPath, int totalImages, int loadedFrames, string status)
@@ -184,11 +219,14 @@ namespace SimpleDonkeyManager
             lblProgramCon.Text = $"📂 현재 폴더 : {displayPath}    |    프레임 수 : {loadedFrames} / {totalImages}    |    상태 : {status}";
         }
 
-        public void LoadImagesToControls(string[] imageFiles)
+        /// <summary>
+        /// DataLoadControl에서 DataFilterControl으로 데이터를 전달합니다.
+        /// </summary>
+        public void SetFilterControlData(ImageManager imageManager, List<FrameData> frameDataList)
         {
             if (dataFilterControl != null)
             {
-                dataFilterControl.LoadImages(imageFiles);
+                dataFilterControl.SetFrameData(imageManager, frameDataList);
             }
         }
 
@@ -215,14 +253,15 @@ namespace SimpleDonkeyManager
         }
 
 
-            public void NotifyImageSelected(string imagePath)
-            {
-                // DataFilterControl에도 선택된 이미지를 전달
-                if (dataFilterControl != null)
-                {
-                    dataFilterControl.DisplayImage(imagePath);
-                }
-            }
+                    public void NotifyImageSelected(string imagePath)
+                    {
+                        // DataFilterControl에도 선택된 이미지를 전달
+                        if (dataFilterControl != null)
+                        {
+                            dataFilterControl.DisplayImage(imagePath);
+                        }
+                    }
 
-        }
-    }
+                    }
+                }
+
