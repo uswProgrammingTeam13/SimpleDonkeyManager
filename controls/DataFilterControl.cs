@@ -105,6 +105,30 @@ namespace SimpleDonkeyManager
                 this.originalFrameDataList = new List<FrameData>(frameDataList);
                 this.filteredFrameDataList = new List<FrameData>(frameDataList);
 
+                // 첫 몇 프레임의 메타데이터 디버깅 로깅
+                try
+                {
+                    for (int i = 0; i < Math.Min(3, frameDataList.Count); i++)
+                    {
+                        var frame = frameDataList[i];
+                        if (frame != null && frame.Metadata != null && frame.Metadata.Count > 0)
+                        {
+                            var metadataKeys = string.Join(", ", frame.Metadata.Keys.Take(8));
+                            LogInfo($"  Frame {frame.FrameNumber}: 메타데이터 키={metadataKeys}");
+
+                            // Throttle, Angle 값 로깅
+                            double throttle = frame.GetThrottle();
+                            double angle = frame.GetAngle();
+                            bool disable = frame.GetDisable();
+                            LogInfo($"    Throttle={throttle}, Angle={angle}, Disable={disable}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogWarning($"메타데이터 디버깅 오류: {ex.Message}");
+                }
+
                 // ImageList와 ImageViewer에 데이터 설정
                 if (imageList != null)
                 {
@@ -197,41 +221,46 @@ namespace SimpleDonkeyManager
             {
                 FilterConditions conditions = new FilterConditions();
 
-                // Throttle 필터
+                // Throttle 필터: chkThrottle이 체크되면 "Throttle 0 제외"
+                // 함께 설정된 범위(Min/Max)도 적용됨 (-1 ~ 1)
                 if (chkThrottle != null && chkThrottle.Checked)
                 {
                     try
                     {
                         conditions.FilterThrottle = true;
-                        decimal throttleMin = numFilterThrottle1?.Value ?? 0m;
-                        decimal throttleMax = numFilterThrottle2?.Value ?? 100m;
+                        decimal throttleMin = numFilterThrottle1?.Value ?? -1m;
+                        decimal throttleMax = numFilterThrottle2?.Value ?? 1m;
                         conditions.ThrottleMin = (double)throttleMin;
                         conditions.ThrottleMax = (double)throttleMax;
 
-                        // 스로틀 0 제외 옵션 추가 (필터 범위에 0이 포함되지 않으면 자동 적용)
-                        // 또는 UI에 별도 체크박스가 있다면 그것을 사용
-                        conditions.ExcludeThrottleZero = (conditions.ThrottleMin > 0);
+                        // chkThrottle이 체크되면 항상 0을 제외
+                        conditions.ExcludeThrottleZero = true;
+
+                        LogInfo($"Throttle 필터: 0 제외 + 범위 필터 (Min={conditions.ThrottleMin}, Max={conditions.ThrottleMax})");
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        LogWarning("Throttle 필터 조건 수집 오류");
+                        LogWarning($"Throttle 필터 조건 수집 오류: {ex.Message}");
                     }
                 }
 
-                // Angle 필터
+                // Angle/기본 반전 이미지 제외 필터
+                // chkDisable이 체크되면 Angle 범위 필터 적용 (-1 ~ 1)
                 if (chkDisable != null && chkDisable.Checked)
                 {
                     try
                     {
                         conditions.FilterAngle = true;
-                        decimal angleMin = numFilterAngle1?.Value ?? 0m;
-                        decimal angleMax = numFilterAngle2?.Value ?? 360m;
+                        decimal angleMin = numFilterAngle1?.Value ?? -1m;
+                        decimal angleMax = numFilterAngle2?.Value ?? 1m;
                         conditions.AngleMin = (double)angleMin;
                         conditions.AngleMax = (double)angleMax;
+
+                        LogInfo($"Angle 필터: 범위 필터 (Min={conditions.AngleMin}, Max={conditions.AngleMax})");
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        LogWarning("Angle 필터 조건 수집 오류");
+                        LogWarning($"Angle 필터 조건 수집 오류: {ex.Message}");
                     }
                 }
 
@@ -247,29 +276,29 @@ namespace SimpleDonkeyManager
                         {
                             conditions.FilterResolution = true;
                             conditions.SelectedResolution = selectedRes;
-                        }
-                        else
-                        {
-                            conditions.FilterResolution = false;
-                            conditions.SelectedResolution = null;
+                            LogInfo($"해상도 필터: {selectedRes}");
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    LogWarning("해상도 필터 조건 수집 오류");
+                    LogWarning($"해상도 필터 조건 수집 오류: {ex.Message}");
                 }
 
                 // 중복 프레임 제거
                 if (chkDelFrames != null)
                 {
                     conditions.RemoveDuplicateFrames = chkDelFrames.Checked;
+                    if (conditions.RemoveDuplicateFrames)
+                        LogInfo($"추가 필터: 중복 프레임 제거");
                 }
 
                 // 조향 값 급변 구간 제거
                 if (chkHighlightDel != null)
                 {
                     conditions.RemoveHighlightChanges = chkHighlightDel.Checked;
+                    if (conditions.RemoveHighlightChanges)
+                        LogInfo($"추가 필터: 조향 값 급변 제거");
                 }
 
                 return conditions;
@@ -288,7 +317,7 @@ namespace SimpleDonkeyManager
         {
             try
             {
-                if (imageManager == null || originalFrameDataList == null || originalFrameDataList.Count == 0 || 
+                if (imageManager == null || originalFrameDataList == null || originalFrameDataList.Count == 0 ||
                     filteredFrameDataList == null || filteredFrameDataList.Count == 0)
                 {
                     SetSummaryData("0", "0", "0 (0.0%)", "0.0%");
@@ -377,7 +406,14 @@ namespace SimpleDonkeyManager
                 LogInfo($"필터가 적용됨: {filteredFrameDataList.Count}개 프레임 선택");
                 MessageBox.Show($"{filteredFrameDataList.Count}개의 프레임으로 학습을 시작합니다.", "필터 적용", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // TODO: Python 학습 코드 연동
+                // 필터된 데이터를 Training으로 전달
+                MainWindow mainWindow = this.Parent?.Parent?.Parent as MainWindow;
+                if (mainWindow != null && imageManager != null)
+                {
+                    string dataFolder = imageManager.SelectedFolderPath ?? "";
+                    mainWindow.SetTrainingData(filteredFrameDataList, dataFolder);
+                    LogInfo($"학습 데이터 전달: {filteredFrameDataList.Count}개 프레임, 폴더: {dataFolder}");
+                }
             }
             catch (Exception ex)
             {
@@ -491,31 +527,36 @@ namespace SimpleDonkeyManager
                     return new List<FrameData>();
 
                 List<FrameData> result = new List<FrameData>(originalFrameDataList);
+                int beforeCount = result.Count;
 
                 // Throttle 필터
                 if (conditions.FilterThrottle)
                 {
                     try
                     {
+                        int beforeThrottle = result.Count;
                         result = result.Where(f =>
                         {
                             if (f == null)
                                 return false;
+
                             double throttle = f.GetThrottle();
 
-                            // 스로틀 값 범위 체크
-                            bool inRange = throttle >= conditions.ThrottleMin && throttle <= conditions.ThrottleMax;
-
-                            // 스로틀 0 제외 옵션이 활성화되면 0 제외
-                            if (inRange && conditions.ExcludeThrottleZero && throttle == 0)
+                            // 1단계: 0 제외 (chkThrottle이 체크되어있으면 항상 0.0 제외)
+                            if (conditions.ExcludeThrottleZero && throttle == 0.0)
                                 return false;
 
+                            // 2단계: 범위 체크 (0이 아닌 경우 범위 확인)
+                            bool inRange = throttle >= conditions.ThrottleMin && throttle <= conditions.ThrottleMax;
                             return inRange;
                         }).ToList();
+
+                        int removedCount = beforeThrottle - result.Count;
+                        LogInfo($"Throttle 필터 적용: {beforeThrottle} → {result.Count} ({removedCount}개 제거, 범위: {conditions.ThrottleMin}~{conditions.ThrottleMax}, 0제외={conditions.ExcludeThrottleZero})");
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        LogWarning("Throttle 필터 적용 중 오류");
+                        LogWarning($"Throttle 필터 적용 중 오류: {ex.Message}");
                     }
                 }
 
@@ -524,17 +565,25 @@ namespace SimpleDonkeyManager
                 {
                     try
                     {
+                        int beforeAngle = result.Count;
                         result = result.Where(f =>
                         {
                             if (f == null)
                                 return false;
+
                             double angle = f.GetAngle();
-                            return angle >= conditions.AngleMin && angle <= conditions.AngleMax;
+
+                            // 범위 체크
+                            bool inRange = angle >= conditions.AngleMin && angle <= conditions.AngleMax;
+                            return inRange;
                         }).ToList();
+
+                        int removedCount = beforeAngle - result.Count;
+                        LogInfo($"Angle 필터 적용: {beforeAngle} → {result.Count} ({removedCount}개 제거, 범위: {conditions.AngleMin}~{conditions.AngleMax})");
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        LogWarning("Angle 필터 적용 중 오류");
+                        LogWarning($"Angle 필터 적용 중 오류: {ex.Message}");
                     }
                 }
 
@@ -543,16 +592,20 @@ namespace SimpleDonkeyManager
                 {
                     try
                     {
+                        int beforeResolution = result.Count;
                         result = result.Where(f =>
                         {
                             if (f == null)
                                 return false;
                             return f.Resolution == conditions.SelectedResolution;
                         }).ToList();
+
+                        int removedCount = beforeResolution - result.Count;
+                        LogInfo($"해상도 필터 적용 ({conditions.SelectedResolution}): {beforeResolution} → {result.Count} ({removedCount}개 제거)");
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        LogWarning("해상도 필터 적용 중 오류");
+                        LogWarning($"해상도 필터 적용 중 오류: {ex.Message}");
                     }
                 }
 
@@ -561,11 +614,15 @@ namespace SimpleDonkeyManager
                 {
                     try
                     {
+                        int beforeDuplicate = result.Count;
                         result = RemoveDuplicates(result);
+
+                        int removedCount = beforeDuplicate - result.Count;
+                        LogInfo($"중복 프레임 제거: {beforeDuplicate} → {result.Count} ({removedCount}개 제거)");
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        LogWarning("중복 프레임 제거 중 오류");
+                        LogWarning($"중복 프레임 제거 중 오류: {ex.Message}");
                     }
                 }
 
@@ -574,14 +631,19 @@ namespace SimpleDonkeyManager
                 {
                     try
                     {
+                        int beforeHighlight = result.Count;
                         result = RemoveHighlightChanges(result);
+
+                        int removedCount = beforeHighlight - result.Count;
+                        LogInfo($"조향 값 급변 제거: {beforeHighlight} → {result.Count} ({removedCount}개 제거)");
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        LogWarning("조향 값 급변 제거 중 오류");
+                        LogWarning($"조향 값 급변 제거 중 오류: {ex.Message}");
                     }
                 }
 
+                LogInfo($"전체 필터 결과: {beforeCount} → {result.Count}개 프레임");
                 return result ?? new List<FrameData>();
             }
             catch (Exception ex)
@@ -722,6 +784,22 @@ namespace SimpleDonkeyManager
         }
 
         /// <summary>
+        /// 필터된 프레임 데이터 리스트를 반환합니다.
+        /// </summary>
+        public List<FrameData> GetFilteredFrameData()
+        {
+            return filteredFrameDataList ?? new List<FrameData>();
+        }
+
+        /// <summary>
+        /// 원본 프레임 데이터 리스트를 반환합니다.
+        /// </summary>
+        public List<FrameData> GetOriginalFrameData()
+        {
+            return originalFrameDataList ?? new List<FrameData>();
+        }
+
+        /// <summary>
         /// 로그 메시지를 기록합니다.
         /// </summary>
         private void LogInfo(string message)
@@ -741,6 +819,11 @@ namespace SimpleDonkeyManager
             {
                 logger.AppendLog($"[필터 경고] {message}");
             }
+        }
+
+        private void chkThrottle_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 

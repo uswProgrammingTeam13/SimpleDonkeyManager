@@ -48,6 +48,7 @@ namespace SimpleDonkeyManager
             // Logger 주입
             dataLoadControl.SetLogger(logger);
             dataFilterControl.SetLogger(logger);
+            trainingControl.SetLogger(logger);
 
             // 배열에 저장 (InitialScreen은 배열에 포함 안 함)
             controls = new UserControl[] { dataLoadControl, dataFilterControl, trainingControl, resultControl };
@@ -178,6 +179,28 @@ namespace SimpleDonkeyManager
             using (Pen pen = new Pen(SystemColors.ControlDark, 1))
             {
                 e.Graphics.DrawLine(pen, 0, 0, pnlConditionView.Width, 0);
+            }
+        }
+
+        /// <summary>
+        /// TrainingControl에 전체 로드된 데이터를 전달합니다.
+        /// </summary>
+        public void SetTrainingFullData(ImageManager imageManager, List<FrameData> frameDataList)
+        {
+            if (trainingControl != null && imageManager != null)
+            {
+                trainingControl.SetFullFrameData(frameDataList, imageManager.SelectedFolderPath ?? "");
+            }
+        }
+
+        /// <summary>
+        /// TrainingControl에 필터된 데이터를 전달합니다.
+        /// </summary>
+        public void SetTrainingData(List<FrameData> frameDataList, string dataFolder)
+        {
+            if (trainingControl != null)
+            {
+                trainingControl.SetTrainData(frameDataList, dataFolder);
             }
         }
 

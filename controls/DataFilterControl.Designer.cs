@@ -341,11 +341,12 @@
             numFilterThrottle2.Font = new Font("맑은 고딕", 9F);
             numFilterThrottle2.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numFilterThrottle2.Location = new Point(93, 178);
+            numFilterThrottle2.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             numFilterThrottle2.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
             numFilterThrottle2.Name = "numFilterThrottle2";
             numFilterThrottle2.Size = new Size(55, 23);
             numFilterThrottle2.TabIndex = 13;
-            numFilterThrottle2.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            numFilterThrottle2.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // numFilterThrottle1
             // 
@@ -353,6 +354,7 @@
             numFilterThrottle1.Font = new Font("맑은 고딕", 9F);
             numFilterThrottle1.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numFilterThrottle1.Location = new Point(7, 178);
+            numFilterThrottle1.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             numFilterThrottle1.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
             numFilterThrottle1.Name = "numFilterThrottle1";
             numFilterThrottle1.Size = new Size(55, 23);
@@ -385,11 +387,12 @@
             numFilterAngle2.Font = new Font("맑은 고딕", 9F);
             numFilterAngle2.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numFilterAngle2.Location = new Point(93, 118);
+            numFilterAngle2.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             numFilterAngle2.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
             numFilterAngle2.Name = "numFilterAngle2";
             numFilterAngle2.Size = new Size(55, 23);
             numFilterAngle2.TabIndex = 9;
-            numFilterAngle2.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            numFilterAngle2.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // numFilterAngle1
             // 
@@ -397,6 +400,7 @@
             numFilterAngle1.Font = new Font("맑은 고딕", 9F);
             numFilterAngle1.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numFilterAngle1.Location = new Point(7, 118);
+            numFilterAngle1.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
             numFilterAngle1.Minimum = new decimal(new int[] { 1, 0, 0, int.MinValue });
             numFilterAngle1.Name = "numFilterAngle1";
             numFilterAngle1.Size = new Size(55, 23);
@@ -434,6 +438,7 @@
             chkThrottle.TabIndex = 5;
             chkThrottle.Text = "Throttle 0 제외";
             chkThrottle.UseVisualStyleBackColor = true;
+            chkThrottle.CheckedChanged += chkThrottle_CheckedChanged;
             // 
             // lblFilterBasic
             // 

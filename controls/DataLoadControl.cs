@@ -259,6 +259,10 @@ namespace SimpleDonkeyManager
                     try
                     {
                         mainWindow.SetFilterControlData(imageManager, allFrames);
+
+                        // TrainingControl에도 전체 데이터 전달 (필터링 이전)
+                        mainWindow.SetTrainingFullData(imageManager, allFrames);
+
                         mainWindow.UpdateProgramStatus(
                             imageManager.SelectedFolderPath,
                             allFrames.Count,

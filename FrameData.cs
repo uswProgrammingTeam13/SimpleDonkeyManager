@@ -53,12 +53,35 @@ namespace SimpleDonkeyManager
         /// </summary>
         public double GetThrottle()
         {
-            if (Metadata.TryGetValue("throttle", out var throttleObj))
+            try
             {
-                if (double.TryParse(throttleObj.ToString(), out double throttle))
-                    return throttle;
+                // 다양한 키 형식으로 throttle 값을 찾아봅니다
+                string[] possibleKeys = { "throttle", "user/throttle", "user_throttle", "Throttle" };
+
+                foreach (var key in possibleKeys)
+                {
+                    if (Metadata != null && Metadata.TryGetValue(key, out var throttleObj))
+                    {
+                        if (throttleObj != null)
+                        {
+                            string valueStr = throttleObj.ToString().Trim();
+
+                            // JSON 리터럴 형식 제거 (큰따옴표 제거)
+                            valueStr = valueStr.Trim('"');
+
+                            // 숫자 파싱 시도
+                            if (double.TryParse(valueStr, out double throttle))
+                                return throttle;
+                        }
+                    }
+                }
+
+                return 0.0;
             }
-            return 0.0;
+            catch
+            {
+                return 0.0;
+            }
         }
 
         /// <summary>
@@ -66,12 +89,35 @@ namespace SimpleDonkeyManager
         /// </summary>
         public double GetAngle()
         {
-            if (Metadata.TryGetValue("angle", out var angleObj))
+            try
             {
-                if (double.TryParse(angleObj.ToString(), out double angle))
-                    return angle;
+                // 다양한 키 형식으로 angle 값을 찾아봅니다
+                string[] possibleKeys = { "angle", "user/angle", "user_angle", "Angle", "steering" };
+
+                foreach (var key in possibleKeys)
+                {
+                    if (Metadata != null && Metadata.TryGetValue(key, out var angleObj))
+                    {
+                        if (angleObj != null)
+                        {
+                            string valueStr = angleObj.ToString().Trim();
+
+                            // JSON 리터럴 형식 제거 (큰따옴표 제거)
+                            valueStr = valueStr.Trim('"');
+
+                            // 숫자 파싱 시도
+                            if (double.TryParse(valueStr, out double angle))
+                                return angle;
+                        }
+                    }
+                }
+
+                return 0.0;
             }
-            return 0.0;
+            catch
+            {
+                return 0.0;
+            }
         }
 
         /// <summary>
@@ -79,12 +125,35 @@ namespace SimpleDonkeyManager
         /// </summary>
         public bool GetDisable()
         {
-            if (Metadata.TryGetValue("disable", out var disableObj))
+            try
             {
-                if (bool.TryParse(disableObj.ToString(), out bool disable))
-                    return disable;
+                // 다양한 키 형식으로 disable 값을 찾아봅니다
+                string[] possibleKeys = { "disable", "user/disable", "user_disable", "Disable" };
+
+                foreach (var key in possibleKeys)
+                {
+                    if (Metadata != null && Metadata.TryGetValue(key, out var disableObj))
+                    {
+                        if (disableObj != null)
+                        {
+                            string valueStr = disableObj.ToString().Trim();
+
+                            // JSON 리터럴 형식 제거 (큰따옴표 제거)
+                            valueStr = valueStr.Trim('"');
+
+                            // 불린 파싱 시도
+                            if (bool.TryParse(valueStr, out bool disable))
+                                return disable;
+                        }
+                    }
+                }
+
+                return false;
             }
-            return false;
+            catch
+            {
+                return false;
+            }
         }
 
         public override string ToString()
