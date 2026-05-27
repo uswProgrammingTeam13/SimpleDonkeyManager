@@ -15,17 +15,31 @@ namespace SimpleDonkeyManager.controls
         private PlotModel plotModel = null;
         private ChartDataModel trainingMetrics = null;
         private List<FrameData> trainingData = null;
+        private string lastModelPath = null;
 
         public ResultControl()
         {
             InitializeComponent();
             InitializeChartView();
             InitializeImageViewer();
+            InitializeTooltips();
 
             // Resize 이벤트 핸들러
             this.Resize += ResultControl_Resize;
             this.Load += ResultControl_Load;
             this.VisibleChanged += ResultControl_VisibleChanged;
+        }
+
+        private void InitializeTooltips()
+        {
+            var toolTip = new ToolTip { AutoPopDelay = 8000, InitialDelay = 400, ReshowDelay = 200, ShowAlways = true };
+            toolTip.SetToolTip(lblTotalEpochs, "총 학습 에포크(반복) 횟수입니다.");
+            toolTip.SetToolTip(lblMinLoss, "학습 중 기록된 최소 손실값(Loss)입니다. 낮을수록 좋습니다.");
+            toolTip.SetToolTip(lblMaxAccuracy, "학습 중 기록된 최고 정확도(Accuracy)입니다. 높을수록 좋습니다.");
+            toolTip.SetToolTip(lblTrainingTime, "전체 학습에 소요된 시간입니다.");
+            toolTip.SetToolTip(pnlResultChart, "에포크별 Loss / Accuracy 변화 그래프입니다.");
+            toolTip.SetToolTip(imageViewerUpper1, "학습에 사용된 이미지를 미리보기합니다. 재생 버튼으로 슬라이드쇼를 실행할 수 있습니다.");
+            toolTip.SetToolTip(btnOpenModelFolder, "학습된 모델이 저장된 폴더를 파일 탐색기로 엽니다.");
         }
 
         private void ResultControl_Load(object sender, EventArgs e)
@@ -340,6 +354,47 @@ namespace SimpleDonkeyManager.controls
             catch (Exception ex)
             {
                 MessageBox.Show($"결과 요약 표시 오류: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 학습된 모델 파일 경로를 설정합니다.
+        /// </summary>
+        public void SetModelPath(string modelPath)
+        {
+            lastModelPath = modelPath;
+            if (btnOpenModelFolder != null)
+            {
+                bool hasPath = !string.IsNullOrEmpty(modelPath) && System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(modelPath));
+                btnOpenModelFolder.Enabled = hasPath;
+                string dir = hasPath ? System.IO.Path.GetDirectoryName(modelPath) : "(없음)";
+                btnOpenModelFolder.Text = $"📂 저장된 폴더 열기  ({System.IO.Path.GetFileName(modelPath)})";
+            }
+        }
+
+        private void BtnOpenModelFolder_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string dir = string.IsNullOrEmpty(lastModelPath)
+                    ? null
+                    : System.IO.Path.GetDirectoryName(lastModelPath);
+
+                if (string.IsNullOrEmpty(dir) || !System.IO.Directory.Exists(dir))
+                {
+                    MessageBox.Show("모델 저장 폴더를 찾을 수 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // 파일 탐색기에서 해당 파일을 선택한 상태로 열기
+                if (!string.IsNullOrEmpty(lastModelPath) && System.IO.File.Exists(lastModelPath))
+                    System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{lastModelPath}\"");
+                else
+                    System.Diagnostics.Process.Start("explorer.exe", $"\"{dir}\"");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"폴더 열기 오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

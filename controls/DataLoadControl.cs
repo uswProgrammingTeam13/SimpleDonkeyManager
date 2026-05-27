@@ -31,7 +31,16 @@ namespace SimpleDonkeyManager
             // 이미지 선택 이벤트 구독
             imageList.ImageSelected += ImageList_ImageSelected;
 
+            InitializeTooltips();
+
             logger = null;
+        }
+
+        private void InitializeTooltips()
+        {
+            var toolTip = new ToolTip { AutoPopDelay = 8000, InitialDelay = 400, ReshowDelay = 200, ShowAlways = true };
+            toolTip.SetToolTip(btnSelectFolder, "학습 데이터가 들어있는 폴더를 선택합니다.\n선택한 폴더 내의 이미지와 JSON 파일을 자동으로 불러옵니다.");
+            toolTip.SetToolTip(btnLoadStart, "선택한 폴더의 데이터를 애플리케이션에 로드합니다.");
         }
 
         /// <summary>

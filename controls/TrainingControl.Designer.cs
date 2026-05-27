@@ -31,7 +31,7 @@ namespace SimpleDonkeyManager
             pnlTrainLog = new Panel();
             lblTrainingLog = new Label();
             lstTrainingLog = new ListBox();
-            pnlTrainButtons = new Panel();
+            pnlTrainButtons = new TableLayoutPanel();
             btnStartTraining = new Button();
             pnlChartRight = new Panel();
             lblChartTitle = new Label();
@@ -157,12 +157,17 @@ namespace SimpleDonkeyManager
             // 
             // btnSelectModelPath
             // 
-            btnSelectModelPath.Location = new Point(440, 75);
+            btnSelectModelPath.FlatAppearance.BorderColor = Color.DodgerBlue;
+            btnSelectModelPath.FlatAppearance.MouseOverBackColor = Color.Azure;
+            btnSelectModelPath.FlatStyle = FlatStyle.Flat;
+            btnSelectModelPath.Font = new Font("나눔고딕", 9F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnSelectModelPath.ForeColor = SystemColors.Highlight;
+            btnSelectModelPath.Location = new Point(440, 69);
             btnSelectModelPath.Margin = new Padding(3, 4, 3, 4);
             btnSelectModelPath.Name = "btnSelectModelPath";
-            btnSelectModelPath.Size = new Size(90, 30);
+            btnSelectModelPath.Size = new Size(95, 29);
             btnSelectModelPath.TabIndex = 5;
-            btnSelectModelPath.Text = "경로 선택";
+            btnSelectModelPath.Text = "📂 경로 선택";
             btnSelectModelPath.UseVisualStyleBackColor = true;
             // 
             // pnlProgress
@@ -242,28 +247,33 @@ namespace SimpleDonkeyManager
             // pnlTrainButtons
             // 
             pnlTrainButtons.BackColor = Color.FromArgb(240, 240, 240);
-            pnlTrainButtons.BorderStyle = BorderStyle.FixedSingle;
-            pnlTrainButtons.Controls.Add(btnCheckTrainingResult);
-            pnlTrainButtons.Controls.Add(btnStartTraining);
+            pnlTrainButtons.ColumnCount = 2;
+            pnlTrainButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            pnlTrainButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            pnlTrainButtons.Controls.Add(btnStartTraining, 0, 0);
+            pnlTrainButtons.Controls.Add(btnCheckTrainingResult, 1, 0);
             pnlTrainButtons.Dock = DockStyle.Fill;
             pnlTrainButtons.Location = new Point(3, 554);
             pnlTrainButtons.Margin = new Padding(3, 4, 3, 4);
             pnlTrainButtons.Name = "pnlTrainButtons";
+            pnlTrainButtons.Padding = new Padding(4);
+            pnlTrainButtons.RowCount = 1;
+            pnlTrainButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             pnlTrainButtons.Size = new Size(544, 67);
             pnlTrainButtons.TabIndex = 3;
             // 
             // btnStartTraining
             // 
-            btnStartTraining.BackColor = SystemColors.Highlight;
-            btnStartTraining.Font = new Font("나눔고딕", 10.2F, FontStyle.Bold);
-            btnStartTraining.ForeColor = Color.White;
-            btnStartTraining.Location = new Point(10, 17);
-            btnStartTraining.Margin = new Padding(3, 4, 3, 4);
+            btnStartTraining.Dock = DockStyle.Fill;
+            btnStartTraining.FlatAppearance.BorderColor = Color.DodgerBlue;
+            btnStartTraining.FlatAppearance.MouseOverBackColor = Color.Azure;
+            btnStartTraining.FlatStyle = FlatStyle.Flat;
+            btnStartTraining.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnStartTraining.ForeColor = SystemColors.Highlight;
             btnStartTraining.Name = "btnStartTraining";
-            btnStartTraining.Size = new Size(260, 44);
             btnStartTraining.TabIndex = 0;
             btnStartTraining.Text = "▷ 학습 시작";
-            btnStartTraining.UseVisualStyleBackColor = false;
+            btnStartTraining.UseVisualStyleBackColor = true;
             // 
             // pnlChartRight
             // 
@@ -290,16 +300,16 @@ namespace SimpleDonkeyManager
             // 
             // btnCheckTrainingResult
             // 
-            btnCheckTrainingResult.BackColor = SystemColors.Highlight;
-            btnCheckTrainingResult.Font = new Font("나눔고딕", 10.2F, FontStyle.Bold);
-            btnCheckTrainingResult.ForeColor = Color.White;
-            btnCheckTrainingResult.Location = new Point(271, 17);
-            btnCheckTrainingResult.Margin = new Padding(3, 4, 3, 4);
+            btnCheckTrainingResult.Dock = DockStyle.Fill;
+            btnCheckTrainingResult.FlatAppearance.BorderColor = Color.DodgerBlue;
+            btnCheckTrainingResult.FlatAppearance.MouseOverBackColor = Color.Azure;
+            btnCheckTrainingResult.FlatStyle = FlatStyle.Flat;
+            btnCheckTrainingResult.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnCheckTrainingResult.ForeColor = SystemColors.Highlight;
             btnCheckTrainingResult.Name = "btnCheckTrainingResult";
-            btnCheckTrainingResult.Size = new Size(260, 44);
             btnCheckTrainingResult.TabIndex = 1;
             btnCheckTrainingResult.Text = "학습 결과 확인";
-            btnCheckTrainingResult.UseVisualStyleBackColor = false;
+            btnCheckTrainingResult.UseVisualStyleBackColor = true;
             // 
             // TrainingControl
             // 
@@ -345,7 +355,7 @@ namespace SimpleDonkeyManager
         private System.Windows.Forms.Label lblProgressLabel;
         private System.Windows.Forms.Panel pnlTrainLog;
         private System.Windows.Forms.Label lblTrainingLog;
-        private System.Windows.Forms.Panel pnlTrainButtons;
+        private System.Windows.Forms.TableLayoutPanel pnlTrainButtons;
         private Button btnCheckTrainingResult;
     }
 }

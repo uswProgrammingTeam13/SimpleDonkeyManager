@@ -49,6 +49,7 @@
             lstJSONSummary = new ListView();
             tableLayoutPanel3 = new TableLayoutPanel();
             groupBox1 = new GroupBox();
+            btnLargeView = new Button();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             pnlLeftThumbnail.SuspendLayout();
@@ -215,6 +216,7 @@
             pnlControlBar.Controls.Add(button4);
             pnlControlBar.Controls.Add(label5);
             pnlControlBar.Controls.Add(lstJSONSummary);
+            pnlControlBar.Controls.Add(btnLargeView);
             pnlControlBar.Dock = DockStyle.Fill;
             pnlControlBar.ForeColor = Color.RoyalBlue;
             pnlControlBar.Location = new Point(3, 285);
@@ -292,6 +294,18 @@
             lstJSONSummary.UseCompatibleStateImageBehavior = false;
             lstJSONSummary.View = View.Details;
             // 
+            // btnLargeView
+            // 
+            btnLargeView.FlatStyle = FlatStyle.Flat;
+            btnLargeView.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnLargeView.ForeColor = Color.RoyalBlue;
+            btnLargeView.Location = new Point(230, 50);
+            btnLargeView.Name = "btnLargeView";
+            btnLargeView.Size = new Size(100, 26);
+            btnLargeView.TabIndex = 16;
+            btnLargeView.Text = "🔍 크게 보기";
+            btnLargeView.UseVisualStyleBackColor = true;
+            // 
             // tableLayoutPanel3
             // 
             tableLayoutPanel3.Location = new Point(0, 0);
@@ -354,5 +368,6 @@
         private Label label5;
         private ListView lstJSONSummary;
         private ComboBox comboBox1;
+        private Button btnLargeView;
     }
 }
