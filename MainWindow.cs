@@ -256,6 +256,8 @@ namespace SimpleDonkeyManager
         public void ShowResultControl()
         {
             ShowControl(3); // ResultControl은 인덱스 3
+            // 화면 전환 후 그래프 강제 갱신
+            resultControl?.Refresh();
         }
 
         /// <summary>

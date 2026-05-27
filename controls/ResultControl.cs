@@ -25,12 +25,30 @@ namespace SimpleDonkeyManager.controls
             // Resize 이벤트 핸들러
             this.Resize += ResultControl_Resize;
             this.Load += ResultControl_Load;
+            this.VisibleChanged += ResultControl_VisibleChanged;
         }
 
         private void ResultControl_Load(object sender, EventArgs e)
         {
-            // 로드 시 초기 레이아웃 조정
-            AdjustLayoutForWindowSize();
+            // Load 시점은 Width가 0일 수 있으므로 레이아웃 조정 생략
+            // Resize 이벤트에서 처리
+        }
+
+        private void ResultControl_VisibleChanged(object sender, EventArgs e)
+        {
+            // 화면이 표시될 때 기존 데이터로 강제 재렌더링
+            if (this.Visible && trainingMetrics != null)
+            {
+                try
+                {
+                    if (plotView != null)
+                    {
+                        plotView.Invalidate();
+                        plotView.InvalidatePlot(true);
+                    }
+                }
+                catch { }
+            }
         }
 
         private void ResultControl_Resize(object sender, EventArgs e)
@@ -69,6 +87,10 @@ namespace SimpleDonkeyManager.controls
                     return;
 
                 int controlWidth = this.Width;
+
+                // Width가 아직 확정되지 않은 경우 조정 생략
+                if (controlWidth <= 0)
+                    return;
 
                 tlpResultMain.SuspendLayout();
                 try
@@ -251,7 +273,13 @@ namespace SimpleDonkeyManager.controls
                 }
 
                 // 플롯 새로고침
-                plotModel.InvalidatePlot(true);
+                if (plotView != null)
+                {
+                    plotView.InvalidatePlot(true);
+                    plotView.Refresh();
+                }
+                else
+                    plotModel.InvalidatePlot(true);
 
                 // 결과 요약 표시
                 UpdateResultSummary(metrics);

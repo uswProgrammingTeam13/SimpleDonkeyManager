@@ -908,7 +908,11 @@ namespace SimpleDonkeyManager
                 MainWindow mainWindow = this.FindMainWindow();
                 if (mainWindow != null)
                 {
-                    // 결과 화면으로 이동 (버튼 3을 클릭한 것처럼 동작)
+                    // 데이터가 있으면 먼저 결과 화면에 전달 후 이동
+                    if (chartDataModel != null && chartDataModel.GetMetricCount() > 0)
+                    {
+                        mainWindow.SetTrainingResults(chartDataModel, currentTrainingData);
+                    }
                     mainWindow.ShowResultControl();
                     LogInfo("결과 화면으로 이동했습니다.");
                 }
