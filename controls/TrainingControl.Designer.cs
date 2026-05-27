@@ -15,234 +15,305 @@ namespace SimpleDonkeyManager
 
         private void InitializeComponent()
         {
-            System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-            System.Windows.Forms.Panel pnlTrainSettings;
-            System.Windows.Forms.Label lblDataStatus;
-            System.Windows.Forms.Label lblModelType;
-            System.Windows.Forms.Label lblModelPath;
-            System.Windows.Forms.Panel pnlProgress;
-            System.Windows.Forms.Label lblProgressLabel;
-            System.Windows.Forms.ProgressBar prgTrainingProgress;
-            System.Windows.Forms.Label lblProgress;
-            System.Windows.Forms.Panel pnlTrainLog;
-            System.Windows.Forms.Label lblTrainingLog;
-            System.Windows.Forms.ListBox lstTrainingLog;
-            System.Windows.Forms.Panel pnlTrainButtons;
-            System.Windows.Forms.Button btnSelectModelPath;
-            System.Windows.Forms.Button btnStartTraining;
-            System.Windows.Forms.ComboBox cmbModelType;
-            System.Windows.Forms.TextBox txtModelPath;
-
-            tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            pnlTrainSettings = new System.Windows.Forms.Panel();
-            lblDataStatus = new System.Windows.Forms.Label();
-            lblModelType = new System.Windows.Forms.Label();
-            lblModelPath = new System.Windows.Forms.Label();
-            pnlProgress = new System.Windows.Forms.Panel();
-            lblProgressLabel = new System.Windows.Forms.Label();
-            prgTrainingProgress = new System.Windows.Forms.ProgressBar();
-            lblProgress = new System.Windows.Forms.Label();
-            pnlTrainLog = new System.Windows.Forms.Panel();
-            lblTrainingLog = new System.Windows.Forms.Label();
-            lstTrainingLog = new System.Windows.Forms.ListBox();
-            pnlTrainButtons = new System.Windows.Forms.Panel();
-            btnSelectModelPath = new System.Windows.Forms.Button();
-            btnStartTraining = new System.Windows.Forms.Button();
-            cmbModelType = new System.Windows.Forms.ComboBox();
-            txtModelPath = new System.Windows.Forms.TextBox();
-
-            this.SuspendLayout();
+            splMainTraining = new SplitContainer();
+            tableLayoutPanelLeft = new TableLayoutPanel();
+            pnlTrainSettings = new Panel();
+            lblDataStatus = new Label();
+            lblModelType = new Label();
+            cmbModelType = new ComboBox();
+            lblModelPath = new Label();
+            txtModelPath = new TextBox();
+            btnSelectModelPath = new Button();
+            pnlProgress = new Panel();
+            lblProgressLabel = new Label();
+            prgTrainingProgress = new ProgressBar();
+            lblProgress = new Label();
+            pnlTrainLog = new Panel();
+            lblTrainingLog = new Label();
+            lstTrainingLog = new ListBox();
+            pnlTrainButtons = new Panel();
+            btnStartTraining = new Button();
+            pnlChartRight = new Panel();
+            lblChartTitle = new Label();
+            btnCheckTrainingResult = new Button();
+            ((System.ComponentModel.ISupportInitialize)splMainTraining).BeginInit();
+            splMainTraining.Panel1.SuspendLayout();
+            splMainTraining.Panel2.SuspendLayout();
+            splMainTraining.SuspendLayout();
+            tableLayoutPanelLeft.SuspendLayout();
             pnlTrainSettings.SuspendLayout();
             pnlProgress.SuspendLayout();
             pnlTrainLog.SuspendLayout();
             pnlTrainButtons.SuspendLayout();
-
-            // Store references
-            this.lblDataStatus = lblDataStatus;
-            this.cmbModelType = cmbModelType;
-            this.txtModelPath = txtModelPath;
-            this.lstTrainingLog = lstTrainingLog;
-            this.btnStartTraining = btnStartTraining;
-            this.prgTrainingProgress = prgTrainingProgress;
-            this.lblProgress = lblProgress;
-            this.btnSelectModelPath = btnSelectModelPath;
-
-            // tableLayoutPanel1
-            tableLayoutPanel1.ColumnCount = 1;
-            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel1.Controls.Add(pnlTrainSettings, 0, 0);
-            tableLayoutPanel1.Controls.Add(pnlProgress, 0, 1);
-            tableLayoutPanel1.Controls.Add(pnlTrainLog, 0, 2);
-            tableLayoutPanel1.Controls.Add(pnlTrainButtons, 0, 3);
-            tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 4;
-            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 120F));
-            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 80F));
-            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-            tableLayoutPanel1.Size = new System.Drawing.Size(600, 500);
-            tableLayoutPanel1.TabIndex = 0;
-
+            pnlChartRight.SuspendLayout();
+            SuspendLayout();
+            // 
+            // splMainTraining
+            // 
+            splMainTraining.Dock = DockStyle.Fill;
+            splMainTraining.Location = new Point(0, 0);
+            splMainTraining.Margin = new Padding(3, 4, 3, 4);
+            splMainTraining.Name = "splMainTraining";
+            // 
+            // splMainTraining.Panel1
+            // 
+            splMainTraining.Panel1.Controls.Add(tableLayoutPanelLeft);
+            splMainTraining.Panel1MinSize = 400;
+            // 
+            // splMainTraining.Panel2
+            // 
+            splMainTraining.Panel2.Controls.Add(pnlChartRight);
+            splMainTraining.Panel2MinSize = 300;
+            splMainTraining.Size = new Size(900, 625);
+            splMainTraining.SplitterDistance = 550;
+            splMainTraining.SplitterWidth = 8;
+            splMainTraining.TabIndex = 0;
+            // 
+            // tableLayoutPanelLeft
+            // 
+            tableLayoutPanelLeft.ColumnCount = 1;
+            tableLayoutPanelLeft.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanelLeft.Controls.Add(pnlTrainSettings, 0, 0);
+            tableLayoutPanelLeft.Controls.Add(pnlProgress, 0, 1);
+            tableLayoutPanelLeft.Controls.Add(pnlTrainLog, 0, 2);
+            tableLayoutPanelLeft.Controls.Add(pnlTrainButtons, 0, 3);
+            tableLayoutPanelLeft.Dock = DockStyle.Fill;
+            tableLayoutPanelLeft.Location = new Point(0, 0);
+            tableLayoutPanelLeft.Margin = new Padding(3, 4, 3, 4);
+            tableLayoutPanelLeft.Name = "tableLayoutPanelLeft";
+            tableLayoutPanelLeft.RowCount = 4;
+            tableLayoutPanelLeft.RowStyles.Add(new RowStyle(SizeType.Absolute, 150F));
+            tableLayoutPanelLeft.RowStyles.Add(new RowStyle(SizeType.Absolute, 100F));
+            tableLayoutPanelLeft.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanelLeft.RowStyles.Add(new RowStyle(SizeType.Absolute, 75F));
+            tableLayoutPanelLeft.Size = new Size(550, 625);
+            tableLayoutPanelLeft.TabIndex = 0;
+            // 
             // pnlTrainSettings
-            pnlTrainSettings.BackColor = System.Drawing.Color.FromArgb(248, 248, 248);
-            pnlTrainSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            // 
+            pnlTrainSettings.BackColor = Color.FromArgb(248, 248, 248);
+            pnlTrainSettings.BorderStyle = BorderStyle.FixedSingle;
             pnlTrainSettings.Controls.Add(lblDataStatus);
             pnlTrainSettings.Controls.Add(lblModelType);
             pnlTrainSettings.Controls.Add(cmbModelType);
             pnlTrainSettings.Controls.Add(lblModelPath);
             pnlTrainSettings.Controls.Add(txtModelPath);
             pnlTrainSettings.Controls.Add(btnSelectModelPath);
-            pnlTrainSettings.Dock = System.Windows.Forms.DockStyle.Fill;
-            pnlTrainSettings.Location = new System.Drawing.Point(3, 3);
+            pnlTrainSettings.Dock = DockStyle.Fill;
+            pnlTrainSettings.Location = new Point(3, 4);
+            pnlTrainSettings.Margin = new Padding(3, 4, 3, 4);
             pnlTrainSettings.Name = "pnlTrainSettings";
-            pnlTrainSettings.Size = new System.Drawing.Size(594, 114);
+            pnlTrainSettings.Size = new Size(544, 142);
             pnlTrainSettings.TabIndex = 0;
-
+            // 
             // lblDataStatus
+            // 
             lblDataStatus.AutoSize = true;
-            lblDataStatus.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold);
-            lblDataStatus.Location = new System.Drawing.Point(10, 10);
+            lblDataStatus.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            lblDataStatus.ForeColor = Color.Red;
+            lblDataStatus.Location = new Point(10, 12);
             lblDataStatus.Name = "lblDataStatus";
-            lblDataStatus.Size = new System.Drawing.Size(150, 14);
+            lblDataStatus.Size = new Size(152, 15);
             lblDataStatus.TabIndex = 0;
             lblDataStatus.Text = "데이터셋: 준비되지 않음";
-            lblDataStatus.ForeColor = System.Drawing.Color.Red;
-
+            // 
             // lblModelType
+            // 
             lblModelType.AutoSize = true;
-            lblModelType.Font = new System.Drawing.Font("나눔고딕", 8.999999F, System.Drawing.FontStyle.Bold);
-            lblModelType.Location = new System.Drawing.Point(10, 35);
+            lblModelType.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold);
+            lblModelType.Location = new Point(10, 44);
             lblModelType.Name = "lblModelType";
-            lblModelType.Size = new System.Drawing.Size(86, 14);
+            lblModelType.Size = new Size(64, 14);
             lblModelType.TabIndex = 1;
             lblModelType.Text = "모델 타입:";
-
+            // 
             // cmbModelType
+            // 
             cmbModelType.FormattingEnabled = true;
-            cmbModelType.Location = new System.Drawing.Point(100, 35);
+            cmbModelType.Location = new Point(100, 44);
+            cmbModelType.Margin = new Padding(3, 4, 3, 4);
             cmbModelType.Name = "cmbModelType";
-            cmbModelType.Size = new System.Drawing.Size(120, 20);
+            cmbModelType.Size = new Size(120, 23);
             cmbModelType.TabIndex = 2;
-
+            // 
             // lblModelPath
+            // 
             lblModelPath.AutoSize = true;
-            lblModelPath.Font = new System.Drawing.Font("나눔고딕", 8.999999F, System.Drawing.FontStyle.Bold);
-            lblModelPath.Location = new System.Drawing.Point(10, 60);
+            lblModelPath.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold);
+            lblModelPath.Location = new Point(10, 75);
             lblModelPath.Name = "lblModelPath";
-            lblModelPath.Size = new System.Drawing.Size(86, 14);
+            lblModelPath.Size = new Size(64, 14);
             lblModelPath.TabIndex = 3;
             lblModelPath.Text = "모델 경로:";
-
+            // 
             // txtModelPath
-            txtModelPath.Location = new System.Drawing.Point(100, 60);
+            // 
+            txtModelPath.Location = new Point(100, 75);
+            txtModelPath.Margin = new Padding(3, 4, 3, 4);
             txtModelPath.Name = "txtModelPath";
             txtModelPath.ReadOnly = true;
-            txtModelPath.Size = new System.Drawing.Size(380, 20);
+            txtModelPath.Size = new Size(330, 23);
             txtModelPath.TabIndex = 4;
-
+            // 
             // btnSelectModelPath
-            btnSelectModelPath.Location = new System.Drawing.Point(490, 60);
+            // 
+            btnSelectModelPath.Location = new Point(440, 75);
+            btnSelectModelPath.Margin = new Padding(3, 4, 3, 4);
             btnSelectModelPath.Name = "btnSelectModelPath";
-            btnSelectModelPath.Size = new System.Drawing.Size(90, 24);
+            btnSelectModelPath.Size = new Size(90, 30);
             btnSelectModelPath.TabIndex = 5;
             btnSelectModelPath.Text = "경로 선택";
             btnSelectModelPath.UseVisualStyleBackColor = true;
-
+            // 
             // pnlProgress
-            pnlProgress.BackColor = System.Drawing.Color.FromArgb(242, 242, 242);
-            pnlProgress.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            // 
+            pnlProgress.BackColor = Color.FromArgb(242, 242, 242);
+            pnlProgress.BorderStyle = BorderStyle.FixedSingle;
             pnlProgress.Controls.Add(lblProgressLabel);
             pnlProgress.Controls.Add(prgTrainingProgress);
             pnlProgress.Controls.Add(lblProgress);
-            pnlProgress.Dock = System.Windows.Forms.DockStyle.Fill;
-            pnlProgress.Location = new System.Drawing.Point(3, 123);
+            pnlProgress.Dock = DockStyle.Fill;
+            pnlProgress.Location = new Point(3, 154);
+            pnlProgress.Margin = new Padding(3, 4, 3, 4);
             pnlProgress.Name = "pnlProgress";
-            pnlProgress.Size = new System.Drawing.Size(594, 74);
+            pnlProgress.Size = new Size(544, 92);
             pnlProgress.TabIndex = 1;
-
+            // 
             // lblProgressLabel
+            // 
             lblProgressLabel.AutoSize = true;
-            lblProgressLabel.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold);
-            lblProgressLabel.Location = new System.Drawing.Point(10, 5);
+            lblProgressLabel.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            lblProgressLabel.Location = new Point(10, 6);
             lblProgressLabel.Name = "lblProgressLabel";
-            lblProgressLabel.Size = new System.Drawing.Size(87, 14);
+            lblProgressLabel.Size = new Size(82, 15);
             lblProgressLabel.TabIndex = 0;
             lblProgressLabel.Text = "학습 진행도:";
-
+            // 
             // prgTrainingProgress
-            prgTrainingProgress.Location = new System.Drawing.Point(10, 25);
+            // 
+            prgTrainingProgress.Location = new Point(10, 31);
+            prgTrainingProgress.Margin = new Padding(3, 4, 3, 4);
             prgTrainingProgress.Name = "prgTrainingProgress";
-            prgTrainingProgress.Size = new System.Drawing.Size(530, 23);
+            prgTrainingProgress.Size = new Size(480, 29);
             prgTrainingProgress.TabIndex = 1;
-            prgTrainingProgress.Value = 0;
-
+            // 
             // lblProgress
+            // 
             lblProgress.AutoSize = true;
-            lblProgress.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold);
-            lblProgress.Location = new System.Drawing.Point(550, 25);
+            lblProgress.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            lblProgress.Location = new Point(500, 31);
             lblProgress.Name = "lblProgress";
-            lblProgress.Size = new System.Drawing.Size(30, 14);
+            lblProgress.Size = new Size(31, 15);
             lblProgress.TabIndex = 2;
             lblProgress.Text = "0%";
-
+            // 
             // pnlTrainLog
-            pnlTrainLog.BackColor = System.Drawing.Color.FromArgb(242, 242, 242);
-            pnlTrainLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            // 
+            pnlTrainLog.BackColor = Color.FromArgb(242, 242, 242);
+            pnlTrainLog.BorderStyle = BorderStyle.FixedSingle;
             pnlTrainLog.Controls.Add(lblTrainingLog);
             pnlTrainLog.Controls.Add(lstTrainingLog);
-            pnlTrainLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            pnlTrainLog.Location = new System.Drawing.Point(3, 203);
+            pnlTrainLog.Dock = DockStyle.Fill;
+            pnlTrainLog.Location = new Point(3, 254);
+            pnlTrainLog.Margin = new Padding(3, 4, 3, 4);
             pnlTrainLog.Name = "pnlTrainLog";
-            pnlTrainLog.Size = new System.Drawing.Size(594, 230);
+            pnlTrainLog.Size = new Size(544, 292);
             pnlTrainLog.TabIndex = 2;
-
+            // 
             // lblTrainingLog
+            // 
             lblTrainingLog.AutoSize = true;
-            lblTrainingLog.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold);
-            lblTrainingLog.Location = new System.Drawing.Point(10, 5);
+            lblTrainingLog.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            lblTrainingLog.Location = new Point(10, 6);
             lblTrainingLog.Name = "lblTrainingLog";
-            lblTrainingLog.Size = new System.Drawing.Size(87, 14);
+            lblTrainingLog.Size = new Size(69, 15);
             lblTrainingLog.TabIndex = 0;
             lblTrainingLog.Text = "학습 로그:";
-
+            // 
             // lstTrainingLog
+            // 
             lstTrainingLog.FormattingEnabled = true;
-            lstTrainingLog.Location = new System.Drawing.Point(10, 25);
+            lstTrainingLog.Location = new Point(10, 31);
+            lstTrainingLog.Margin = new Padding(3, 4, 3, 4);
             lstTrainingLog.Name = "lstTrainingLog";
-            lstTrainingLog.Size = new System.Drawing.Size(570, 200);
+            lstTrainingLog.Size = new Size(520, 244);
             lstTrainingLog.TabIndex = 1;
-
+            // 
             // pnlTrainButtons
-            pnlTrainButtons.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
-            pnlTrainButtons.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            // 
+            pnlTrainButtons.BackColor = Color.FromArgb(240, 240, 240);
+            pnlTrainButtons.BorderStyle = BorderStyle.FixedSingle;
+            pnlTrainButtons.Controls.Add(btnCheckTrainingResult);
             pnlTrainButtons.Controls.Add(btnStartTraining);
-            pnlTrainButtons.Dock = System.Windows.Forms.DockStyle.Fill;
-            pnlTrainButtons.Location = new System.Drawing.Point(3, 439);
+            pnlTrainButtons.Dock = DockStyle.Fill;
+            pnlTrainButtons.Location = new Point(3, 554);
+            pnlTrainButtons.Margin = new Padding(3, 4, 3, 4);
             pnlTrainButtons.Name = "pnlTrainButtons";
-            pnlTrainButtons.Size = new System.Drawing.Size(594, 54);
+            pnlTrainButtons.Size = new Size(544, 67);
             pnlTrainButtons.TabIndex = 3;
-
+            // 
             // btnStartTraining
-            btnStartTraining.BackColor = System.Drawing.SystemColors.Highlight;
-            btnStartTraining.Font = new System.Drawing.Font("나눔고딕", 10.2F, System.Drawing.FontStyle.Bold);
-            btnStartTraining.ForeColor = System.Drawing.Color.White;
-            btnStartTraining.Location = new System.Drawing.Point(150, 10);
+            // 
+            btnStartTraining.BackColor = SystemColors.Highlight;
+            btnStartTraining.Font = new Font("나눔고딕", 10.2F, FontStyle.Bold);
+            btnStartTraining.ForeColor = Color.White;
+            btnStartTraining.Location = new Point(10, 17);
+            btnStartTraining.Margin = new Padding(3, 4, 3, 4);
             btnStartTraining.Name = "btnStartTraining";
-            btnStartTraining.Size = new System.Drawing.Size(300, 35);
+            btnStartTraining.Size = new Size(260, 44);
             btnStartTraining.TabIndex = 0;
             btnStartTraining.Text = "▷ 학습 시작";
             btnStartTraining.UseVisualStyleBackColor = false;
-
+            // 
+            // pnlChartRight
+            // 
+            pnlChartRight.BackColor = Color.FromArgb(248, 248, 248);
+            pnlChartRight.BorderStyle = BorderStyle.FixedSingle;
+            pnlChartRight.Controls.Add(lblChartTitle);
+            pnlChartRight.Dock = DockStyle.Fill;
+            pnlChartRight.Location = new Point(0, 0);
+            pnlChartRight.Margin = new Padding(3, 4, 3, 4);
+            pnlChartRight.Name = "pnlChartRight";
+            pnlChartRight.Padding = new Padding(3, 4, 3, 4);
+            pnlChartRight.Size = new Size(342, 625);
+            pnlChartRight.TabIndex = 4;
+            // 
+            // lblChartTitle
+            // 
+            lblChartTitle.AutoSize = true;
+            lblChartTitle.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
+            lblChartTitle.Location = new Point(10, 10);
+            lblChartTitle.Name = "lblChartTitle";
+            lblChartTitle.Size = new Size(82, 15);
+            lblChartTitle.TabIndex = 0;
+            lblChartTitle.Text = "학습 그래프:";
+            // 
+            // btnCheckTrainingResult
+            // 
+            btnCheckTrainingResult.BackColor = SystemColors.Highlight;
+            btnCheckTrainingResult.Font = new Font("나눔고딕", 10.2F, FontStyle.Bold);
+            btnCheckTrainingResult.ForeColor = Color.White;
+            btnCheckTrainingResult.Location = new Point(271, 17);
+            btnCheckTrainingResult.Margin = new Padding(3, 4, 3, 4);
+            btnCheckTrainingResult.Name = "btnCheckTrainingResult";
+            btnCheckTrainingResult.Size = new Size(260, 44);
+            btnCheckTrainingResult.TabIndex = 1;
+            btnCheckTrainingResult.Text = "학습 결과 확인";
+            btnCheckTrainingResult.UseVisualStyleBackColor = false;
+            // 
             // TrainingControl
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(tableLayoutPanel1);
-            this.Name = "TrainingControl";
-            this.Size = new System.Drawing.Size(600, 500);
-
-            this.ResumeLayout(false);
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(splMainTraining);
+            Margin = new Padding(3, 4, 3, 4);
+            Name = "TrainingControl";
+            Size = new Size(900, 625);
+            splMainTraining.Panel1.ResumeLayout(false);
+            splMainTraining.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splMainTraining).EndInit();
+            splMainTraining.ResumeLayout(false);
+            tableLayoutPanelLeft.ResumeLayout(false);
             pnlTrainSettings.ResumeLayout(false);
             pnlTrainSettings.PerformLayout();
             pnlProgress.ResumeLayout(false);
@@ -250,8 +321,14 @@ namespace SimpleDonkeyManager
             pnlTrainLog.ResumeLayout(false);
             pnlTrainLog.PerformLayout();
             pnlTrainButtons.ResumeLayout(false);
+            pnlChartRight.ResumeLayout(false);
+            pnlChartRight.PerformLayout();
+            ResumeLayout(false);
         }
 
+        private System.Windows.Forms.SplitContainer splMainTraining;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanelLeft;
+        private System.Windows.Forms.Panel pnlTrainSettings;
         private System.Windows.Forms.Label lblDataStatus;
         private System.Windows.Forms.ComboBox cmbModelType;
         private System.Windows.Forms.TextBox txtModelPath;
@@ -260,5 +337,15 @@ namespace SimpleDonkeyManager
         private System.Windows.Forms.ProgressBar prgTrainingProgress;
         private System.Windows.Forms.Label lblProgress;
         private System.Windows.Forms.Button btnSelectModelPath;
+        private System.Windows.Forms.Panel pnlChartRight;
+        private System.Windows.Forms.Label lblChartTitle;
+        private System.Windows.Forms.Label lblModelType;
+        private System.Windows.Forms.Label lblModelPath;
+        private System.Windows.Forms.Panel pnlProgress;
+        private System.Windows.Forms.Label lblProgressLabel;
+        private System.Windows.Forms.Panel pnlTrainLog;
+        private System.Windows.Forms.Label lblTrainingLog;
+        private System.Windows.Forms.Panel pnlTrainButtons;
+        private Button btnCheckTrainingResult;
     }
 }

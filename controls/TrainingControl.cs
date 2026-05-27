@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using OxyPlot;
+using OxyPlot.Series;
+using OxyPlot.Axes;
+using OxyPlot.WindowsForms;
 
 namespace SimpleDonkeyManager
 {
@@ -22,11 +23,15 @@ namespace SimpleDonkeyManager
         private Process trainingProcess;
         private bool isTraining = false;
         private bool isFiltered = false;  // 필터 여부
+        private ChartDataModel chartDataModel = new ChartDataModel();  // 그래프 데이터 모델
+        private PlotView plotView = null;  // OxyPlot 뷰어
+        private PlotModel plotModel = null;  // 플롯 모델 (Donkey UI 형식)
 
         public TrainingControl()
         {
             InitializeComponent();
             InitializeTrainingControl();
+            InitializeChartView();
         }
 
         private void InitializeTrainingControl()
@@ -44,12 +49,252 @@ namespace SimpleDonkeyManager
                 // 버튼 이벤트
                 btnSelectModelPath.Click += BtnSelectModelPath_Click;
                 btnStartTraining.Click += BtnStartTraining_Click;
+                btnCheckTrainingResult.Click += BtnCheckTrainingResult_Click;
+
+                // Resize 이벤트 핸들러
+                this.Resize += TrainingControl_Resize;
+                this.Load += TrainingControl_Load;
 
                 UpdateUI();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"TrainingControl 초기화 오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void TrainingControl_Load(object sender, EventArgs e)
+        {
+            // 로드 시 초기 레이아웃 조정
+            AdjustLayoutForWindowSize();
+        }
+
+        private void TrainingControl_Resize(object sender, EventArgs e)
+        {
+            // 창 크기 변경 시 레이아웃 조정
+            AdjustLayoutForWindowSize();
+        }
+
+        /// <summary>
+        /// 창 크기에 따라 레이아웃을 동적으로 조정합니다.
+        /// </summary>
+        private void AdjustLayoutForWindowSize()
+        {
+            try
+            {
+                if (splMainTraining == null || splMainTraining.IsDisposed)
+                    return;
+
+                int controlWidth = this.Width;
+                int controlHeight = this.Height;
+
+                // 작은 화면 (폭이 900 이하): 상하 레이아웃
+                // 큰 화면 (폭이 900 초과): 좌우 레이아웃
+                if (controlWidth <= 900)
+                {
+                    // 수직 방향 (상하)
+                    if (splMainTraining.Orientation != Orientation.Horizontal)
+                    {
+                        splMainTraining.Orientation = Orientation.Horizontal;
+                        LogInfo($"레이아웃 변경: 수직 방향 (폭: {controlWidth}px)");
+                    }
+
+                    // 상하 비율 조정: 위쪽 50%, 아래쪽 50%
+                    int splitterDistance = (int)(controlHeight * 0.5);
+                    if (splMainTraining.SplitterDistance != splitterDistance && splitterDistance > splMainTraining.Panel1MinSize && splitterDistance < controlHeight - splMainTraining.Panel2MinSize)
+                    {
+                        splMainTraining.SplitterDistance = splitterDistance;
+                    }
+                }
+                else
+                {
+                    // 수평 방향 (좌우)
+                    if (splMainTraining.Orientation != Orientation.Vertical)
+                    {
+                        splMainTraining.Orientation = Orientation.Vertical;
+                        LogInfo($"레이아웃 변경: 수평 방향 (폭: {controlWidth}px)");
+                    }
+
+                    // 좌우 비율 조정: 좌측 약 60%, 우측 약 40%
+                    int splitterDistance = (int)(controlWidth * 0.6);
+                    if (splMainTraining.SplitterDistance != splitterDistance && splitterDistance > splMainTraining.Panel1MinSize && splitterDistance < controlWidth - splMainTraining.Panel2MinSize)
+                    {
+                        splMainTraining.SplitterDistance = splitterDistance;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"레이아웃 조정 오류: {ex.Message}");
+            }
+        }
+
+        private void InitializeChartView()
+        {
+            try
+            {
+                // OxyPlot PlotView 생성 (Donkey UI 형식)
+                plotView = new PlotView();
+                plotView.Dock = DockStyle.Fill;
+                plotView.Name = "plotViewChart";
+                plotView.Margin = new Padding(5);
+
+                // 플롯 모델 초기화 (손실값 표시)
+                CreatePlotModel();
+                plotView.Model = plotModel;
+
+                // pnlChartRight에 추가
+                pnlChartRight.Controls.Clear();
+                pnlChartRight.Controls.Add(plotView);
+
+                LogInfo("그래프 뷰 초기화 완료");
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"그래프 초기화 오류: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Donkey UI 형식의 학습 그래프 모델 생성
+        /// 훈련 손실과 검증 손실을 함께 표시
+        /// </summary>
+        private void CreatePlotModel()
+        {
+            plotModel = new PlotModel
+            {
+                Title = "Training Loss Progress",
+                TitleFontSize = 14,
+                Background = OxyColors.White,
+                PlotAreaBorderColor = OxyColors.Black,
+                PlotAreaBorderThickness = new OxyThickness(1)
+            };
+
+            // X축 (에포크)
+            var xAxis = new LinearAxis
+            {
+                Position = AxisPosition.Bottom,
+                Title = "Epoch",
+                TitleFontSize = 12,
+                MajorGridlineStyle = LineStyle.Solid,
+                MajorGridlineColor = OxyColor.FromArgb(200, 200, 200, 200)
+            };
+            plotModel.Axes.Add(xAxis);
+
+            // Y축 (손실값)
+            var yAxis = new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                Title = "Loss",
+                TitleFontSize = 12,
+                MajorGridlineStyle = LineStyle.Solid,
+                MajorGridlineColor = OxyColor.FromArgb(200, 200, 200, 200)
+            };
+            plotModel.Axes.Add(yAxis);
+
+            // 훈련 손실 라인 시리즈 (파란색)
+            var trainSeries = new LineSeries
+            {
+                Title = "Train Loss",
+                Color = OxyColors.Blue,
+                StrokeThickness = 2,
+                MarkerType = MarkerType.Circle,
+                MarkerSize = 4,
+                MarkerFill = OxyColors.Blue
+            };
+            plotModel.Series.Add(trainSeries);
+
+            // 검증 손실 라인 시리즈 (빨간색)
+            var valSeries = new LineSeries
+            {
+                Title = "Validation Loss",
+                Color = OxyColors.Red,
+                StrokeThickness = 2,
+                MarkerType = MarkerType.Circle,
+                MarkerSize = 4,
+                MarkerFill = OxyColors.Red
+            };
+            plotModel.Series.Add(valSeries);
+        }
+
+        /// <summary>
+        /// 그래프에 새 에포크 데이터 추가 및 실시간 업데이트
+        /// </summary>
+        private void UpdateChartWithMetric(int epoch, float trainLoss, float? validationLoss = null)
+        {
+            try
+            {
+                if (plotView == null || plotModel == null)
+                    return;
+
+                // ChartDataModel에 메트릭 추가
+                chartDataModel.AddMetric(epoch, trainLoss, validationLoss);
+
+                // UI 스레드에서 업데이트
+                if (plotView.InvokeRequired)
+                {
+                    plotView.Invoke(new Action(() => UpdateChartUI()));
+                }
+                else
+                {
+                    UpdateChartUI();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"그래프 업데이트 오류: {ex.Message}");
+            }
+        }
+
+        private void UpdateChartUI()
+        {
+            try
+            {
+                if (plotModel == null || chartDataModel == null)
+                    return;
+
+                // 기존 시리즈 데이터 제거 (처음부터 재생성)
+                if (plotModel.Series.Count >= 2)
+                {
+                    ((LineSeries)plotModel.Series[0]).Points.Clear();
+                    ((LineSeries)plotModel.Series[1]).Points.Clear();
+                }
+
+                // 훈련 손실 데이터 추가
+                var trainLosses = chartDataModel.GetTrainLosses();
+                var epochs = chartDataModel.GetEpochs();
+                for (int i = 0; i < Math.Min(trainLosses.Length, epochs.Length); i++)
+                {
+                    ((LineSeries)plotModel.Series[0]).Points.Add(
+                        new DataPoint(epochs[i], trainLosses[i]));
+                }
+
+                // 검증 손실 데이터 추가
+                var validationLosses = chartDataModel.GetValidationLosses();
+                var metricsCount = chartDataModel.GetMetricCount();
+                var filteredEpochs = new List<double>();
+
+                for (int i = 0; i < metricsCount; i++)
+                {
+                    var metrics = chartDataModel.GetAllMetrics();
+                    if (i < metrics.Count && metrics[i].ValidationLoss.HasValue)
+                    {
+                        filteredEpochs.Add(metrics[i].Epoch);
+                    }
+                }
+
+                for (int i = 0; i < Math.Min(validationLosses.Length, filteredEpochs.Count); i++)
+                {
+                    ((LineSeries)plotModel.Series[1]).Points.Add(
+                        new DataPoint(filteredEpochs[i], validationLosses[i]));
+                }
+
+                // 플롯 새로고침
+                plotModel.InvalidatePlot(true);
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"그래프 UI 업데이트 오류: {ex.Message}");
             }
         }
 
@@ -112,12 +357,12 @@ namespace SimpleDonkeyManager
 
                     if (count > 0)
                     {
-                        lblDataStatus.Text = $"데이터셋: {count}개 프레임 ({status}) 준비됨";
+                        lblDataStatus.Text = $"데이터: {count}개 프레임 ({status}) 준비됨";
                         lblDataStatus.ForeColor = Color.Green;
                     }
                     else
                     {
-                        lblDataStatus.Text = "데이터셋: 준비되지 않음";
+                        lblDataStatus.Text = "데이터: 준비되지 않음";
                         lblDataStatus.ForeColor = Color.Red;
                     }
                 }
@@ -211,6 +456,14 @@ namespace SimpleDonkeyManager
                 btnStartTraining.Text = "⏹ 학습 중지";
                 prgTrainingProgress.Value = 0;
                 lstTrainingLog.Items.Clear();
+
+                // 그래프 초기화
+                chartDataModel.Clear();
+                CreatePlotModel();
+                if (plotView != null)
+                {
+                    plotView.Model = plotModel;
+                }
 
                 Task.Run(() =>
                 {
@@ -312,6 +565,11 @@ namespace SimpleDonkeyManager
                             if (exitCode == 0)
                             {
                                 LogInfo("학습이 정상 완료되었습니다.");
+                                // 학습 완료 후 메트릭 저장
+                                SaveTrainingMetrics(modelPath);
+
+                                // 학습 완료 후 결과 데이터를 ResultControl로 전달
+                                NotifyTrainingCompleted(modelPath);
                             }
                             else
                             {
@@ -536,11 +794,12 @@ namespace SimpleDonkeyManager
         {
             try
             {
-                // "Epoch 1/100" 형식 파싱
+                // "Epoch 1/100" 형식 파싱 (진행도)
                 if (logLine.Contains("Epoch") && logLine.Contains("/"))
                 {
-                    string[] parts = logLine.Split(new[] { "Epoch", "/", " " }, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length >= 3 && int.TryParse(parts[1], out int current) && int.TryParse(parts[2], out int total))
+                    // 정규식으로 더 정확하게 파싱
+                    var epochMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"Epoch\s+(\d+)/(\d+)");
+                    if (epochMatch.Success && int.TryParse(epochMatch.Groups[1].Value, out int current) && int.TryParse(epochMatch.Groups[2].Value, out int total))
                     {
                         int progress = (int)((double)current / total * 100);
                         if (prgTrainingProgress != null && !prgTrainingProgress.IsDisposed)
@@ -549,8 +808,47 @@ namespace SimpleDonkeyManager
                             {
                                 prgTrainingProgress.Value = Math.Min(progress, 100);
                                 lblProgress.Text = $"{progress}%";
+                                LogInfo($"진행도 업데이트: {progress}% ({current}/{total})");
                             }));
                         }
+                    }
+                }
+
+                // 손실값 파싱: "loss: 0.1234 - val_loss: 0.5678" 형식
+                if (logLine.Contains("loss:"))
+                {
+                    float? trainLoss = null;
+                    float? valLoss = null;
+                    int epochNum = 0;
+
+                    // 에포크 번호 추출
+                    if (logLine.Contains("Epoch"))
+                    {
+                        var epochMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"Epoch\s+(\d+)");
+                        if (epochMatch.Success && int.TryParse(epochMatch.Groups[1].Value, out int ep))
+                        {
+                            epochNum = ep;
+                        }
+                    }
+
+                    // 훈련 손실 추출 (loss: 값)
+                    var lossMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"loss:\s*([\d.]+)");
+                    if (lossMatch.Success && float.TryParse(lossMatch.Groups[1].Value, out float loss))
+                    {
+                        trainLoss = loss;
+                    }
+
+                    // 검증 손실 추출 (val_loss: 값 또는 - val_loss: 값)
+                    var valLossMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"val_loss:\s*([\d.]+)");
+                    if (valLossMatch.Success && float.TryParse(valLossMatch.Groups[1].Value, out float vLoss))
+                    {
+                        valLoss = vLoss;
+                    }
+
+                    // 데이터가 있으면 그래프 업데이트
+                    if (trainLoss.HasValue && epochNum > 0)
+                    {
+                        UpdateChartWithMetric(epochNum, trainLoss.Value, valLoss);
                     }
                 }
             }
@@ -579,6 +877,49 @@ namespace SimpleDonkeyManager
             }
         }
 
+        /// <summary>
+        /// 학습 완료를 MainWindow에 알리고 ResultControl에 데이터를 전달합니다.
+        /// </summary>
+        private void NotifyTrainingCompleted(string modelPath)
+        {
+            try
+            {
+                // 소요 시간을 정확히 기록
+                chartDataModel.MarkAsCompleted();
+
+                MainWindow mainWindow = this.FindMainWindow();
+                if (mainWindow != null)
+                {
+                    // ResultControl에 학습 메트릭과 데이터 전달
+                    mainWindow.SetTrainingResults(chartDataModel, currentTrainingData);
+                    LogInfo("학습 결과를 결과 화면으로 전달했습니다.");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"학습 완료 알림 오류: {ex.Message}");
+            }
+        }
+
+        private void BtnCheckTrainingResult_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                MainWindow mainWindow = this.FindMainWindow();
+                if (mainWindow != null)
+                {
+                    // 결과 화면으로 이동 (버튼 3을 클릭한 것처럼 동작)
+                    mainWindow.ShowResultControl();
+                    LogInfo("결과 화면으로 이동했습니다.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"결과 화면 이동 오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"결과 화면 이동 오류: {ex.Message}");
+            }
+        }
+
         private void LogInfo(string message)
         {
             if (logger != null)
@@ -595,12 +936,56 @@ namespace SimpleDonkeyManager
             }
         }
 
-        private void groupBox1_Enter(object sender, EventArgs e)
+        /// <summary>
+        /// 학습 메트릭을 JSON 파일로 저장합니다.
+        /// 결과 화면에서 불러올 수 있도록 모델 파일과 같은 폴더에 저장합니다.
+        /// </summary>
+        private void SaveTrainingMetrics(string modelPath)
         {
+            try
+            {
+                if (chartDataModel == null || chartDataModel.GetMetricCount() == 0)
+                {
+                    LogWarning("저장할 학습 메트릭이 없습니다.");
+                    return;
+                }
+
+                // 메트릭 JSON 파일 경로 (모델 파일과 같은 폴더에 저장)
+                string modelDir = Path.GetDirectoryName(modelPath);
+                string modelFileName = Path.GetFileNameWithoutExtension(modelPath);
+                string metricsPath = Path.Combine(modelDir, $"{modelFileName}_metrics.json");
+
+                // JSON 저장
+                string json = chartDataModel.ToJson();
+                File.WriteAllText(metricsPath, json);
+
+                LogInfo($"학습 메트릭 저장 완료: {metricsPath}");
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"메트릭 저장 오류: {ex.Message}");
+            }
         }
 
-        private void label8_Click(object sender, EventArgs e)
+        public ChartDataModel GetChartDataModel()
         {
+            return chartDataModel;
+        }
+
+        /// <summary>
+        /// MainWindow를 부모 계층에서 찾습니다.
+        /// UserControl → pnlMainContent(Panel) → MainWindow(Form) 구조를 지원합니다.
+        /// </summary>
+        private MainWindow FindMainWindow()
+        {
+            Control parent = this.Parent;
+            while (parent != null)
+            {
+                if (parent is MainWindow mw)
+                    return mw;
+                parent = parent.Parent;
+            }
+            return null;
         }
     }
 }

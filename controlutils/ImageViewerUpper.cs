@@ -28,10 +28,9 @@ namespace SimpleDonkeyManager.controlutils
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
 
             // 버튼 이벤트
-            button1.Click += Button1_Click; // 처음
-            button6.Click += Button6_Click; // 이전
-            button5.Click += Button5_Click; // 재생
-            button2.Click += Button2_Click; // 다음
+            btnFirst.Click += BtnFirst_Click;    // 처음
+            btnPlay.Click += BtnPlay_Click;      // 재생
+            btnNext.Click += BtnNext_Click;      // 다음
             comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
             trackBar2.ValueChanged += TrackBar2_ValueChanged;
 
@@ -178,23 +177,23 @@ namespace SimpleDonkeyManager.controlutils
                     return;
 
                 // 프레임 정보 업데이트
-                if (label2 != null)
+                if (lblFrame != null)
                 {
-                    label2.Text = $"Frame: {frameData.FrameNumber:0000} / {frameDataList.Count:0,0}";
+                    lblFrame.Text = $"Frame: {frameData.FrameNumber:0000} / {frameDataList.Count:0,0}";
                 }
 
                 // Angle 정보
-                if (label3 != null)
+                if (lblAngle != null)
                 {
                     double angle = frameData.GetAngle();
-                    label3.Text = $"Angle: {angle:F2} rad";
+                    lblAngle.Text = $"Angle: {angle:F2} rad";
                 }
 
                 // Throttle 정보
-                if (label4 != null)
+                if (lblThrottle != null)
                 {
                     double throttle = frameData.GetThrottle();
-                    label4.Text = $"Throttle: {throttle:F2}";
+                    lblThrottle.Text = $"Throttle: {throttle:F2}";
                 }
             }
             catch (Exception ex)
@@ -203,30 +202,21 @@ namespace SimpleDonkeyManager.controlutils
             }
         }
 
-        private void Button1_Click(object sender, EventArgs e)
+        private void BtnFirst_Click(object sender, EventArgs e)
         {
             // 처음으로
             DisplayFrameAtIndex(0);
         }
 
-        private void Button6_Click(object sender, EventArgs e)
-        {
-            // 이전 프레임
-            if (currentFrameIndex > 0)
-            {
-                DisplayFrameAtIndex(currentFrameIndex - 1);
-            }
-        }
-
-        private void Button5_Click(object sender, EventArgs e)
+        private void BtnPlay_Click(object sender, EventArgs e)
         {
             // 재생/정지 토글
             if (isPlaying)
             {
                 isPlaying = false;
                 playTimer.Stop();
-                button5.Text = "▶";
-                button5.BackColor = Color.DodgerBlue;
+                btnPlay.Text = "▶";
+                btnPlay.BackColor = Color.DodgerBlue;
             }
             else
             {
@@ -238,12 +228,12 @@ namespace SimpleDonkeyManager.controlutils
 
                 isPlaying = true;
                 playTimer.Start();
-                button5.Text = "⏸";
-                button5.BackColor = Color.DarkOrange;
+                btnPlay.Text = "⏸";
+                btnPlay.BackColor = Color.DarkOrange;
             }
         }
 
-        private void Button2_Click(object sender, EventArgs e)
+        private void BtnNext_Click(object sender, EventArgs e)
         {
             // 다음 프레임
             if (currentFrameIndex < frameDataList.Count - 1)
@@ -266,8 +256,8 @@ namespace SimpleDonkeyManager.controlutils
                     {
                         isPlaying = false;
                         playTimer.Stop();
-                        button5.Text = "▶";
-                        button5.BackColor = Color.DodgerBlue;
+                        btnPlay.Text = "▶";
+                        btnPlay.BackColor = Color.DodgerBlue;
                     }
                 }
             }
@@ -343,16 +333,5 @@ namespace SimpleDonkeyManager.controlutils
             }
         }
 
-        private void panel3_Paint(object sender, PaintEventArgs e)
-        {
+            }
         }
-
-        private void label8_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void label8_Click_1(object sender, EventArgs e)
-        {
-        }
-    }
-}

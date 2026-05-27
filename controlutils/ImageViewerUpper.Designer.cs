@@ -1,16 +1,9 @@
-﻿namespace SimpleDonkeyManager.controlutils
+namespace SimpleDonkeyManager.controlutils
 {
     partial class ImageViewerUpper
     {
-        /// <summary> 
-        /// 필수 디자이너 변수입니다.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
-        /// 사용 중인 모든 리소스를 정리합니다.
-        /// </summary>
-        /// <param name="disposing">관리되는 리소스를 삭제해야 하면 true이고, 그렇지 않으면 false입니다.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -20,311 +13,245 @@
             base.Dispose(disposing);
         }
 
-        #region 구성 요소 디자이너에서 생성한 코드
-
-        /// <summary> 
-        /// 디자이너 지원에 필요한 메서드입니다. 
-        /// 이 메서드의 내용을 코드 편집기로 수정하지 마세요.
-        /// </summary>
         private void InitializeComponent()
         {
             tableLayoutPanel1 = new TableLayoutPanel();
-            trackBar2 = new TrackBar();
+            pnlImage = new Panel();
             pictureBox1 = new PictureBox();
-            panel1 = new Panel();
-            label4 = new Label();
-            label3 = new Label();
-            label2 = new Label();
-            panel2 = new Panel();
-            label7 = new Label();
-            label6 = new Label();
-            label5 = new Label();
-            panel4 = new Panel();
-            label8 = new Label();
-            button1 = new Button();
-            button2 = new Button();
-            button5 = new Button();
-            button6 = new Button();
-            label9 = new Label();
+            pnlControls = new Panel();
+            btnFirst = new Button();
+            btnPlay = new Button();
+            btnNext = new Button();
+            lblSpeed = new Label();
             comboBox1 = new ComboBox();
-            panel3 = new Panel();
+            pnlTrackBar = new Panel();
+            trackBar2 = new TrackBar();
+            pnlInfo = new Panel();
+            lblFrame = new Label();
+            lblAngle = new Label();
+            lblThrottle = new Label();
             tableLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
+            pnlImage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
-            panel1.SuspendLayout();
-            panel2.SuspendLayout();
-            panel4.SuspendLayout();
+            pnlControls.SuspendLayout();
+            pnlTrackBar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
+            pnlInfo.SuspendLayout();
             SuspendLayout();
             // 
             // tableLayoutPanel1
             // 
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Controls.Add(trackBar2, 0, 3);
-            tableLayoutPanel1.Controls.Add(pictureBox1, 0, 0);
-            tableLayoutPanel1.Controls.Add(panel1, 0, 1);
-            tableLayoutPanel1.Controls.Add(panel3, 0, 5);
-            tableLayoutPanel1.Controls.Add(panel2, 0, 4);
-            tableLayoutPanel1.Controls.Add(panel4, 0, 2);
+            tableLayoutPanel1.Controls.Add(pnlImage, 0, 0);
+            tableLayoutPanel1.Controls.Add(pnlControls, 0, 1);
+            tableLayoutPanel1.Controls.Add(pnlTrackBar, 0, 2);
+            tableLayoutPanel1.Controls.Add(pnlInfo, 0, 3);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 6;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 54.00551F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 13.0783119F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.03012F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 7.27514029F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 15.09036F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.52056265F));
-            tableLayoutPanel1.Size = new Size(556, 990);
+            tableLayoutPanel1.RowCount = 4;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 100F));
+            tableLayoutPanel1.Size = new Size(357, 600);
             tableLayoutPanel1.TabIndex = 0;
             // 
-            // trackBar2
+            // pnlImage
             // 
-            trackBar2.Dock = DockStyle.Fill;
-            trackBar2.Location = new Point(3, 715);
-            trackBar2.Maximum = 12345;
-            trackBar2.Minimum = 1;
-            trackBar2.Name = "trackBar2";
-            trackBar2.Size = new Size(550, 66);
-            trackBar2.TabIndex = 6;
-            trackBar2.Value = 1;
+            pnlImage.BackColor = Color.White;
+            pnlImage.BorderStyle = BorderStyle.FixedSingle;
+            pnlImage.Controls.Add(pictureBox1);
+            pnlImage.Dock = DockStyle.Fill;
+            pnlImage.Location = new Point(3, 3);
+            pnlImage.Name = "pnlImage";
+            pnlImage.Size = new Size(351, 364);
+            pnlImage.TabIndex = 0;
             // 
             // pictureBox1
             // 
             pictureBox1.Dock = DockStyle.Fill;
-            pictureBox1.Location = new Point(10, 10);
-            pictureBox1.Margin = new Padding(10);
+            pictureBox1.Location = new Point(0, 0);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(536, 514);
+            pictureBox1.Size = new Size(349, 362);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.TabIndex = 1;
+            pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             // 
-            // panel1
+            // pnlControls
             // 
-            panel1.Controls.Add(label4);
-            panel1.Controls.Add(label3);
-            panel1.Controls.Add(label2);
-            panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(3, 537);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(550, 123);
-            panel1.TabIndex = 2;
+            pnlControls.BackColor = Color.FromArgb(248, 248, 248);
+            pnlControls.Controls.Add(btnFirst);
+            pnlControls.Controls.Add(btnPlay);
+            pnlControls.Controls.Add(btnNext);
+            pnlControls.Controls.Add(lblSpeed);
+            pnlControls.Controls.Add(comboBox1);
+            pnlControls.Dock = DockStyle.Fill;
+            pnlControls.Location = new Point(3, 373);
+            pnlControls.Name = "pnlControls";
+            pnlControls.Size = new Size(351, 64);
+            pnlControls.TabIndex = 1;
             // 
-            // label4
+            // btnFirst
             // 
-            label4.AutoSize = true;
-            label4.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label4.Location = new Point(12, 88);
-            label4.Name = "label4";
-            label4.Size = new Size(150, 23);
-            label4.TabIndex = 2;
-            label4.Text = "Throttle: 0.18";
+            btnFirst.BackColor = Color.DodgerBlue;
+            btnFirst.FlatStyle = FlatStyle.Flat;
+            btnFirst.Font = new Font("나눔고딕", 24F, FontStyle.Bold);
+            btnFirst.ForeColor = Color.White;
+            btnFirst.Location = new Point(15, 8);
+            btnFirst.Name = "btnFirst";
+            btnFirst.Size = new Size(50, 50);
+            btnFirst.TabIndex = 0;
+            btnFirst.Text = "⏮";
+            btnFirst.TextAlign = ContentAlignment.MiddleLeft;
+            btnFirst.UseVisualStyleBackColor = false;
             // 
-            // label3
+            // btnPlay
             // 
-            label3.AutoSize = true;
-            label3.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label3.Location = new Point(12, 53);
-            label3.Name = "label3";
-            label3.Size = new Size(170, 23);
-            label3.TabIndex = 1;
-            label3.Text = "Angle: 0.24 rad";
+            btnPlay.BackColor = Color.DodgerBlue;
+            btnPlay.FlatStyle = FlatStyle.Flat;
+            btnPlay.Font = new Font("나눔고딕", 24F, FontStyle.Bold);
+            btnPlay.ForeColor = Color.White;
+            btnPlay.Location = new Point(75, 8);
+            btnPlay.Name = "btnPlay";
+            btnPlay.Size = new Size(50, 50);
+            btnPlay.TabIndex = 1;
+            btnPlay.Text = "▶";
+            btnPlay.TextAlign = ContentAlignment.MiddleLeft;
+            btnPlay.UseVisualStyleBackColor = false;
             // 
-            // label2
+            // btnNext
             // 
-            label2.AutoSize = true;
-            label2.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label2.Location = new Point(12, 20);
-            label2.Name = "label2";
-            label2.Size = new Size(233, 23);
-            label2.TabIndex = 0;
-            label2.Text = "Frame: 0001 / 12,345";
+            btnNext.BackColor = Color.DodgerBlue;
+            btnNext.FlatStyle = FlatStyle.Flat;
+            btnNext.Font = new Font("나눔고딕", 24F, FontStyle.Bold);
+            btnNext.ForeColor = Color.White;
+            btnNext.Location = new Point(135, 8);
+            btnNext.Name = "btnNext";
+            btnNext.Size = new Size(50, 50);
+            btnNext.TabIndex = 2;
+            btnNext.Text = "⏭";
+            btnNext.UseVisualStyleBackColor = false;
             // 
-            // panel2
+            // lblSpeed
             // 
-            panel2.Controls.Add(comboBox1);
-            panel2.Controls.Add(label7);
-            panel2.Controls.Add(label9);
-            panel2.Controls.Add(label6);
-            panel2.Controls.Add(button6);
-            panel2.Controls.Add(label5);
-            panel2.Controls.Add(button5);
-            panel2.Controls.Add(button2);
-            panel2.Controls.Add(button1);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(3, 787);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(550, 143);
-            panel2.TabIndex = 4;
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label7.Location = new Point(472, -3);
-            label7.Name = "label7";
-            label7.Size = new Size(75, 23);
-            label7.TabIndex = 2;
-            label7.Text = "12345";
-            // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label6.Location = new Point(195, 0);
-            label6.Name = "label6";
-            label6.Size = new Size(150, 23);
-            label6.TabIndex = 1;
-            label6.Text = "0001 / 12345";
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label5.Location = new Point(3, 0);
-            label5.Name = "label5";
-            label5.Size = new Size(23, 23);
-            label5.TabIndex = 0;
-            label5.Text = "1";
-            // 
-            // panel4
-            // 
-            panel4.Controls.Add(label8);
-            panel4.Dock = DockStyle.Top;
-            panel4.Location = new Point(3, 666);
-            panel4.Name = "panel4";
-            panel4.Size = new Size(550, 43);
-            panel4.TabIndex = 7;
-            // 
-            // label8
-            // 
-            label8.Anchor = AnchorStyles.None;
-            label8.AutoSize = true;
-            label8.Font = new Font("나눔고딕", 9.75F, FontStyle.Bold);
-            label8.Location = new Point(12, 20);
-            label8.Name = "label8";
-            label8.Size = new Size(117, 23);
-            label8.TabIndex = 8;
-            label8.Text = "프레임 이동";
-            label8.Click += label8_Click_1;
-            // 
-            // button1
-            // 
-            button1.Font = new Font("맑은 고딕", 16F);
-            button1.Location = new Point(40, 48);
-            button1.Name = "button1";
-            button1.Size = new Size(55, 55);
-            button1.TabIndex = 0;
-            button1.Text = "⏮";
-            button1.TextAlign = ContentAlignment.TopCenter;
-            button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            button2.Font = new Font("맑은 고딕", 16F);
-            button2.Location = new Point(226, 47);
-            button2.Name = "button2";
-            button2.Size = new Size(55, 55);
-            button2.TabIndex = 4;
-            button2.Text = "⏭";
-            button2.UseVisualStyleBackColor = true;
-            // 
-            // button5
-            // 
-            button5.BackColor = Color.DodgerBlue;
-            button5.Font = new Font("맑은 고딕", 16F);
-            button5.ForeColor = SystemColors.ControlLightLight;
-            button5.Location = new Point(165, 47);
-            button5.Name = "button5";
-            button5.Size = new Size(55, 55);
-            button5.TabIndex = 5;
-            button5.Text = "▶";
-            button5.UseVisualStyleBackColor = false;
-            // 
-            // button6
-            // 
-            button6.Font = new Font("맑은 고딕", 16F);
-            button6.Location = new Point(101, 47);
-            button6.Name = "button6";
-            button6.Size = new Size(55, 55);
-            button6.TabIndex = 6;
-            button6.Text = "◀";
-            button6.UseVisualStyleBackColor = true;
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.Font = new Font("나눔고딕", 14F, FontStyle.Bold);
-            label9.Location = new Point(349, 56);
-            label9.Name = "label9";
-            label9.Size = new Size(68, 32);
-            label9.TabIndex = 7;
-            label9.Text = "배속";
+            lblSpeed.AutoSize = true;
+            lblSpeed.Font = new Font("나눔고딕", 10F, FontStyle.Bold);
+            lblSpeed.Location = new Point(208, 15);
+            lblSpeed.Name = "lblSpeed";
+            lblSpeed.Size = new Size(40, 16);
+            lblSpeed.TabIndex = 3;
+            lblSpeed.Text = "배속:";
             // 
             // comboBox1
             // 
-            comboBox1.Font = new Font("나눔고딕", 11.999999F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            comboBox1.Font = new Font("나눔고딕", 10F, FontStyle.Bold);
             comboBox1.FormattingEnabled = true;
-            comboBox1.Items.AddRange(new object[] { "0.5x", "1.0x", "2.0x" });
-            comboBox1.Location = new Point(417, 54);
+            comboBox1.Items.AddRange(new object[] { "0.5x", "1.0x", "1.5x", "2.0x" });
+            comboBox1.Location = new Point(254, 12);
             comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(86, 36);
-            comboBox1.TabIndex = 8;
+            comboBox1.Size = new Size(80, 23);
+            comboBox1.TabIndex = 4;
             comboBox1.Text = "1.0x";
             // 
-            // panel3
+            // pnlTrackBar
             // 
-            panel3.Dock = DockStyle.Fill;
-            panel3.Location = new Point(3, 936);
-            panel3.Name = "panel3";
-            panel3.Size = new Size(550, 51);
-            panel3.TabIndex = 5;
-            panel3.Paint += panel3_Paint;
+            pnlTrackBar.BackColor = Color.FromArgb(242, 242, 242);
+            pnlTrackBar.Controls.Add(trackBar2);
+            pnlTrackBar.Dock = DockStyle.Fill;
+            pnlTrackBar.Location = new Point(3, 443);
+            pnlTrackBar.Name = "pnlTrackBar";
+            pnlTrackBar.Padding = new Padding(10);
+            pnlTrackBar.Size = new Size(351, 54);
+            pnlTrackBar.TabIndex = 2;
+            // 
+            // trackBar2
+            // 
+            trackBar2.BackColor = Color.White;
+            trackBar2.Dock = DockStyle.Fill;
+            trackBar2.Location = new Point(10, 10);
+            trackBar2.Name = "trackBar2";
+            trackBar2.Size = new Size(331, 34);
+            trackBar2.TabIndex = 0;
+            // 
+            // pnlInfo
+            // 
+            pnlInfo.BackColor = Color.FromArgb(248, 248, 248);
+            pnlInfo.BorderStyle = BorderStyle.FixedSingle;
+            pnlInfo.Controls.Add(lblFrame);
+            pnlInfo.Controls.Add(lblAngle);
+            pnlInfo.Controls.Add(lblThrottle);
+            pnlInfo.Dock = DockStyle.Fill;
+            pnlInfo.Location = new Point(3, 503);
+            pnlInfo.Name = "pnlInfo";
+            pnlInfo.Size = new Size(351, 94);
+            pnlInfo.TabIndex = 3;
+            // 
+            // lblFrame
+            // 
+            lblFrame.AutoSize = true;
+            lblFrame.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            lblFrame.Location = new Point(10, 10);
+            lblFrame.Name = "lblFrame";
+            lblFrame.Size = new Size(134, 17);
+            lblFrame.TabIndex = 0;
+            lblFrame.Text = "Frame: 0000 / 0";
+            // 
+            // lblAngle
+            // 
+            lblAngle.AutoSize = true;
+            lblAngle.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            lblAngle.Location = new Point(10, 35);
+            lblAngle.Name = "lblAngle";
+            lblAngle.Size = new Size(131, 17);
+            lblAngle.TabIndex = 1;
+            lblAngle.Text = "Angle: 0.00 rad";
+            // 
+            // lblThrottle
+            // 
+            lblThrottle.AutoSize = true;
+            lblThrottle.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            lblThrottle.Location = new Point(10, 60);
+            lblThrottle.Name = "lblThrottle";
+            lblThrottle.Size = new Size(116, 17);
+            lblThrottle.TabIndex = 2;
+            lblThrottle.Text = "Throttle: 0.00";
             // 
             // ImageViewerUpper
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(tableLayoutPanel1);
-            Margin = new Padding(4, 5, 4, 5);
             Name = "ImageViewerUpper";
-            Size = new Size(556, 990);
+            Size = new Size(357, 600);
             tableLayoutPanel1.ResumeLayout(false);
-            tableLayoutPanel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)trackBar2).EndInit();
+            pnlImage.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
-            panel2.ResumeLayout(false);
-            panel2.PerformLayout();
-            panel4.ResumeLayout(false);
-            panel4.PerformLayout();
+            pnlControls.ResumeLayout(false);
+            pnlControls.PerformLayout();
+            pnlTrackBar.ResumeLayout(false);
+            pnlTrackBar.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)trackBar2).EndInit();
+            pnlInfo.ResumeLayout(false);
+            pnlInfo.PerformLayout();
             ResumeLayout(false);
         }
 
-        #endregion
-
-        private TableLayoutPanel tableLayoutPanel1;
-        private PictureBox pictureBox1;
-        private Panel panel1;
-        private Label label4;
-        private Label label3;
-        private Label label2;
-        private Panel panel2;
-        private Label label7;
-        private Label label6;
-        private Label label5;
-        private TrackBar trackBar2;
-        private Panel panel4;
-        private Label label8;
-        private ComboBox comboBox1;
-        private Label label9;
-        private Button button6;
-        private Button button5;
-        private Button button2;
-        private Button button1;
-        private Panel panel3;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Panel pnlImage;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Panel pnlControls;
+        private System.Windows.Forms.Button btnFirst;
+        private System.Windows.Forms.Button btnPlay;
+        private System.Windows.Forms.Button btnNext;
+        private System.Windows.Forms.Label lblSpeed;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Panel pnlTrackBar;
+        private System.Windows.Forms.TrackBar trackBar2;
+        private System.Windows.Forms.Panel pnlInfo;
+        private System.Windows.Forms.Label lblFrame;
+        private System.Windows.Forms.Label lblAngle;
+        private System.Windows.Forms.Label lblThrottle;
     }
 }

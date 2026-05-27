@@ -80,8 +80,7 @@ def train_mock(tubs, model, model_type, comment):
 
         val_loss = loss + (epoch * 0.01)
 
-        print(f"Epoch {epoch}/{num_epochs}")
-        print(f"Loss: {loss:.4f} - Val Loss: {val_loss:.4f}")
+        print(f"Epoch {epoch}/{num_epochs} - loss: {loss:.4f} - val_loss: {val_loss:.4f}")
 
         # Simulate time
         time.sleep(0.5)

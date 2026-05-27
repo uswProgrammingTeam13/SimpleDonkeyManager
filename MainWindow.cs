@@ -12,6 +12,7 @@ namespace SimpleDonkeyManager
         private int currentControlIndex = -1;
         private UserControl[] controls;
         private Logger logger;
+        private HelpManager helpManager;
 
         /// <summary>
         /// Logger 인스턴스를 공개적으로 노출합니다.
@@ -25,15 +26,31 @@ namespace SimpleDonkeyManager
         {
             InitializeComponent();
             logger = new Logger();
+            helpManager = new HelpManager();
 
             // Logger의 LogAdded 이벤트 구독
             logger.LogAdded += Logger_LogAdded;
 
             tableLayoutPanelButtons.Paint += TableLayoutPanelButtons_Paint;
             pnlConditionView.Paint += PnlConditionView_Paint;
+
             InitializeControls();
+            InitializeHelpTexts();
 
             logger.AppendLog("프로그램이 실행되었습니다. 환영합니다!");
+
+            // 초기 화면 도움말 표시
+            ShowHelpTab(HelpManager.HELP_INITIAL);
+        }
+
+        private void InitializeHelpTexts()
+        {
+            // 각 탭에 도움말 텍스트 로드
+            richTxtHelpInitial.Text = helpManager.GetInitialHelp();
+            richTxtHelpDataLoad.Text = helpManager.GetDataLoadHelp();
+            richTxtHelpDataFilter.Text = helpManager.GetDataFilterHelp();
+            richTxtHelpTraining.Text = helpManager.GetTrainingHelp();
+            richTxtHelpResult.Text = helpManager.GetResultHelp();
         }
 
         private void InitializeControls()
@@ -87,38 +104,48 @@ namespace SimpleDonkeyManager
             controls[currentControlIndex].BringToFront();
 
             UpdateButtonIndicator(index);
+
+            // 해당 컨트롤에 맞는 도움말 탭으로 자동 전환
+            ShowHelpTab(index + 1); // +1은 InitialHelp가 탭 0이므로
+        }
+
+        /// <summary>
+        /// 도움말 탭을 지정된 인덱스로 변경합니다.
+        /// </summary>
+        private void ShowHelpTab(int helpIndex)
+        {
+            if (tabControlHelp != null && helpIndex >= 0 && helpIndex < tabControlHelp.TabCount)
+            {
+                tabControlHelp.SelectedIndex = helpIndex;
+            }
         }
 
         private void UpdateButtonIndicator(int index)
         {
             // 기본 상태로 텍스트와 배경색 초기화
-            btnDataLoadCon.Text = "📂 데이터 불러오기";
-            btnDataFilterCon.Text = "🔍 데이터 필터링";
-            btnTraningCon.Text = "▶ 학습 실행";
-            btnResultCon.Text = "📈 학습 결과 확인";
+            btnDataLoadCon.Text = "① 데이터 불러오기";
+            btnDataFilterCon.Text = "② 데이터 필터링";
+            btnTraningCon.Text = "③ 학습 실행";
+            btnResultCon.Text = "④ 학습 결과 확인";
 
             btnDataLoadCon.BackColor = SystemColors.Control;
             btnDataFilterCon.BackColor = SystemColors.Control;
-
+            btnTraningCon.BackColor = SystemColors.Control;
             btnResultCon.BackColor = SystemColors.Control;
 
             // 활성화된 버튼에만 색상 변경
             switch (index)
             {
                 case 0:
-                    btnDataLoadCon.Text = "📂 데이터 불러오기";
                     btnDataLoadCon.BackColor = Color.LightSkyBlue;
                     break;
                 case 1:
-                    btnDataFilterCon.Text = "🔍 데이터 필터링";
                     btnDataFilterCon.BackColor = Color.LightSkyBlue;
                     break;
                 case 2:
-                    btnTraningCon.Text = "▶ 학습 실행";
                     btnTraningCon.BackColor = Color.LightSkyBlue;
                     break;
                 case 3:
-                    btnResultCon.Text = "📈 학습 결과 확인";
                     btnResultCon.BackColor = Color.LightSkyBlue;
                     break;
             }
@@ -205,6 +232,33 @@ namespace SimpleDonkeyManager
         }
 
         /// <summary>
+        /// 학습 완료 후 ResultControl에 결과를 전달합니다.
+        /// 백그라운드 스레드에서 호출되므로 UI 스레드로 전환합니다.
+        /// </summary>
+        public void SetTrainingResults(ChartDataModel metrics, List<FrameData> trainingData)
+        {
+            if (resultControl == null || metrics == null)
+                return;
+
+            if (resultControl.InvokeRequired)
+            {
+                resultControl.Invoke(new Action(() => SetTrainingResults(metrics, trainingData)));
+                return;
+            }
+
+            resultControl.DisplayTrainingResults(metrics);
+            resultControl.SetTrainingData(trainingData);
+        }
+
+        /// <summary>
+        /// ResultControl을 표시합니다. (결과 화면으로 이동)
+        /// </summary>
+        public void ShowResultControl()
+        {
+            ShowControl(3); // ResultControl은 인덱스 3
+        }
+
+        /// <summary>
         /// 프로그램 상태 라벨 업데이트
         /// </summary>
         public void UpdateProgramStatus(string folderPath, int totalImages, int loadedFrames, string status)
@@ -243,25 +297,30 @@ namespace SimpleDonkeyManager
                     richTxtLog.Invoke(new Action(() =>
                     {
                         richTxtLog.AppendText(e.LogMessage + Environment.NewLine);
+                        // 자동으로 맨 아래로 스크롤
+                        richTxtLog.SelectionStart = richTxtLog.Text.Length;
+                        richTxtLog.ScrollToCaret();
                     }));
                 }
                 else
                 {
                     richTxtLog.AppendText(e.LogMessage + Environment.NewLine);
+                    // 자동으로 맨 아래로 스크롤
+                    richTxtLog.SelectionStart = richTxtLog.Text.Length;
+                    richTxtLog.ScrollToCaret();
                 }
             }
         }
 
 
-                    public void NotifyImageSelected(string imagePath)
-                    {
-                        // DataFilterControl에도 선택된 이미지를 전달
-                        if (dataFilterControl != null)
-                        {
-                            dataFilterControl.DisplayImage(imagePath);
+                            public void NotifyImageSelected(string imagePath)
+                            {
+                                // DataFilterControl에도 선택된 이미지를 전달
+                                if (dataFilterControl != null)
+                                {
+                                    dataFilterControl.DisplayImage(imagePath);
+                                }
+                            }
                         }
                     }
-
-                    }
-                }
 
