@@ -1,8 +1,0 @@
-# Mock Donkey Car Model
-{
-  "type": "linear",
-  "records": 3,
-  "comment": null,
-  "created": "2026-05-27 18:18:58",
-  "mode": "mock"
-}

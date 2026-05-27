@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using System.IO;
-using System.Text.Json;
 
 namespace SimpleDonkeyManager
 {
@@ -81,35 +77,7 @@ namespace SimpleDonkeyManager
         }
 
 
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void imgListPan_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e) { }
 
         private void btnSelectFolder_Click(object sender, EventArgs e)
         {
@@ -178,9 +146,12 @@ namespace SimpleDonkeyManager
                                 mainWindow.UpdateProgramStatus(
                                     folderPath,
                                     stats.TotalImageCount,
-                                    0,  // 현재는 로드된 프레임이 0
+                                    0,
                                     "데이터 로드 준비 완료"
                                 );
+                                mainWindow.SetStatusMessage(
+                                    $"① 데이터 불러오기 —  폴더 선택 완료 ({stats.TotalImageCount:N0}개 이미지)  →  [데이터 로드] 버튼을 눌러주세요.",
+                                    MainWindow.StatusLevel.Info);
                             }
                             catch (Exception ex)
                             {
@@ -269,6 +240,9 @@ namespace SimpleDonkeyManager
                             allFrames.Count,
                             "데이터 로드 완료"
                         );
+                        mainWindow.SetStatusMessage(
+                            $"① 데이터 불러오기 —  로드 완료 ({allFrames.Count:N0}개 프레임)  →  ② [데이터 필터링] 화면으로 이동해주세요.",
+                            MainWindow.StatusLevel.Success);
                         LogInfo($"데이터 로드 완료: {allFrames.Count}개 프레임 로드");
                     }
                     catch (Exception ex)

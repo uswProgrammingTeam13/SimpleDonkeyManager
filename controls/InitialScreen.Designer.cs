@@ -39,7 +39,6 @@
             BackgroundImageLayout = ImageLayout.Stretch;
             Name = "InitialScreen";
             Size = new Size(1176, 600);
-            Load += InitialScreen_Load;
             ResumeLayout(false);
         }
 

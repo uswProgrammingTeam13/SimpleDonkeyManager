@@ -28,151 +28,230 @@
         /// </summary>
         private void InitializeComponent()
         {
-            label1 = new Label();
-            tableLayoutPanel1 = new TableLayoutPanel();
-            panel1 = new Panel();
-            tableLayoutPanel2 = new TableLayoutPanel();
-            groupBox1 = new GroupBox();
-            groupBox2 = new GroupBox();
-            panel2 = new Panel();
-            groupBox3 = new GroupBox();
+            tlpResultMain = new TableLayoutPanel();
+            pnlLeft = new Panel();
+            tlpResultLeft = new TableLayoutPanel();
+            grpSummary = new GroupBox();
+            tlpSummary = new TableLayoutPanel();
+            lblTotalEpochs = new Label();
+            lblMinLoss = new Label();
+            lblMaxAccuracy = new Label();
+            lblTrainingTime = new Label();
+            grpChart = new GroupBox();
+            pnlResultChart = new Panel();
+            pnlRight = new Panel();
+            grpImagePreview = new GroupBox();
             imageViewerUpper1 = new SimpleDonkeyManager.controlutils.ImageViewerUpper();
-            tableLayoutPanel1.SuspendLayout();
-            panel1.SuspendLayout();
-            tableLayoutPanel2.SuspendLayout();
-            panel2.SuspendLayout();
+            tlpResultMain.SuspendLayout();
+            pnlLeft.SuspendLayout();
+            tlpResultLeft.SuspendLayout();
+            grpSummary.SuspendLayout();
+            tlpSummary.SuspendLayout();
+            grpChart.SuspendLayout();
+            pnlRight.SuspendLayout();
+            grpImagePreview.SuspendLayout();
             SuspendLayout();
             // 
-            // label1
+            // tlpResultMain
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(1133, 576);
-            label1.Name = "label1";
-            label1.Size = new Size(39, 15);
-            label1.TabIndex = 0;
-            label1.Text = "Result";
+            tlpResultMain.ColumnCount = 2;
+            tlpResultMain.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67F));
+            tlpResultMain.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+            tlpResultMain.Controls.Add(pnlLeft, 0, 0);
+            tlpResultMain.Controls.Add(pnlRight, 1, 0);
+            tlpResultMain.Dock = DockStyle.Fill;
+            tlpResultMain.Location = new Point(0, 0);
+            tlpResultMain.Name = "tlpResultMain";
+            tlpResultMain.RowCount = 1;
+            tlpResultMain.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tlpResultMain.Size = new Size(1176, 600);
+            tlpResultMain.TabIndex = 1;
             // 
-            // tableLayoutPanel1
+            // pnlLeft
             // 
-            tableLayoutPanel1.ColumnCount = 2;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 67F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
-            tableLayoutPanel1.Controls.Add(panel1, 0, 0);
-            tableLayoutPanel1.Controls.Add(panel2, 1, 0);
-            tableLayoutPanel1.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Location = new Point(0, 0);
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 1;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(1176, 600);
-            tableLayoutPanel1.TabIndex = 1;
+            pnlLeft.BackColor = Color.White;
+            pnlLeft.Controls.Add(tlpResultLeft);
+            pnlLeft.Dock = DockStyle.Fill;
+            pnlLeft.Location = new Point(3, 3);
+            pnlLeft.Name = "pnlLeft";
+            pnlLeft.Size = new Size(781, 594);
+            pnlLeft.TabIndex = 0;
             // 
-            // panel1
+            // tlpResultLeft
             // 
-            panel1.BackColor = Color.White;
-            panel1.Controls.Add(tableLayoutPanel2);
-            panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(3, 3);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(775, 594);
-            panel1.TabIndex = 0;
+            tlpResultLeft.ColumnCount = 1;
+            tlpResultLeft.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tlpResultLeft.Controls.Add(grpSummary, 0, 0);
+            tlpResultLeft.Controls.Add(grpChart, 0, 1);
+            tlpResultLeft.Dock = DockStyle.Fill;
+            tlpResultLeft.Location = new Point(0, 0);
+            tlpResultLeft.Name = "tlpResultLeft";
+            tlpResultLeft.RowCount = 2;
+            tlpResultLeft.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tlpResultLeft.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tlpResultLeft.Size = new Size(781, 594);
+            tlpResultLeft.TabIndex = 0;
             // 
-            // tableLayoutPanel2
+            // grpSummary
             // 
-            tableLayoutPanel2.ColumnCount = 1;
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Controls.Add(groupBox1, 0, 0);
-            tableLayoutPanel2.Controls.Add(groupBox2, 0, 1);
-            tableLayoutPanel2.Dock = DockStyle.Fill;
-            tableLayoutPanel2.Location = new Point(0, 0);
-            tableLayoutPanel2.Name = "tableLayoutPanel2";
-            tableLayoutPanel2.RowCount = 2;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel2.Size = new Size(775, 594);
-            tableLayoutPanel2.TabIndex = 0;
+            grpSummary.Controls.Add(tlpSummary);
+            grpSummary.Dock = DockStyle.Fill;
+            grpSummary.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
+            grpSummary.ForeColor = Color.RoyalBlue;
+            grpSummary.Location = new Point(3, 3);
+            grpSummary.Name = "grpSummary";
+            grpSummary.Size = new Size(775, 291);
+            grpSummary.TabIndex = 0;
+            grpSummary.TabStop = false;
+            grpSummary.Text = "결과 요약";
             // 
-            // groupBox1
+            // tlpSummary
             // 
-            groupBox1.Dock = DockStyle.Fill;
-            groupBox1.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
-            groupBox1.ForeColor = Color.RoyalBlue;
-            groupBox1.Location = new Point(3, 3);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(769, 291);
-            groupBox1.TabIndex = 0;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "결과 요약";
+            tlpSummary.ColumnCount = 1;
+            tlpSummary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tlpSummary.Controls.Add(lblTotalEpochs, 0, 0);
+            tlpSummary.Controls.Add(lblMinLoss, 0, 1);
+            tlpSummary.Controls.Add(lblMaxAccuracy, 0, 2);
+            tlpSummary.Controls.Add(lblTrainingTime, 0, 3);
+            tlpSummary.Dock = DockStyle.Fill;
+            tlpSummary.Name = "tlpSummary";
+            tlpSummary.RowCount = 4;
+            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tlpSummary.TabIndex = 4;
+            tlpSummary.Padding = new Padding(6, 4, 6, 4);
             // 
-            // groupBox2
+            // lblTotalEpochs
             // 
-            groupBox2.Dock = DockStyle.Fill;
-            groupBox2.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
-            groupBox2.ForeColor = Color.RoyalBlue;
-            groupBox2.Location = new Point(3, 300);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(769, 291);
-            groupBox2.TabIndex = 1;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "학습 결과 추이";
+            lblTotalEpochs.AutoSize = false;
+            lblTotalEpochs.Dock = DockStyle.Fill;
+            lblTotalEpochs.Font = new Font("나눔고딕", 18F, FontStyle.Bold);
+            lblTotalEpochs.Name = "lblTotalEpochs";
+            lblTotalEpochs.TabIndex = 0;
+            lblTotalEpochs.Text = "총 에포크: 0";
+            lblTotalEpochs.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // panel2
+            // lblMinLoss
             // 
-            panel2.BackColor = Color.White;
-            panel2.Controls.Add(groupBox3);
-            panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(784, 3);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(389, 594);
-            panel2.TabIndex = 1;
+            lblMinLoss.AutoSize = false;
+            lblMinLoss.Dock = DockStyle.Fill;
+            lblMinLoss.Font = new Font("나눔고딕", 18F, FontStyle.Bold);
+            lblMinLoss.Name = "lblMinLoss";
+            lblMinLoss.TabIndex = 1;
+            lblMinLoss.Text = "최소 손실값: 0.0000";
+            lblMinLoss.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // groupBox3
+            // lblMaxAccuracy
             // 
-            groupBox3.Controls.Add(imageViewerUpper1);
-            groupBox3.Dock = DockStyle.Fill;
-            groupBox3.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
-            groupBox3.ForeColor = Color.RoyalBlue;
-            groupBox3.Location = new Point(0, 0);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(389, 594);
-            groupBox3.TabIndex = 0;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "이미지 미리보기";
+            lblMaxAccuracy.AutoSize = false;
+            lblMaxAccuracy.Dock = DockStyle.Fill;
+            lblMaxAccuracy.Font = new Font("나눔고딕", 18F, FontStyle.Bold);
+            lblMaxAccuracy.Name = "lblMaxAccuracy";
+            lblMaxAccuracy.TabIndex = 2;
+            lblMaxAccuracy.Text = "최고 정확도: 0.0000";
+            lblMaxAccuracy.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // lblTrainingTime
+            // 
+            lblTrainingTime.AutoSize = false;
+            lblTrainingTime.Dock = DockStyle.Fill;
+            lblTrainingTime.Font = new Font("나눔고딕", 18F, FontStyle.Bold);
+            lblTrainingTime.Name = "lblTrainingTime";
+            lblTrainingTime.TabIndex = 3;
+            lblTrainingTime.Text = "소요 시간: 0초";
+            lblTrainingTime.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // grpChart
+            // 
+            grpChart.Controls.Add(pnlResultChart);
+            grpChart.Dock = DockStyle.Fill;
+            grpChart.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
+            grpChart.ForeColor = Color.RoyalBlue;
+            grpChart.Location = new Point(3, 300);
+            grpChart.Name = "grpChart";
+            grpChart.Size = new Size(775, 291);
+            grpChart.TabIndex = 1;
+            grpChart.TabStop = false;
+            grpChart.Text = "학습 결과 추이";
+            // 
+            // pnlResultChart
+            // 
+            pnlResultChart.BackColor = Color.White;
+            pnlResultChart.BorderStyle = BorderStyle.FixedSingle;
+            pnlResultChart.Dock = DockStyle.Fill;
+            pnlResultChart.Location = new Point(3, 25);
+            pnlResultChart.Name = "pnlResultChart";
+            pnlResultChart.Padding = new Padding(5);
+            pnlResultChart.Size = new Size(769, 263);
+            pnlResultChart.TabIndex = 0;
+            // 
+            // pnlRight
+            // 
+            pnlRight.BackColor = Color.White;
+            pnlRight.Controls.Add(grpImagePreview);
+            pnlRight.Dock = DockStyle.Fill;
+            pnlRight.Location = new Point(790, 3);
+            pnlRight.Name = "pnlRight";
+            pnlRight.Size = new Size(383, 594);
+            pnlRight.TabIndex = 1;
+            // 
+            // grpImagePreview
+            // 
+            grpImagePreview.Controls.Add(imageViewerUpper1);
+            grpImagePreview.Dock = DockStyle.Fill;
+            grpImagePreview.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
+            grpImagePreview.ForeColor = Color.RoyalBlue;
+            grpImagePreview.Location = new Point(0, 0);
+            grpImagePreview.Name = "grpImagePreview";
+            grpImagePreview.Size = new Size(383, 594);
+            grpImagePreview.TabIndex = 0;
+            grpImagePreview.TabStop = false;
+            grpImagePreview.Text = "이미지 미리보기";
             // 
             // imageViewerUpper1
             // 
             imageViewerUpper1.Dock = DockStyle.Fill;
             imageViewerUpper1.Location = new Point(3, 25);
             imageViewerUpper1.Name = "imageViewerUpper1";
-            imageViewerUpper1.Size = new Size(383, 566);
+            imageViewerUpper1.Size = new Size(377, 566);
             imageViewerUpper1.TabIndex = 0;
             // 
             // ResultControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(tableLayoutPanel1);
-            Controls.Add(label1);
+            Controls.Add(tlpResultMain);
             Name = "ResultControl";
             Size = new Size(1176, 600);
-            tableLayoutPanel1.ResumeLayout(false);
-            panel1.ResumeLayout(false);
-            tableLayoutPanel2.ResumeLayout(false);
-            panel2.ResumeLayout(false);
+            tlpResultMain.ResumeLayout(false);
+            pnlLeft.ResumeLayout(false);
+            tlpResultLeft.ResumeLayout(false);
+            grpSummary.ResumeLayout(false);
+            tlpSummary.ResumeLayout(false);
+            grpChart.ResumeLayout(false);
+            pnlRight.ResumeLayout(false);
+            grpImagePreview.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private Label label1;
-        private TableLayoutPanel tableLayoutPanel1;
-        private Panel panel1;
-        private TableLayoutPanel tableLayoutPanel2;
-        private Panel panel2;
-        private GroupBox groupBox1;
-        private GroupBox groupBox2;
-        private GroupBox groupBox3;
+        private TableLayoutPanel tlpResultMain;
+        private Panel pnlLeft;
+        private TableLayoutPanel tlpResultLeft;
+        private TableLayoutPanel tlpSummary;
+        private Panel pnlRight;
+        private Panel pnlResultChart;
+        private GroupBox grpSummary;
+        private GroupBox grpChart;
+        private GroupBox grpImagePreview;
+        private Label lblTotalEpochs;
+        private Label lblMinLoss;
+        private Label lblMaxAccuracy;
+        private Label lblTrainingTime;
         private SimpleDonkeyManager.controlutils.ImageViewerUpper imageViewerUpper1;
     }
 }
