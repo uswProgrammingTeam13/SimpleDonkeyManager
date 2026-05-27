@@ -428,6 +428,9 @@ namespace SimpleDonkeyManager
                 {
                     string dataFolder = imageManager.SelectedFolderPath ?? "";
                     mainWindow.SetTrainingData(filteredFrameDataList, dataFolder);
+                    mainWindow.SetStatusMessage(
+                        $"② 데이터 필터링 —  필터 적용 완료 ({filteredFrameDataList.Count:N0}개 프레임)  →  ③ [학습 실행] 화면으로 이동해주세요.",
+                        MainWindow.StatusLevel.Success);
                     LogInfo($"학습 데이터 전달: {filteredFrameDataList.Count}개 프레임, 폴더: {dataFolder}");
                 }
             }
@@ -467,6 +470,11 @@ namespace SimpleDonkeyManager
                 UpdateStatistics();
 
                 LogInfo($"필터 미리보기: {filteredFrameDataList.Count}개 프레임");
+
+                MainWindow mainWindowPreview = FindMainWindow();
+                mainWindowPreview?.SetStatusMessage(
+                    $"② 데이터 필터링 —  미리보기: {filteredFrameDataList.Count:N0}개 프레임 선택됨  →  결과 확인 후 [필터 적용]을 눌러주세요.",
+                    MainWindow.StatusLevel.Info);
 
                 // 첫 번째 프레임 선택
                 if (filteredFrameDataList.Count > 0 && imageList != null)

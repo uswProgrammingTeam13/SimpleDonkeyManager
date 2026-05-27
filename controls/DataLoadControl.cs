@@ -146,9 +146,12 @@ namespace SimpleDonkeyManager
                                 mainWindow.UpdateProgramStatus(
                                     folderPath,
                                     stats.TotalImageCount,
-                                    0,  // 현재는 로드된 프레임이 0
+                                    0,
                                     "데이터 로드 준비 완료"
                                 );
+                                mainWindow.SetStatusMessage(
+                                    $"① 데이터 불러오기 —  폴더 선택 완료 ({stats.TotalImageCount:N0}개 이미지)  →  [데이터 로드] 버튼을 눌러주세요.",
+                                    MainWindow.StatusLevel.Info);
                             }
                             catch (Exception ex)
                             {
@@ -237,6 +240,9 @@ namespace SimpleDonkeyManager
                             allFrames.Count,
                             "데이터 로드 완료"
                         );
+                        mainWindow.SetStatusMessage(
+                            $"① 데이터 불러오기 —  로드 완료 ({allFrames.Count:N0}개 프레임)  →  ② [데이터 필터링] 화면으로 이동해주세요.",
+                            MainWindow.StatusLevel.Success);
                         LogInfo($"데이터 로드 완료: {allFrames.Count}개 프레임 로드");
                     }
                     catch (Exception ex)

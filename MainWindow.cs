@@ -107,6 +107,23 @@ namespace SimpleDonkeyManager
 
             // 해당 컨트롤에 맞는 도움말 탭으로 자동 전환
             ShowHelpTab(index + 1); // +1은 InitialHelp가 탭 0이므로
+
+            // 화면 전환 시 단계별 안내 메시지
+            switch (index)
+            {
+                case 0: // 데이터 불러오기
+                    SetStatusMessage("① 데이터 불러오기 —  이미지 폴더를 선택한 후 [데이터 로드] 버튼을 눌러주세요.", StatusLevel.Wait);
+                    break;
+                case 1: // 데이터 필터링
+                    SetStatusMessage("② 데이터 필터링 —  조향·스로틀 범위를 설정하고 [필터 미리보기] 후 [필터 적용]을 눌러주세요.", StatusLevel.Wait);
+                    break;
+                case 2: // 학습 실행
+                    SetStatusMessage("③ 학습 실행 —  모델 저장 경로를 선택한 후 [학습 시작] 버튼을 눌러주세요.", StatusLevel.Wait);
+                    break;
+                case 3: // 결과 확인
+                    SetStatusMessage("④ 학습 결과 확인 —  학습이 완료된 결과 그래프와 이미지를 확인하세요.", StatusLevel.Wait);
+                    break;
+            }
         }
 
         /// <summary>
@@ -261,19 +278,45 @@ namespace SimpleDonkeyManager
         }
 
         /// <summary>
-        /// 프로그램 상태 라벨 업데이트
+        /// 프로그램 상태 라벨 업데이트 (폴더/프레임 수 포함)
         /// </summary>
         public void UpdateProgramStatus(string folderPath, int totalImages, int loadedFrames, string status)
         {
-            // 폴더 경로가 길 경우 짧게 표시
-            string displayPath = folderPath;
+            string displayPath = folderPath ?? "-";
             if (displayPath.Length > 40)
-            {
                 displayPath = "..." + displayPath.Substring(displayPath.Length - 37);
-            }
 
-            lblProgramCon.Text = $"📂 현재 폴더 : {displayPath}    |    프레임 수 : {loadedFrames} / {totalImages}    |    상태 : {status}";
+            SetStatusMessage($"📂 {displayPath}    |    프레임 수 : {loadedFrames} / {totalImages}    |    {status}");
         }
+
+        /// <summary>
+        /// 상태 메시지와 색상을 지정하여 상태바를 업데이트합니다.
+        /// </summary>
+        public void SetStatusMessage(string message, StatusLevel level = StatusLevel.Info)
+        {
+            if (lblProgramCon == null) return;
+
+            Action update = () =>
+            {
+                lblProgramCon.Text = message;
+                lblProgramCon.ForeColor = level switch
+                {
+                    StatusLevel.Wait    => Color.FromArgb(100, 100, 100),   // 회색  – 대기
+                    StatusLevel.Info    => Color.FromArgb(30,  80,  160),   // 파랑  – 진행
+                    StatusLevel.Success => Color.FromArgb(0,   130,  60),   // 초록  – 완료
+                    StatusLevel.Warning => Color.FromArgb(180,  90,   0),   // 주황  – 경고
+                    StatusLevel.Error   => Color.FromArgb(180,  20,  20),   // 빨강  – 오류
+                    _                   => SystemColors.ControlDarkDark
+                };
+            };
+
+            if (lblProgramCon.InvokeRequired)
+                lblProgramCon.Invoke(update);
+            else
+                update();
+        }
+
+        public enum StatusLevel { Wait, Info, Success, Warning, Error }
 
         /// <summary>
         /// DataLoadControl에서 DataFilterControl으로 데이터를 전달합니다.

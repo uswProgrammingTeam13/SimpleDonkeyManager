@@ -457,6 +457,11 @@ namespace SimpleDonkeyManager
                 prgTrainingProgress.Value = 0;
                 lstTrainingLog.Items.Clear();
 
+                // 상태막 업데이트
+                FindMainWindow()?.SetStatusMessage(
+                    $"③ 학습 실행 —  학습을 시작하는 중입니다... ({currentTrainingData.Count:N0}개 프레임)",
+                    MainWindow.StatusLevel.Info);
+
                 // 그래프 초기화
                 chartDataModel.Clear();
                 CreatePlotModel();
@@ -556,6 +561,9 @@ namespace SimpleDonkeyManager
                         {
                             LogWarning("학습 타임아웃 (5분): 프로세스를 강제 종료합니다.");
                             trainingProcess.Kill();
+                            FindMainWindow()?.SetStatusMessage(
+                                "③ 학습 실행 —  학습이 타임아웃(5분)으로 강제 종료되었습니다.  데이터 또는 Python 환경을 확인하세요.",
+                                MainWindow.StatusLevel.Error);
                         }
                         else
                         {
@@ -570,10 +578,17 @@ namespace SimpleDonkeyManager
 
                                 // 학습 완료 후 결과 데이터를 ResultControl로 전달
                                 NotifyTrainingCompleted(modelPath);
+
+                                FindMainWindow()?.SetStatusMessage(
+                                    "③ 학습 실행 —  학습 완료!  →  [학습 결과 확인] 버튼을 눈러 ④ 결과를 확인하세요.",
+                                    MainWindow.StatusLevel.Success);
                             }
                             else
                             {
                                 LogWarning($"학습 프로세스 오류 코드: {exitCode}");
+                                FindMainWindow()?.SetStatusMessage(
+                                    $"③ 학습 실행 —  학습이 오류로 종료되었습니다 (코드 {exitCode}).  로그를 확인하세요.",
+                                    MainWindow.StatusLevel.Error);
                             }
                         }
                     }
@@ -805,11 +820,14 @@ namespace SimpleDonkeyManager
                         if (prgTrainingProgress != null && !prgTrainingProgress.IsDisposed)
                         {
                             prgTrainingProgress.Invoke((Action)(() =>
-                            {
-                                prgTrainingProgress.Value = Math.Min(progress, 100);
-                                lblProgress.Text = $"{progress}%";
-                                LogInfo($"진행도 업데이트: {progress}% ({current}/{total})");
-                            }));
+                                {
+                                    prgTrainingProgress.Value = Math.Min(progress, 100);
+                                    lblProgress.Text = $"{progress}%";
+                                    LogInfo($"진행도 업데이트: {progress}% ({current}/{total})");
+                                    FindMainWindow()?.SetStatusMessage(
+                                        $"③ 학습 실행 —  학습 진행 중... {progress}% ({current} / {total} 에포크)  │  학습 완료까지 기다려주세요.",
+                                        MainWindow.StatusLevel.Info);
+                                }));
                         }
                     }
                 }

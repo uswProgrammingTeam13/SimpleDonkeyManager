@@ -30,36 +30,10 @@
         {
             listBoxImages = new ListBox();
             groupBox1 = new GroupBox();
-            txtFrameSearch = new TextBox();
             btnFrameSearch = new Button();
+            txtFrameSearch = new TextBox();
             groupBox1.SuspendLayout();
             SuspendLayout();
-            // 
-            // txtFrameSearch
-            // 
-            txtFrameSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtFrameSearch.BorderStyle = BorderStyle.FixedSingle;
-            txtFrameSearch.Font = new Font("나눔고딕", 11F, FontStyle.Regular, GraphicsUnit.Point, 129);
-            txtFrameSearch.Location = new Point(8, 26);
-            txtFrameSearch.Margin = new Padding(2, 1, 2, 1);
-            txtFrameSearch.Name = "txtFrameSearch";
-            txtFrameSearch.PlaceholderText = "프레임 순번 입력";
-            txtFrameSearch.Size = new Size(210, 25);
-            txtFrameSearch.TabIndex = 0;
-            // 
-            // btnFrameSearch
-            // 
-            btnFrameSearch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnFrameSearch.FlatStyle = FlatStyle.Flat;
-            btnFrameSearch.Font = new Font("나눔고딕", 9F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            btnFrameSearch.ForeColor = Color.RoyalBlue;
-            btnFrameSearch.Location = new Point(223, 26);
-            btnFrameSearch.Margin = new Padding(2, 1, 2, 1);
-            btnFrameSearch.Name = "btnFrameSearch";
-            btnFrameSearch.Size = new Size(38, 25);
-            btnFrameSearch.TabIndex = 1;
-            btnFrameSearch.Text = "검색";
-            btnFrameSearch.UseVisualStyleBackColor = true;
             // 
             // listBoxImages
             // 
@@ -69,7 +43,7 @@
             listBoxImages.Location = new Point(8, 56);
             listBoxImages.Margin = new Padding(2, 1, 2, 1);
             listBoxImages.Name = "listBoxImages";
-            listBoxImages.Size = new Size(250, 500);
+            listBoxImages.Size = new Size(250, 497);
             listBoxImages.TabIndex = 2;
             // 
             // groupBox1
@@ -87,6 +61,32 @@
             groupBox1.TabIndex = 8;
             groupBox1.TabStop = false;
             groupBox1.Text = "이미지 선택";
+            // 
+            // btnFrameSearch
+            // 
+            btnFrameSearch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnFrameSearch.FlatStyle = FlatStyle.Flat;
+            btnFrameSearch.Font = new Font("나눔고딕", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnFrameSearch.ForeColor = Color.RoyalBlue;
+            btnFrameSearch.Location = new Point(222, 26);
+            btnFrameSearch.Margin = new Padding(2, 1, 2, 1);
+            btnFrameSearch.Name = "btnFrameSearch";
+            btnFrameSearch.Size = new Size(39, 25);
+            btnFrameSearch.TabIndex = 1;
+            btnFrameSearch.Text = "검색";
+            btnFrameSearch.UseVisualStyleBackColor = true;
+            // 
+            // txtFrameSearch
+            // 
+            txtFrameSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtFrameSearch.BorderStyle = BorderStyle.FixedSingle;
+            txtFrameSearch.Font = new Font("나눔고딕", 11F, FontStyle.Regular, GraphicsUnit.Point, 129);
+            txtFrameSearch.Location = new Point(8, 26);
+            txtFrameSearch.Margin = new Padding(2, 1, 2, 1);
+            txtFrameSearch.Name = "txtFrameSearch";
+            txtFrameSearch.PlaceholderText = "프레임 순번 입력";
+            txtFrameSearch.Size = new Size(210, 24);
+            txtFrameSearch.TabIndex = 0;
             // 
             // ImageList
             // 
