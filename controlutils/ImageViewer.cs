@@ -35,6 +35,9 @@ namespace SimpleDonkeyManager.controlutils
             button4.Click += Button4_Click;
             comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
             trackBar1.ValueChanged += TrackBar1_ValueChanged;
+            btnLargeView.Click += BtnLargeView_Click;
+
+            InitializeTooltips();
 
             // 리사이즈 이벤트 추가 - 썸네일 적응형 표시
             this.Resize += ImageViewer_Resize;
@@ -63,6 +66,41 @@ namespace SimpleDonkeyManager.controlutils
             lstJSONSummary.Columns.Clear();
             lstJSONSummary.Columns.Add("항목", 80);
             lstJSONSummary.Columns.Add("값", 120);
+        }
+
+        private void InitializeTooltips()
+        {
+            var toolTip = new ToolTip { AutoPopDelay = 8000, InitialDelay = 400, ReshowDelay = 200, ShowAlways = true };
+            toolTip.SetToolTip(button1, "이전 프레임으로 이동합니다.");
+            toolTip.SetToolTip(button2, "다음 프레임으로 이동합니다.");
+            toolTip.SetToolTip(button3, "이미지를 자동으로 재생합니다.");
+            toolTip.SetToolTip(button4, "이미지 재생을 정지합니다.");
+            toolTip.SetToolTip(trackBar1, "프레임 위치를 직접 조절합니다. 좌우로 드래그하세요.");
+            toolTip.SetToolTip(comboBox1, "재생 배속을 선택합니다. (0.25 ~ 4.0배)");
+            toolTip.SetToolTip(lstJSONSummary, "현재 프레임의 Angle / Throttle 등 JSON 데이터를 표시합니다.");
+            toolTip.SetToolTip(btnLargeView, "현재 이미지를 별도 창에서 크게 봅니다. (단축키: ESC로 닫기)");
+            toolTip.SetToolTip(pictureBox1, "현재 선택된 프레임 이미지입니다.");
+            toolTip.SetToolTip(pictureBox2, "이전 프레임 미리보기 이미지입니다.");
+            toolTip.SetToolTip(pictureBox3, "다음 프레임 미리보기 이미지입니다.");
+        }
+
+        private void BtnLargeView_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (frameDataList == null || frameDataList.Count == 0)
+                {
+                    MessageBox.Show("표시할 이미지가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                var form = new ImageLargeViewForm(frameDataList, currentFrameIndex);
+                form.Show(this.FindForm());
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"크게 보기 오류: {ex.Message}");
+            }
         }
 
         public void SetImageManager(SimpleDonkeyManager.ImageManager manager)

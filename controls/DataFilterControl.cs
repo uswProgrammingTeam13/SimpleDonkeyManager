@@ -59,8 +59,28 @@ namespace SimpleDonkeyManager
             btnFilterPreview.Click += BtnFilterPreview_Click;
             btnFilterReset.Click += BtnFilterReset_Click;
 
+            InitializeTooltips();
+
             // Logger 참조 (MainWindow에서 주입받을 때까지 null 가능)
             logger = null;
+        }
+
+        private void InitializeTooltips()
+        {
+            var toolTip = new ToolTip { AutoPopDelay = 8000, InitialDelay = 400, ReshowDelay = 200, ShowAlways = true };
+            toolTip.SetToolTip(chkThrottle, "Throttle 값이 0인 프레임을 필터링에서 제외합니다.");
+            toolTip.SetToolTip(chkDisable, "기본 반전(flip) 이미지를 필터링에서 제외합니다.");
+            toolTip.SetToolTip(numFilterAngle1, "조향각(Angle) 필터의 최솟값을 설정합니다. (단위: Rad)");
+            toolTip.SetToolTip(numFilterAngle2, "조향각(Angle) 필터의 최댓값을 설정합니다. (단위: Rad)");
+            toolTip.SetToolTip(numFilterThrottle1, "Throttle 필터의 최솟값을 설정합니다.");
+            toolTip.SetToolTip(numFilterThrottle2, "Throttle 필터의 최댓값을 설정합니다.");
+            toolTip.SetToolTip(comboBox1, "해상도 필터를 선택합니다. '(전체)'를 선택하면 모든 해상도를 포함합니다.");
+            toolTip.SetToolTip(chkDelFrames, "완전히 동일한 중복 프레임을 제거합니다.");
+            toolTip.SetToolTip(chkHighlightDel, "조향 값이 급격히 변하는 구간의 프레임을 제거합니다.");
+            toolTip.SetToolTip(btnFilterPreview, "현재 필터 조건으로 미리보기를 수행합니다. 실제 데이터는 변경되지 않습니다.");
+            toolTip.SetToolTip(btnFilterStart, "현재 필터 조건을 적용하여 데이터를 필터링합니다.");
+            toolTip.SetToolTip(btnFilterReset, "모든 필터 조건을 초기값으로 되돌립니다.");
+            toolTip.SetToolTip(lstFilterSummary, "필터링 결과 요약 정보를 표시합니다.");
         }
 
         /// <summary>

@@ -252,19 +252,21 @@ namespace SimpleDonkeyManager
         /// 학습 완료 후 ResultControl에 결과를 전달합니다.
         /// 백그라운드 스레드에서 호출되므로 UI 스레드로 전환합니다.
         /// </summary>
-        public void SetTrainingResults(ChartDataModel metrics, List<FrameData> trainingData)
+        public void SetTrainingResults(ChartDataModel metrics, List<FrameData> trainingData, string modelPath = null)
         {
             if (resultControl == null || metrics == null)
                 return;
 
             if (resultControl.InvokeRequired)
             {
-                resultControl.Invoke(new Action(() => SetTrainingResults(metrics, trainingData)));
+                resultControl.Invoke(new Action(() => SetTrainingResults(metrics, trainingData, modelPath)));
                 return;
             }
 
             resultControl.DisplayTrainingResults(metrics);
             resultControl.SetTrainingData(trainingData);
+            if (modelPath != null)
+                resultControl.SetModelPath(modelPath);
         }
 
         /// <summary>
