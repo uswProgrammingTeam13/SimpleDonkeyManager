@@ -58,6 +58,7 @@ namespace SimpleDonkeyManager
             btnFilterStart.Click += BtnFilterStart_Click;
             btnFilterPreview.Click += BtnFilterPreview_Click;
             btnFilterReset.Click += BtnFilterReset_Click;
+            btnRemoveSelectedFrame.Click += BtnRemoveSelectedFrame_Click;
 
             InitializeTooltips();
 
@@ -80,6 +81,7 @@ namespace SimpleDonkeyManager
             toolTip.SetToolTip(btnFilterPreview, "현재 필터 조건으로 미리보기를 수행합니다. 실제 데이터는 변경되지 않습니다.");
             toolTip.SetToolTip(btnFilterStart, "현재 필터 조건을 적용하여 데이터를 필터링합니다.");
             toolTip.SetToolTip(btnFilterReset, "모든 필터 조건을 초기값으로 되돌립니다.");
+            toolTip.SetToolTip(btnRemoveSelectedFrame, "ImageList에서 현재 선택된 프레임을 필터링 결과에서 제거합니다.");
             toolTip.SetToolTip(lstFilterSummary, "필터링 결과 요약 정보를 표시합니다.");
         }
 
@@ -557,6 +559,85 @@ namespace SimpleDonkeyManager
             {
                 MessageBox.Show($"필터 초기화 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 LogWarning($"필터 초기화 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// ImageList에서 현재 선택된 프레임을 필터링 결과에서 제거합니다.
+        /// </summary>
+        private void BtnRemoveSelectedFrame_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (filteredFrameDataList == null || filteredFrameDataList.Count == 0)
+                {
+                    MessageBox.Show("필터링된 데이터가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    LogWarning("프레임 제거 실패: 필터링된 데이터 없음");
+                    return;
+                }
+
+                if (imageList == null)
+                {
+                    LogWarning("프레임 제거 실패: imageList가 null입니다");
+                    return;
+                }
+
+                int selectedIndex = imageList.SelectedIndex;
+                FrameData selectedFrame = imageList.SelectedFrame;
+
+                if (selectedFrame == null || selectedIndex < 0)
+                {
+                    MessageBox.Show("제거할 프레임을 ImageList에서 먼저 선택해주세요.", "선택 필요", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LogWarning("프레임 제거 실패: 선택된 프레임 없음");
+                    return;
+                }
+
+                int frameNumber = selectedFrame.FrameNumber;
+
+                // 필터링된 리스트에서 제거
+                bool removed = filteredFrameDataList.Remove(selectedFrame);
+                if (!removed)
+                {
+                    // 참조가 다를 수 있으므로 FrameNumber로 다시 시도
+                    int removedCount = filteredFrameDataList.RemoveAll(f => f != null && f.FrameNumber == frameNumber);
+                    removed = removedCount > 0;
+                }
+
+                if (!removed)
+                {
+                    LogWarning($"프레임 {frameNumber} 제거 실패: 리스트에서 찾을 수 없음");
+                    return;
+                }
+
+                // UI 갱신
+                imageList.LoadFrames(filteredFrameDataList);
+                UpdateStatistics();
+
+                // 인접 프레임으로 선택 이동
+                if (filteredFrameDataList.Count > 0)
+                {
+                    int nextIndex = Math.Min(selectedIndex, filteredFrameDataList.Count - 1);
+                    try
+                    {
+                        imageList.SelectFrame(nextIndex);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogWarning($"인접 프레임 선택 실패: {ex.Message}");
+                    }
+                }
+
+                LogInfo($"프레임 {frameNumber} 제거됨 (남은 프레임: {filteredFrameDataList.Count}개)");
+
+                MainWindow mainWindow = FindMainWindow();
+                mainWindow?.SetStatusMessage(
+                    $"② 데이터 필터링 —  Frame {frameNumber} 제거됨  (남은 프레임: {filteredFrameDataList.Count:N0}개)",
+                    MainWindow.StatusLevel.Info);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"프레임 제거 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"프레임 제거 예외: {ex.Message}");
             }
         }
 

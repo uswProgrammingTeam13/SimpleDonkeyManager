@@ -45,6 +45,7 @@
             groupBox1 = new GroupBox();
             pnlFilterSetBasic = new Panel();
             comboBox1 = new ComboBox();
+            btnRemoveSelectedFrame = new Button();
             lblFilterSize = new Label();
             lblFilterThrottlenum = new Label();
             numFilterThrottle2 = new NumericUpDown();
@@ -285,6 +286,7 @@
             // 
             pnlFilterSetBasic.BackColor = Color.FromArgb(242, 242, 242);
             pnlFilterSetBasic.BorderStyle = BorderStyle.FixedSingle;
+            pnlFilterSetBasic.Controls.Add(btnRemoveSelectedFrame);
             pnlFilterSetBasic.Controls.Add(comboBox1);
             pnlFilterSetBasic.Controls.Add(lblFilterSize);
             pnlFilterSetBasic.Controls.Add(lblFilterThrottlenum);
@@ -314,6 +316,21 @@
             comboBox1.Size = new Size(121, 23);
             comboBox1.TabIndex = 16;
             comboBox1.Text = "(전체)";
+            // 
+            // btnRemoveSelectedFrame
+            // 
+            btnRemoveSelectedFrame.BackColor = Color.White;
+            btnRemoveSelectedFrame.FlatAppearance.BorderColor = Color.IndianRed;
+            btnRemoveSelectedFrame.FlatAppearance.MouseOverBackColor = Color.MistyRose;
+            btnRemoveSelectedFrame.FlatStyle = FlatStyle.Flat;
+            btnRemoveSelectedFrame.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            btnRemoveSelectedFrame.ForeColor = Color.IndianRed;
+            btnRemoveSelectedFrame.Location = new Point(7, 268);
+            btnRemoveSelectedFrame.Name = "btnRemoveSelectedFrame";
+            btnRemoveSelectedFrame.Size = new Size(215, 32);
+            btnRemoveSelectedFrame.TabIndex = 17;
+            btnRemoveSelectedFrame.Text = "✖ 선택 프레임 제거";
+            btnRemoveSelectedFrame.UseVisualStyleBackColor = false;
             // 
             // lblFilterSize
             // 
@@ -543,6 +560,7 @@
         private GroupBox pnlFilterResult;
         private Panel pnlFilterSetBasic;
         private ComboBox comboBox1;
+        private Button btnRemoveSelectedFrame;
         private Label lblFilterSize;
         private Label lblFilterThrottlenum;
         private NumericUpDown numFilterThrottle2;
