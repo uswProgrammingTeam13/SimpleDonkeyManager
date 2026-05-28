@@ -55,12 +55,26 @@ namespace SimpleDonkeyManager
                 this.Resize += TrainingControl_Resize;
                 this.Load += TrainingControl_Load;
 
+                InitializeTooltips();
+
                 UpdateUI();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"TrainingControl 초기화 오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void InitializeTooltips()
+        {
+            var toolTip = new ToolTip { AutoPopDelay = 8000, InitialDelay = 400, ReshowDelay = 200, ShowAlways = true };
+            toolTip.SetToolTip(cmbModelType, "학습에 사용할 모델 타입을 선택합니다.\n(linear, inferred, tensorrt_linear, tflite_linear)");
+            toolTip.SetToolTip(txtModelPath, "학습된 모델이 저장될 경로입니다.");
+            toolTip.SetToolTip(btnSelectModelPath, "모델을 저장할 폴더를 선택합니다.");
+            toolTip.SetToolTip(btnStartTraining, "설정된 조건으로 학습을 시작하거나 중지합니다.");
+            toolTip.SetToolTip(btnCheckTrainingResult, "학습 완료 후 결과 탭으로 이동하여 결과를 확인합니다.");
+            toolTip.SetToolTip(prgTrainingProgress, "현재 학습 진행률을 표시합니다.");
+            toolTip.SetToolTip(lstTrainingLog, "학습 과정의 로그 메시지를 실시간으로 표시합니다.");
         }
 
         private void TrainingControl_Load(object sender, EventArgs e)
@@ -96,7 +110,7 @@ namespace SimpleDonkeyManager
                     if (splMainTraining.Orientation != Orientation.Horizontal)
                     {
                         splMainTraining.Orientation = Orientation.Horizontal;
-                        LogInfo($"레이아웃 변경: 수직 방향 (폭: {controlWidth}px)");
+                        LogDetail($"레이아웃 변경: 수직 방향 (폭: {controlWidth}px)");
                     }
 
                     // 상하 비율 조정: 위쪽 50%, 아래쪽 50%
@@ -112,7 +126,7 @@ namespace SimpleDonkeyManager
                     if (splMainTraining.Orientation != Orientation.Vertical)
                     {
                         splMainTraining.Orientation = Orientation.Vertical;
-                        LogInfo($"레이아웃 변경: 수평 방향 (폭: {controlWidth}px)");
+                        LogDetail($"레이아웃 변경: 수평 방향 (폭: {controlWidth}px)");
                     }
 
                     // 좌우 비율 조정: 좌측 약 60%, 우측 약 40%
@@ -125,7 +139,7 @@ namespace SimpleDonkeyManager
             }
             catch (Exception ex)
             {
-                LogWarning($"레이아웃 조정 오류: {ex.Message}");
+                LogDetail($"레이아웃 조정 오류: {ex.Message}");
             }
         }
 
@@ -147,11 +161,11 @@ namespace SimpleDonkeyManager
                 pnlChartRight.Controls.Clear();
                 pnlChartRight.Controls.Add(plotView);
 
-                LogInfo("그래프 뷰 초기화 완료");
+                LogDetail("그래프 뷰 초기화 완료");
             }
             catch (Exception ex)
             {
-                LogWarning($"그래프 초기화 오류: {ex.Message}");
+                LogDetail($"그래프 초기화 오류: {ex.Message}");
             }
         }
 
@@ -242,7 +256,7 @@ namespace SimpleDonkeyManager
             }
             catch (Exception ex)
             {
-                LogWarning($"그래프 업데이트 오류: {ex.Message}");
+                LogDetail($"그래프 업데이트 오류: {ex.Message}");
             }
         }
 
@@ -294,7 +308,7 @@ namespace SimpleDonkeyManager
             }
             catch (Exception ex)
             {
-                LogWarning($"그래프 UI 업데이트 오류: {ex.Message}");
+                LogDetail($"그래프 UI 업데이트 오류: {ex.Message}");
             }
         }
 
@@ -316,11 +330,11 @@ namespace SimpleDonkeyManager
                 currentTrainingData = new List<FrameData>(fullFrameDataList);  // 현재 데이터를 전체 데이터로 설정
 
                 UpdateUI();
-                LogInfo($"전체 데이터 설정: {fullFrameDataList.Count}개 프레임, 폴더: {dataFolder}");
+                LogDetail($"전체 데이터 설정: {fullFrameDataList.Count}개 프레임, 폴더: {dataFolder}");
             }
             catch (Exception ex)
             {
-                LogWarning($"전체 데이터 설정 오류: {ex.Message}");
+                LogDetail($"전체 데이터 설정 오류: {ex.Message}");
             }
         }
 
@@ -337,11 +351,11 @@ namespace SimpleDonkeyManager
                 currentTrainingData = new List<FrameData>(filteredFrameDataList);  // 현재 데이터를 필터된 데이터로 설정
 
                 UpdateUI();
-                LogInfo($"필터된 데이터 설정: {filteredFrameDataList.Count}개 프레임, 폴더: {dataFolder}");
+                LogDetail($"필터된 데이터 설정: {filteredFrameDataList.Count}개 프레임, 폴더: {dataFolder}");
             }
             catch (Exception ex)
             {
-                LogWarning($"필터된 데이터 설정 오류: {ex.Message}");
+                LogDetail($"필터된 데이터 설정 오류: {ex.Message}");
             }
         }
 
@@ -375,7 +389,7 @@ namespace SimpleDonkeyManager
             }
             catch (Exception ex)
             {
-                LogWarning($"UI 업데이트 오류: {ex.Message}");
+                LogDetail($"UI 업데이트 오류: {ex.Message}");
             }
         }
 
@@ -391,14 +405,14 @@ namespace SimpleDonkeyManager
                     {
                         modelSaveFolder = folderDialog.SelectedPath;
                         UpdateUI();
-                        LogInfo($"모델 저장 폴더 선택: {modelSaveFolder}");
+                        LogDetail($"모델 저장 폴더 선택: {modelSaveFolder}");
                     }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"폴더 선택 오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LogWarning($"폴더 선택 오류: {ex.Message}");
+                LogDetail($"폴더 선택 오류: {ex.Message}");
             }
         }
 
@@ -437,7 +451,7 @@ namespace SimpleDonkeyManager
                 string modelFileName = $"model_{DateTime.Now:yyyyMMdd_HHmmss}.h5";
                 string fullModelPath = Path.Combine(modelSaveFolder, modelFileName);
 
-                LogInfo($"학습 시작: 타입={modelType}, 데이터={currentTrainingData.Count}개, 모델경로={fullModelPath}");
+                LogInfo($"학습 시작 (타입={modelType}, 데이터={currentTrainingData.Count}개)");
 
                 StartTrainingAsync(selectedDataFolder, fullModelPath, modelType);
             }
@@ -479,13 +493,13 @@ namespace SimpleDonkeyManager
 
                         if (string.IsNullOrEmpty(pythonScriptPath) || !File.Exists(pythonScriptPath))
                         {
-                            LogWarning($"Python 스크립트를 찾을 수 없음: train.py");
+                            LogDetail($"Python 스크립트를 찾을 수 없음: train.py");
                             return;
                         }
 
                         if (!Directory.Exists(dataFolder))
                         {
-                            LogWarning($"데이터 폴더를 찾을 수 없음: {dataFolder}");
+                            LogDetail($"데이터 폴더를 찾을 수 없음: {dataFolder}");
                             return;
                         }
 
@@ -496,18 +510,18 @@ namespace SimpleDonkeyManager
                             try
                             {
                                 Directory.CreateDirectory(modelDir);
-                                LogInfo($"모델 저장 폴더 생성: {modelDir}");
+                                LogDetail($"모델 저장 폴더 생성: {modelDir}");
                             }
                             catch (Exception ex)
                             {
-                                LogWarning($"모델 폴더 생성 실패: {ex.Message}");
+                                LogDetail($"모델 폴더 생성 실패: {ex.Message}");
                                 return;
                             }
                         }
 
-                        LogInfo($"Python 스크립트 경로: {pythonScriptPath}");
-                        LogInfo($"데이터 폴더: {dataFolder}");
-                        LogInfo($"모델 저장 경로: {modelPath}");
+                        LogDetail($"Python 스크립트 경로: {pythonScriptPath}");
+                        LogDetail($"데이터 폴더: {dataFolder}");
+                        LogDetail($"모델 저장 경로: {modelPath}");
 
                         // Python 실행 파일 찾기
                         // 우선순위:
@@ -520,11 +534,11 @@ namespace SimpleDonkeyManager
                         if (!string.IsNullOrEmpty(localVenvPython) && File.Exists(localVenvPython))
                         {
                             pythonExe = localVenvPython;
-                            LogInfo($"로컬 가상환경 Python 사용: {pythonExe}");
+                            LogDetail($"로컬 가상환경 Python 사용: {pythonExe}");
                         }
                         else
                         {
-                            LogInfo($"시스템 전역 Python 사용: {pythonExe}");
+                            LogDetail($"시스템 전역 Python 사용: {pythonExe}");
                         }
 
                         // Python 인수 구성
@@ -542,10 +556,16 @@ namespace SimpleDonkeyManager
                             UseShellExecute = false,
                             RedirectStandardOutput = true,
                             RedirectStandardError = true,
-                            CreateNoWindow = true
+                            CreateNoWindow = true,
+                            StandardOutputEncoding = System.Text.Encoding.UTF8,
+                            StandardErrorEncoding = System.Text.Encoding.UTF8,
                         };
 
-                        LogInfo($"실행 명령어: {psi.FileName} {psi.Arguments}");
+                        // Python이 UTF-8 모드로 동작하도록 환경 변수 설정
+                        psi.EnvironmentVariables["PYTHONUTF8"] = "1";
+                        psi.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
+
+                        LogDetail($"실행 명령어: {psi.FileName} {psi.Arguments}");
 
                         trainingProcess = new Process { StartInfo = psi };
                         trainingProcess.OutputDataReceived += TrainingProcess_OutputDataReceived;
@@ -554,21 +574,21 @@ namespace SimpleDonkeyManager
                         trainingProcess.BeginOutputReadLine();
                         trainingProcess.BeginErrorReadLine();
 
-                        // 프로세스 종료 대기
-                        bool exited = trainingProcess.WaitForExit(5 * 60 * 1000); // 5분 타임아웃
+                        // 프로세스 종료 대기 (실제 학습은 데이터 규모에 따라 수 시간 소요될 수 있음)
+                        bool exited = trainingProcess.WaitForExit(3 * 60 * 60 * 1000); // 3시간 타임아웃
 
                         if (!exited)
                         {
-                            LogWarning("학습 타임아웃 (5분): 프로세스를 강제 종료합니다.");
+                            LogWarning("학습 타임아웃 (3시간): 프로세스를 강제 종료합니다.");
                             trainingProcess.Kill();
                             FindMainWindow()?.SetStatusMessage(
-                                "③ 학습 실행 —  학습이 타임아웃(5분)으로 강제 종료되었습니다.  데이터 또는 Python 환경을 확인하세요.",
+                                "③ 학습 실행 —  학습이 타임아웃(3시간)으로 강제 종료되었습니다.  데이터 또는 Python 환경을 확인하세요.",
                                 MainWindow.StatusLevel.Error);
                         }
                         else
                         {
                             int exitCode = trainingProcess.ExitCode;
-                            LogInfo($"학습 프로세스 종료 (코드: {exitCode})");
+                            LogDetail($"학습 프로세스 종료 (코드: {exitCode})");
 
                             if (exitCode == 0)
                             {
@@ -595,7 +615,7 @@ namespace SimpleDonkeyManager
                     catch (Exception ex)
                     {
                         LogWarning($"학습 프로세스 오류: {ex.Message}");
-                        LogWarning($"스택 추적: {ex.StackTrace}");
+                        LogDetail($"스택 추적: {ex.StackTrace}");
                     }
                     finally
                     {
@@ -606,6 +626,7 @@ namespace SimpleDonkeyManager
                             {
                                 btnStartTraining.Text = "▷ 학습 시작";
                                 prgTrainingProgress.Value = 100;
+                                lblProgress.Text = "100%";
                             }));
                         }
                     }
@@ -613,7 +634,7 @@ namespace SimpleDonkeyManager
             }
             catch (Exception ex)
             {
-                LogWarning($"비동기 학습 시작 오류: {ex.Message}");
+                LogDetail($"비동기 학습 시작 오류: {ex.Message}");
                 isTraining = false;
             }
         }
@@ -647,7 +668,7 @@ namespace SimpleDonkeyManager
                         string fullPath = Path.GetFullPath(path);
                         if (File.Exists(fullPath))
                         {
-                            LogInfo($"로컬 가상환경 Python 찾음: {fullPath}");
+                            LogDetail($"로컬 가상환경 Python 찾음: {fullPath}");
                             return fullPath;
                         }
                     }
@@ -666,7 +687,7 @@ namespace SimpleDonkeyManager
                     string pythonPath = Path.Combine(currentDir.FullName, "donkey_env", "Scripts", "python.exe");
                     if (File.Exists(pythonPath))
                     {
-                        LogInfo($"로컬 가상환경 Python 찾음: {pythonPath}");
+                        LogDetail($"로컬 가상환경 Python 찾음: {pythonPath}");
                         return pythonPath;
                     }
 
@@ -674,12 +695,12 @@ namespace SimpleDonkeyManager
                 }
 
                 // 로컬 가상환경이 없으면 null 반환 (시스템 Python 사용)
-                LogInfo("로컬 가상환경을 찾을 수 없습니다. 시스템 전역 Python을 사용합니다.");
+                LogDetail("로컬 가상환경을 찾을 수 없습니다. 시스템 전역 Python을 사용합니다.");
                 return null;
             }
             catch (Exception ex)
             {
-                LogWarning($"Python 실행 파일 검색 오류: {ex.Message}");
+                LogDetail($"Python 실행 파일 검색 오류: {ex.Message}");
                 return null;
             }
         }
@@ -695,9 +716,9 @@ namespace SimpleDonkeyManager
         {
             try
             {
-                LogInfo($"Python 스크립트 검색 시작...");
-                LogInfo($"  BaseDirectory: {AppDomain.CurrentDomain.BaseDirectory}");
-                LogInfo($"  CurrentDirectory: {Directory.GetCurrentDirectory()}");
+                LogDetail($"Python 스크립트 검색 시작...");
+                LogDetail($"  BaseDirectory: {AppDomain.CurrentDomain.BaseDirectory}");
+                LogDetail($"  CurrentDirectory: {Directory.GetCurrentDirectory()}");
 
                 // 경로 후보들
                 string[] possiblePaths = new string[]
@@ -721,22 +742,22 @@ namespace SimpleDonkeyManager
                     try
                     {
                         string fullPath = Path.GetFullPath(path);
-                        LogInfo($"  검색 위치: {fullPath}");
+                        LogDetail($"  검색 위치: {fullPath}");
 
                         if (File.Exists(fullPath))
                         {
-                            LogInfo($"  ✓ 찾음!");
+                            LogDetail($"  ✓ 찾음!");
                             return fullPath;
                         }
                     }
                     catch (Exception ex)
                     {
-                        LogInfo($"  경로 파싱 오류: {ex.Message}");
+                        LogDetail($"  경로 파싱 오류: {ex.Message}");
                     }
                 }
 
                 // 마지막 수단: 프로젝트 폴더 직접 검색
-                LogInfo($"프로젝트 폴더 직접 검색 중...");
+                LogDetail($"프로젝트 폴더 직접 검색 중...");
 
                 // SimpleDonkeyManager 프로젝트 폴더 찾기
                 DirectoryInfo currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
@@ -746,11 +767,11 @@ namespace SimpleDonkeyManager
                     if (currentDir.Parent == null) break;
 
                     string pythonPath = Path.Combine(currentDir.FullName, "python", "train.py");
-                    LogInfo($"  검색 위치: {pythonPath}");
+                    LogDetail($"  검색 위치: {pythonPath}");
 
                     if (File.Exists(pythonPath))
                     {
-                        LogInfo($"  ✓ 찾음!");
+                        LogDetail($"  ✓ 찾음!");
                         return pythonPath;
                     }
 
@@ -771,7 +792,7 @@ namespace SimpleDonkeyManager
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
-                LogInfo($"[학습] {e.Data}");
+                LogDetail($"[출력] {e.Data}");
 
                 // 로그 표시
                 if (lstTrainingLog != null && !lstTrainingLog.IsDisposed)
@@ -792,7 +813,7 @@ namespace SimpleDonkeyManager
         {
             if (!string.IsNullOrEmpty(e.Data))
             {
-                LogWarning($"[학습 오류] {e.Data}");
+                LogDetail($"[오류출력] {e.Data}");
 
                 if (lstTrainingLog != null && !lstTrainingLog.IsDisposed)
                 {
@@ -820,14 +841,14 @@ namespace SimpleDonkeyManager
                         if (prgTrainingProgress != null && !prgTrainingProgress.IsDisposed)
                         {
                             prgTrainingProgress.Invoke((Action)(() =>
-                                {
-                                    prgTrainingProgress.Value = Math.Min(progress, 100);
-                                    lblProgress.Text = $"{progress}%";
-                                    LogInfo($"진행도 업데이트: {progress}% ({current}/{total})");
-                                    FindMainWindow()?.SetStatusMessage(
-                                        $"③ 학습 실행 —  학습 진행 중... {progress}% ({current} / {total} 에포크)  │  학습 완료까지 기다려주세요.",
-                                        MainWindow.StatusLevel.Info);
-                                }));
+                                    {
+                                        prgTrainingProgress.Value = Math.Min(progress, 100);
+                                        lblProgress.Text = $"{progress}%";
+                                        LogDetail($"진행도 업데이트: {progress}% ({current}/{total})");
+                                        FindMainWindow()?.SetStatusMessage(
+                                            $"③ 학습 실행 —  학습 진행 중... {progress}% ({current} / {total} 에포크)  │  학습 완료까지 기다려주세요.",
+                                            MainWindow.StatusLevel.Info);
+                                    }));
                         }
                     }
                 }
@@ -891,7 +912,7 @@ namespace SimpleDonkeyManager
             }
             catch (Exception ex)
             {
-                LogWarning($"학습 중지 오류: {ex.Message}");
+                LogDetail($"학습 중지 오류: {ex.Message}");
             }
         }
 
@@ -909,8 +930,8 @@ namespace SimpleDonkeyManager
                 if (mainWindow != null)
                 {
                     // ResultControl에 학습 메트릭과 데이터 전달
-                    mainWindow.SetTrainingResults(chartDataModel, currentTrainingData);
-                    LogInfo("학습 결과를 결과 화면으로 전달했습니다.");
+                    mainWindow.SetTrainingResults(chartDataModel, currentTrainingData, modelPath);
+                    LogDetail("학습 결과를 결과 화면으로 전달했습니다.");
                 }
             }
             catch (Exception ex)
@@ -932,13 +953,13 @@ namespace SimpleDonkeyManager
                         mainWindow.SetTrainingResults(chartDataModel, currentTrainingData);
                     }
                     mainWindow.ShowResultControl();
-                    LogInfo("결과 화면으로 이동했습니다.");
+                    LogDetail("결과 화면으로 이동했습니다.");
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"결과 화면 이동 오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LogWarning($"결과 화면 이동 오류: {ex.Message}");
+                LogDetail($"결과 화면 이동 오류: {ex.Message}");
             }
         }
 
@@ -955,6 +976,18 @@ namespace SimpleDonkeyManager
             if (logger != null)
             {
                 logger.AppendLog($"[학습 경고] {message}");
+            }
+        }
+
+        /// <summary>
+        /// 학습 화면 로그에만 기록하고 실행 로그(MainWindow)에는 표시하지 않습니다.
+        /// Python 출력, 경로 탐색 등 세부 로그에 사용합니다.
+        /// </summary>
+        private void LogDetail(string message)
+        {
+            if (logger != null)
+            {
+                logger.AppendLogSilent($"[학습] {message}");
             }
         }
 
@@ -981,7 +1014,7 @@ namespace SimpleDonkeyManager
                 string json = chartDataModel.ToJson();
                 File.WriteAllText(metricsPath, json);
 
-                LogInfo($"학습 메트릭 저장 완료: {metricsPath}");
+                LogDetail($"학습 메트릭 저장 완료: {metricsPath}");
             }
             catch (Exception ex)
             {
@@ -1008,6 +1041,11 @@ namespace SimpleDonkeyManager
                 parent = parent.Parent;
             }
             return null;
+        }
+
+        private void btnStartTraining_Click_1(object sender, EventArgs e)
+        {
+
         }
     }
 }

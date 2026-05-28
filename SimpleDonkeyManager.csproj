@@ -23,15 +23,23 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="resources\" />
-  </ItemGroup>
-
   <!-- helptexts 폴더를 빌드 출력 디렉토리에 복사 -->
   <ItemGroup>
     <Content Include="helptexts\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <!-- resources 폴더를 빌드 출력 디렉토리에 복사 (setup-environment.ps1 포함) -->
+  <ItemGroup>
+    <Content Include="resources\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="donkey_env\**" />
+    <EmbeddedResource Remove="donkey_env\**" />
+    <None Remove="donkey_env\**" />
   </ItemGroup>
 
   <!-- OxyPlot for WinForms - 학습 그래프 표시 -->

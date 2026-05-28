@@ -37,6 +37,7 @@
             lblMinLoss = new Label();
             lblMaxAccuracy = new Label();
             lblTrainingTime = new Label();
+            btnOpenModelFolder = new Button();
             grpChart = new GroupBox();
             pnlResultChart = new Panel();
             pnlRight = new Panel();
@@ -113,13 +114,15 @@
             tlpSummary.Controls.Add(lblMinLoss, 0, 1);
             tlpSummary.Controls.Add(lblMaxAccuracy, 0, 2);
             tlpSummary.Controls.Add(lblTrainingTime, 0, 3);
+            tlpSummary.Controls.Add(btnOpenModelFolder, 0, 4);
             tlpSummary.Dock = DockStyle.Fill;
             tlpSummary.Name = "tlpSummary";
-            tlpSummary.RowCount = 4;
-            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
-            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tlpSummary.RowCount = 5;
+            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             tlpSummary.TabIndex = 4;
             tlpSummary.Padding = new Padding(6, 4, 6, 4);
             // 
@@ -163,8 +166,22 @@
             lblTrainingTime.Text = "소요 시간: 0초";
             lblTrainingTime.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // grpChart
+            // btnOpenModelFolder
             // 
+            btnOpenModelFolder.Dock = DockStyle.Fill;
+            btnOpenModelFolder.FlatAppearance.BorderColor = Color.DodgerBlue;
+            btnOpenModelFolder.FlatAppearance.MouseOverBackColor = Color.Azure;
+            btnOpenModelFolder.FlatStyle = FlatStyle.Flat;
+            btnOpenModelFolder.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnOpenModelFolder.ForeColor = SystemColors.Highlight;
+            btnOpenModelFolder.Name = "btnOpenModelFolder";
+            btnOpenModelFolder.TabIndex = 4;
+            btnOpenModelFolder.Text = "📂 저장된 폴더 열기";
+            btnOpenModelFolder.UseVisualStyleBackColor = true;
+            btnOpenModelFolder.Click += BtnOpenModelFolder_Click;
+            // 
+            // grpChart
+            //
             grpChart.Controls.Add(pnlResultChart);
             grpChart.Dock = DockStyle.Fill;
             grpChart.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
@@ -252,6 +269,7 @@
         private Label lblMinLoss;
         private Label lblMaxAccuracy;
         private Label lblTrainingTime;
+        private Button btnOpenModelFolder;
         private SimpleDonkeyManager.controlutils.ImageViewerUpper imageViewerUpper1;
     }
 }

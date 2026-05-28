@@ -37,6 +37,20 @@ namespace SimpleDonkeyManager
         /// </summary>
         public void AppendLog(string message)
         {
+            AppendLogInternal(message, fireEvent: true);
+        }
+
+        /// <summary>
+        /// 로그를 내부 목록에만 추가하고 LogAdded 이벤트는 발생시키지 않습니다.
+        /// 실행 로그에 표시하지 않을 상세 로그에 사용합니다.
+        /// </summary>
+        public void AppendLogSilent(string message)
+        {
+            AppendLogInternal(message, fireEvent: false);
+        }
+
+        private void AppendLogInternal(string message, bool fireEvent)
+        {
             try
             {
                 if (logs == null)
@@ -60,13 +74,16 @@ namespace SimpleDonkeyManager
                 }
 
                 // LogAdded 이벤트 발생 (이벤트 호출 실패는 무시)
-                try
+                if (fireEvent)
                 {
-                    OnLogAdded(new LogAddedEventArgs(logs[logs.Count - 1], DateTime.Now));
-                }
-                catch
-                {
-                    // 이벤트 호출 실패는 무시
+                    try
+                    {
+                        OnLogAdded(new LogAddedEventArgs(logs[logs.Count - 1], DateTime.Now));
+                    }
+                    catch
+                    {
+                        // 이벤트 호출 실패는 무시
+                    }
                 }
             }
             catch (Exception ex)
