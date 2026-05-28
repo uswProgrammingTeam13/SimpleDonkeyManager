@@ -33,6 +33,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="donkey_env\**" />
+    <EmbeddedResource Remove="donkey_env\**" />
+    <None Remove="donkey_env\**" />
+  </ItemGroup>
 
   <!-- OxyPlot for WinForms - 학습 그래프 표시 -->
   <ItemGroup>
