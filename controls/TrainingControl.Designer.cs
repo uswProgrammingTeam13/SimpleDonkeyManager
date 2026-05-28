@@ -276,6 +276,7 @@ namespace SimpleDonkeyManager
             btnStartTraining.TabIndex = 0;
             btnStartTraining.Text = "▷ 학습 시작";
             btnStartTraining.UseVisualStyleBackColor = true;
+            btnStartTraining.Click += btnStartTraining_Click_1;
             // 
             // btnCheckTrainingResult
             // 
