@@ -108,9 +108,9 @@ namespace SimpleDonkeyManager
                 {
                     // 수직 방향 (상하)
                     if (splMainTraining.Orientation != Orientation.Horizontal)
-                        {
-                            splMainTraining.Orientation = Orientation.Horizontal;
-                            LogDetail($"레이아웃 변경: 수직 방향 (폭: {controlWidth}px)");
+                    {
+                        splMainTraining.Orientation = Orientation.Horizontal;
+                        LogDetail($"레이아웃 변경: 수직 방향 (폭: {controlWidth}px)");
                     }
 
                     // 상하 비율 조정: 위쪽 50%, 아래쪽 50%
@@ -669,7 +669,7 @@ namespace SimpleDonkeyManager
                         if (File.Exists(fullPath))
                         {
                             LogDetail($"로컬 가상환경 Python 찾음: {fullPath}");
-                                return fullPath;
+                            return fullPath;
                         }
                     }
                     catch
@@ -845,10 +845,10 @@ namespace SimpleDonkeyManager
                                         prgTrainingProgress.Value = Math.Min(progress, 100);
                                         lblProgress.Text = $"{progress}%";
                                         LogDetail($"진행도 업데이트: {progress}% ({current}/{total})");
-                                    FindMainWindow()?.SetStatusMessage(
-                                        $"③ 학습 실행 —  학습 진행 중... {progress}% ({current} / {total} 에포크)  │  학습 완료까지 기다려주세요.",
-                                        MainWindow.StatusLevel.Info);
-                                }));
+                                        FindMainWindow()?.SetStatusMessage(
+                                            $"③ 학습 실행 —  학습 진행 중... {progress}% ({current} / {total} 에포크)  │  학습 완료까지 기다려주세요.",
+                                            MainWindow.StatusLevel.Info);
+                                    }));
                         }
                     }
                 }
@@ -1041,6 +1041,11 @@ namespace SimpleDonkeyManager
                 parent = parent.Parent;
             }
             return null;
+        }
+
+        private void btnStartTraining_Click_1(object sender, EventArgs e)
+        {
+
         }
     }
 }

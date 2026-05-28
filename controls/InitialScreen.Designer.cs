@@ -1,4 +1,4 @@
-﻿namespace SimpleDonkeyManager.controls
+namespace SimpleDonkeyManager.controls
 {
     partial class InitialScreen
     {
@@ -29,7 +29,23 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InitialScreen));
+            btnAutoSetupEnvironment = new Button();
             SuspendLayout();
+            // 
+            // btnAutoSetupEnvironment
+            // 
+            btnAutoSetupEnvironment.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnAutoSetupEnvironment.BackColor = Color.FromArgb(41, 128, 185);
+            btnAutoSetupEnvironment.FlatStyle = FlatStyle.Flat;
+            btnAutoSetupEnvironment.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnAutoSetupEnvironment.ForeColor = Color.White;
+            btnAutoSetupEnvironment.Location = new Point(1020, 15);
+            btnAutoSetupEnvironment.Name = "btnAutoSetupEnvironment";
+            btnAutoSetupEnvironment.Size = new Size(141, 32);
+            btnAutoSetupEnvironment.TabIndex = 0;
+            btnAutoSetupEnvironment.Text = "⚙ 자동 환경 설정";
+            btnAutoSetupEnvironment.UseVisualStyleBackColor = false;
+            btnAutoSetupEnvironment.Click += BtnAutoSetupEnvironment_Click;
             // 
             // InitialScreen
             // 
@@ -37,11 +53,14 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             BackgroundImageLayout = ImageLayout.Stretch;
+            Controls.Add(btnAutoSetupEnvironment);
             Name = "InitialScreen";
             Size = new Size(1176, 600);
             ResumeLayout(false);
         }
 
         #endregion
+
+        private Button btnAutoSetupEnvironment;
     }
 }
