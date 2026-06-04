@@ -173,28 +173,58 @@ python -m pip install --upgrade pip
 
 #### 필수 패키지 설치 (한 번에)
 
+> ⚠️ **버전 고정 필수**: donkeycar 5.3.0 은 특정 버전 조합에서만 정상 동작합니다.
+> 최신 버전을 그냥 설치하면 학습 시 다음과 같은 오류가 발생합니다.
+> - `ModuleNotFoundError: No module named 'albumentations'`
+> - `AttributeError: 'Functional' object has no attribute 'input_names'` (Keras 3 비호환)
+> - `numpy 2.x` 비호환 (donkeycar 는 `numpy<2.0` 요구)
+>
+> 아래 버전 조합을 **순서대로** 설치하세요. (또는 `resources\setup-environment.ps1` 한 번 실행으로 자동 처리)
+
 ```powershell
-pip install donkeycar tensorflow numpy Pillow docopt
+# 1) donkeycar 먼저 설치 (핵심 의존성 고정)
+pip install donkeycar==5.3.0
+
+# 2) numpy 1.x 고정 (TensorFlow 설치 전)
+pip install "numpy==1.26.4"
+
+# 3) TensorFlow 2.15 (Keras 2.x 포함 — donkeycar 학습 파이프라인 필수)
+pip install tensorflow==2.15.1
+
+# 4) 이미지 증강 (donkeycar.pipeline.augmentations 의존)
+pip install albumentations==1.4.18 "opencv-python-headless==4.9.0.80"
+
+# 5) 기타 유틸리티
+pip install Pillow docopt h5py pyyaml
+
+# 6) numpy 재고정 (transitive 의존성이 numpy 2.x 를 끌어올 수 있으므로 마지막에 다시 고정)
+pip install "numpy==1.26.4"
 ```
 
 **패키지 설명:**
 
-| 패키지 | 설명 |
-|--------|------|
-| **donkeycar** | 자율주행 학습 파이프라인 |
-| **tensorflow** | 딥러닝 프레임워크 |
-| **numpy** | 수치 계산 라이브러리 |
-| **Pillow** | 이미지 처리 |
-| **docopt** | 명령줄 인자 파싱 |
+| 패키지 | 고정 버전 | 설명 |
+|--------|----------|------|
+| **donkeycar** | 5.3.0 | 자율주행 학습 파이프라인 |
+| **tensorflow** | 2.15.1 | 딥러닝 프레임워크 (Keras 2.x 포함) |
+| **numpy** | 1.26.4 | 수치 계산 (donkeycar 는 `<2.0` 요구) |
+| **albumentations** | 1.4.18 | 이미지 증강 (numpy 1.x 호환 마지막 버전대) |
+| **opencv-python-headless** | 4.9.0.80 | albumentations 의존, numpy 1.x 호환 |
+| **Pillow** | 최신 | 이미지 처리 |
+| **docopt** | 최신 | 명령줄 인자 파싱 |
 
 #### 설치 확인
 
 ```powershell
-python -c "import tensorflow; print('tensorflow OK')"
-python -c "import donkeycar; print('donkeycar OK')"
-python -c "import numpy; print('numpy OK')"
+python -c "import tensorflow as tf; print('tensorflow', tf.__version__)"
+python -c "import keras; print('keras', keras.__version__)"
+python -c "import donkeycar; print('donkeycar', donkeycar.__version__)"
+python -c "import numpy; print('numpy', numpy.__version__)"
+python -c "import albumentations; print('albumentations', albumentations.__version__)"
 python -c "from PIL import Image; print('Pillow OK')"
 python -c "import docopt; print('docopt OK')"
+# 학습 파이프라인 임포트 (가장 중요 — 오류 없으면 학습 준비 완료)
+python -c "from donkeycar.pipeline.training import train; print('donkeycar training pipeline OK')"
 ```
 
 ---
@@ -302,6 +332,11 @@ dotnet publish -c Release -o publish --self-contained -r win-x64
 	├─ (1순위) donkey_env\Scripts\python.exe ← 로컬 가상환경
 	└─ (2순위) python                        ← 시스템 전역 Python
 	↓
+[python\prepare_tub.py 실행] ← 학습 데이터 자동 준비
+	├─ catalog/manifest 자동 생성 (구형 v3 → tub v2 변환)
+	├─ config.py 자동 생성 (없을 경우)
+	└─ 이미 변환된 폴더는 건너뜀
+	↓
 [python\train.py 실행]
 	├─ (1순위) donkeycar 파이프라인으로 학습
 	└─ (2순위) 독립 Keras 학습 (자동 전환)
@@ -346,25 +381,92 @@ pip install tensorflow donkeycar
 
 ---
 
+### ❌ "No module named 'albumentations'"
+
+donkeycar 학습 파이프라인이 `albumentations` 에 의존하는데 설치되지 않은 경우입니다.
+
+**해결:**
+
+```powershell
+.\donkey_env\Scripts\Activate.ps1
+pip install albumentations==1.4.18 "opencv-python-headless==4.9.0.80" "numpy==1.26.4"
+```
+
+---
+
+### ❌ "'Functional' object has no attribute 'input_names'" (Keras 3 비호환)
+
+TensorFlow 2.16 이상은 Keras 3 를 기본 포함하는데, donkeycar 5.3.0 은 Keras 2.x API 를 사용합니다.
+
+**해결: TensorFlow 2.15(Keras 2.x)로 고정**
+
+```powershell
+.\donkey_env\Scripts\Activate.ps1
+pip uninstall -y tensorflow tensorflow-intel keras
+pip install --no-cache-dir tensorflow==2.15.1
+pip install "numpy==1.26.4"
+```
+
+확인:
+```powershell
+python -c "import keras; print(keras.__version__)"   # 2.15.x 여야 함
+```
+
+---
+
+### ❌ "numpy 2.x incompatible" / donkeycar import 오류
+
+donkeycar 5.3.0 은 `numpy<2.0` 을 요구합니다. albumentations/opencv 설치 시 numpy 2.x 가
+함께 설치되면 충돌이 발생합니다.
+
+**해결:**
+
+```powershell
+.\donkey_env\Scripts\Activate.ps1
+pip install "numpy==1.26.4"
+```
+
+> 💡 가장 확실한 방법은 `resources\setup-environment.ps1` 을 실행하는 것입니다.
+> 이 스크립트가 위의 모든 버전 충돌을 올바른 순서로 자동 해결합니다.
+
+---
+
 ### ❌ "학습 레코드를 찾을 수 없습니다"
 
 **데이터 폴더 구조 확인:**
 
-**형식 1: DonkeyCar 4.x (권장)**
+**형식 1: DonkeyCar 4.x / 5.x (학습에 필요한 형식)**
 ```
 tub_data/
-├── catalog_0.catalog
 ├── manifest.json
+├── catalog_0.catalog
+├── catalog_0.catalog_manifest
 └── images/
 	└── 0_cam_image_array_.jpg
 ```
 
-**형식 2: DonkeyCar 3.x**
+**형식 2: DonkeyCar 3.x (구형 — 자동 변환됨)**
 ```
 tub_data/
+├── meta.json
 ├── record_000001.json
 └── 0_cam-image_array_.jpg
 ```
+
+> 💡 **catalog 자동 생성**: 형식 2(구형, `record_*.json` + `meta.json`)처럼 `catalog`/`manifest.json`
+> 이 없는 폴더로 학습을 시작하면, 앱이 학습 직전에 `python\prepare_tub.py` 를 자동 실행하여
+> 형식 1(tub v2: `manifest.json` + `catalog` + `images/`)로 **자동 변환**합니다.
+> 변환된 파일은 **원본 데이터 폴더 안에** 생성되며, 원본 이미지/레코드는 그대로 보존됩니다.
+> 이미 변환된 폴더(`manifest.json` 존재)는 자동으로 건너뜁니다.
+>
+> 수동으로 변환하려면:
+> ```powershell
+> python python\prepare_tub.py --tubs "C:\path\to\donkey" --config-dir "python"
+> ```
+
+> 💡 **config.py 자동 생성**: 학습에는 `python\config.py` 가 필요합니다. 없으면
+> `prepare_tub.py`(또는 `setup-environment.ps1`)가 donkeycar 기본 템플릿(`cfg_complete.py`)을
+> 복사하여 자동 생성합니다.
 
 ---
 

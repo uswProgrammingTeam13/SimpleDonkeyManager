@@ -180,11 +180,28 @@ if ($LASTEXITCODE -eq 0) {
 
 Write-Info ""
 Write-Info "Installing required packages..."
+Write-Info "Versions are pinned for donkeycar 5.3.0 compatibility (TensorFlow 2.15 / Keras 2 / NumPy 1.x)."
 
+# ----------------------------------------------------------------------------
+# IMPORTANT: donkeycar 5.3.0 requires a very specific dependency set.
+# Installing the latest versions breaks training with errors such as:
+#   - ModuleNotFoundError: No module named 'albumentations'
+#   - AttributeError: 'Functional' object has no attribute 'input_names'  (Keras 3)
+#   - numpy 2.x incompatibility (donkeycar requires numpy<2.0)
+# The packages below are pinned and installed in the correct order so that
+# `python\train.py` runs end-to-end without manual fixes.
+# ----------------------------------------------------------------------------
 $packages = @(
-	@{ name = "tensorflow"; displayName = "TensorFlow" },
-	@{ name = "donkeycar"; displayName = "DonkeyCar" },
-	@{ name = "numpy"; displayName = "NumPy" },
+	# Install donkeycar first so it pins its own core dependencies.
+	@{ name = "donkeycar==5.3.0"; displayName = "DonkeyCar 5.3.0" },
+	# Pin NumPy < 2.0 (donkeycar requirement) BEFORE TensorFlow.
+	@{ name = "numpy==1.26.4"; displayName = "NumPy 1.26.4" },
+	# TensorFlow 2.15 ships Keras 2.x which donkeycar's training pipeline needs.
+	@{ name = "tensorflow==2.15.1"; displayName = "TensorFlow 2.15.1" },
+	# Image augmentation used by donkeycar.pipeline.augmentations.
+	# 1.4.18 + opencv-headless 4.9 are the last versions compatible with numpy 1.x.
+	@{ name = "albumentations==1.4.18"; displayName = "Albumentations 1.4.18" },
+	@{ name = "opencv-python-headless==4.9.0.80"; displayName = "OpenCV (headless) 4.9.0.80" },
 	@{ name = "Pillow"; displayName = "Pillow" },
 	@{ name = "docopt"; displayName = "docopt" },
 	@{ name = "h5py"; displayName = "h5py" },
@@ -211,6 +228,19 @@ foreach ($pkg in $packages) {
 	}
 }
 
+# ----------------------------------------------------------------------------
+# Re-pin NumPy last. Some packages (e.g. opencv/albumentations) may try to pull
+# in numpy 2.x as a transitive dependency, which breaks donkeycar. Force the
+# compatible version one more time to guarantee a working environment.
+# ----------------------------------------------------------------------------
+Write-Info "Re-pinning NumPy < 2.0 for donkeycar compatibility..."
+& $venvPython -m pip install "numpy==1.26.4" --quiet 2>&1 | Out-Null
+if ($LASTEXITCODE -eq 0) {
+	Write-Success "NumPy pinned to 1.26.4"
+} else {
+	Write-Warning-Custom "Failed to re-pin NumPy"
+}
+
 if ($failedPackages.Count -gt 0) {
 	Write-Warning-Custom "Failed to install: $($failedPackages -join ', ')"
 	Write-Info "Check network connection and run again."
@@ -226,10 +256,13 @@ Write-Info "Verifying installed packages..."
 
 $verifyCommands = @(
 	@{ name = "tensorflow"; cmd = "import tensorflow as tf; print(tf.__version__)" },
+	@{ name = "keras"; cmd = "import keras; print(keras.__version__)" },
 	@{ name = "donkeycar"; cmd = "import donkeycar; print(donkeycar.__version__)" },
 	@{ name = "numpy"; cmd = "import numpy; print(numpy.__version__)" },
+	@{ name = "albumentations"; cmd = "import albumentations; print(albumentations.__version__)" },
 	@{ name = "PIL"; cmd = "from PIL import Image; print('Pillow OK')" },
-	@{ name = "docopt"; cmd = "import docopt; print('docopt OK')" }
+	@{ name = "docopt"; cmd = "import docopt; print('docopt OK')" },
+	@{ name = "training pipeline"; cmd = "from donkeycar.pipeline.training import train; print('donkeycar training pipeline OK')" }
 )
 
 $installedPackages = @()
@@ -271,18 +304,34 @@ if (Test-Path $trainPyPath) {
 }
 
 # ============================================================================
-# 10. config.py Verification
+# 10. config.py Setup (auto-generate via prepare_tub.py)
 # ============================================================================
 
-Write-Header "Configuration File Verification"
+Write-Header "Configuration File Setup"
 
-$configPath = Join-Path $projectRoot "config.py"
+# train.py runs with the working directory set to the `python` folder, so
+# donkeycar's load_config() looks for `python\config.py`. We auto-generate it
+# from donkeycar's default template using prepare_tub.py so training works
+# out of the box on a fresh machine.
+$configPath = Join-Path $projectRoot "python\config.py"
+$prepareScript = Join-Path $projectRoot "python\prepare_tub.py"
 
 if (Test-Path $configPath) {
 	Write-Success "Found config.py: $configPath"
+} elseif (Test-Path $prepareScript) {
+	Write-Info "config.py not found. Generating it from donkeycar template..."
+	$pythonDir = Join-Path $projectRoot "python"
+	& $venvPython -c "import os, shutil, donkeycar; src=os.path.join(os.path.dirname(donkeycar.__file__),'templates','cfg_complete.py'); dst=r'$configPath'; shutil.copyfile(src,dst); open(dst,'a',encoding='utf-8').write('\n# ----- setup-environment.ps1 auto settings -----\nSHOW_PLOT = False\nPRINT_MODEL_SUMMARY = True\nCREATE_TF_LITE = False\nCREATE_TENSOR_RT = False\n'); print('config.py created')" 2>&1 | Out-Null
+
+	if (Test-Path $configPath) {
+		Write-Success "config.py generated: $configPath"
+	} else {
+		Write-Warning-Custom "Failed to generate config.py automatically"
+		Write-Info "It will be auto-created on first training run by prepare_tub.py."
+	}
 } else {
-	Write-Warning-Custom "config.py not found: $configPath"
-	Write-Info "Create config.py in project root if needed."
+	Write-Warning-Custom "config.py not found and prepare_tub.py missing: $configPath"
+	Write-Info "config.py will be auto-created on first training run."
 }
 
 # ============================================================================

@@ -28,14 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            pnlFilterAdditional = new Panel();
-            chkHighlightDel = new CheckBox();
-            lblFilterAdditional = new Label();
-            chkDelFrames = new CheckBox();
-            menuStrip1 = new MenuStrip();
-            miniToolStrip = new MenuStrip();
             lstFilterSummary = new ListView();
-            btnFilterPreview = new Button();
             btnFilterReset = new Button();
             btnFilterStart = new Button();
             panelButtons = new TableLayoutPanel();
@@ -44,6 +37,9 @@
             tableLayoutPanel3 = new TableLayoutPanel();
             groupBox1 = new GroupBox();
             pnlFilterSetBasic = new Panel();
+            btnUndoRemove = new Button();
+            btnRemoveSelectedFrame = new Button();
+            btnFilterUnselected = new Button();
             comboBox1 = new ComboBox();
             lblFilterSize = new Label();
             lblFilterThrottlenum = new Label();
@@ -61,7 +57,6 @@
             tableLayoutPanel4 = new TableLayoutPanel();
             pnlFilterResult = new GroupBox();
             pnlFrameList = new Panel();
-            pnlFilterAdditional.SuspendLayout();
             panelButtons.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
@@ -75,73 +70,6 @@
             tableLayoutPanel4.SuspendLayout();
             pnlFilterResult.SuspendLayout();
             SuspendLayout();
-            // 
-            // pnlFilterAdditional
-            // 
-            pnlFilterAdditional.BackColor = Color.FromArgb(242, 242, 242);
-            pnlFilterAdditional.BorderStyle = BorderStyle.FixedSingle;
-            pnlFilterAdditional.Controls.Add(chkHighlightDel);
-            pnlFilterAdditional.Controls.Add(lblFilterAdditional);
-            pnlFilterAdditional.Controls.Add(chkDelFrames);
-            pnlFilterAdditional.Controls.Add(menuStrip1);
-            pnlFilterAdditional.Dock = DockStyle.Bottom;
-            pnlFilterAdditional.ForeColor = SystemColors.ControlText;
-            pnlFilterAdditional.Location = new Point(3, 316);
-            pnlFilterAdditional.Name = "pnlFilterAdditional";
-            pnlFilterAdditional.Size = new Size(229, 84);
-            pnlFilterAdditional.TabIndex = 3;
-            // 
-            // chkHighlightDel
-            // 
-            chkHighlightDel.AutoSize = true;
-            chkHighlightDel.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold);
-            chkHighlightDel.Location = new Point(7, 60);
-            chkHighlightDel.Name = "chkHighlightDel";
-            chkHighlightDel.Size = new Size(150, 18);
-            chkHighlightDel.TabIndex = 18;
-            chkHighlightDel.Text = "조향 값 급변 구간 제거";
-            chkHighlightDel.UseVisualStyleBackColor = true;
-            // 
-            // lblFilterAdditional
-            // 
-            lblFilterAdditional.AutoSize = true;
-            lblFilterAdditional.Font = new Font("나눔고딕", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            lblFilterAdditional.ForeColor = Color.RoyalBlue;
-            lblFilterAdditional.Location = new Point(3, 6);
-            lblFilterAdditional.Name = "lblFilterAdditional";
-            lblFilterAdditional.Size = new Size(73, 17);
-            lblFilterAdditional.TabIndex = 6;
-            lblFilterAdditional.Text = "추가 필터";
-            // 
-            // chkDelFrames
-            // 
-            chkDelFrames.AutoSize = true;
-            chkDelFrames.Font = new Font("나눔고딕", 8.999999F, FontStyle.Bold);
-            chkDelFrames.Location = new Point(7, 33);
-            chkDelFrames.Name = "chkDelFrames";
-            chkDelFrames.Size = new Size(118, 18);
-            chkDelFrames.TabIndex = 17;
-            chkDelFrames.Text = "중복 프레임 제거";
-            chkDelFrames.UseVisualStyleBackColor = true;
-            // 
-            // menuStrip1
-            // 
-            menuStrip1.Location = new Point(0, 0);
-            menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(227, 24);
-            menuStrip1.TabIndex = 19;
-            menuStrip1.Text = "menuStrip1";
-            // 
-            // miniToolStrip
-            // 
-            miniToolStrip.AccessibleName = "새 항목 선택";
-            miniToolStrip.AccessibleRole = AccessibleRole.ComboBox;
-            miniToolStrip.AutoSize = false;
-            miniToolStrip.Dock = DockStyle.None;
-            miniToolStrip.Location = new Point(6, 2);
-            miniToolStrip.Name = "miniToolStrip";
-            miniToolStrip.Size = new Size(216, 24);
-            miniToolStrip.TabIndex = 19;
             // 
             // lstFilterSummary
             // 
@@ -158,21 +86,6 @@
             lstFilterSummary.UseCompatibleStateImageBehavior = false;
             lstFilterSummary.View = View.Details;
             lstFilterSummary.SelectedIndexChanged += lstFilterSummary_SelectedIndexChanged;
-            // 
-            // btnFilterPreview
-            // 
-            btnFilterPreview.Dock = DockStyle.Fill;
-            btnFilterPreview.FlatAppearance.BorderColor = Color.DodgerBlue;
-            btnFilterPreview.FlatAppearance.MouseOverBackColor = Color.Azure;
-            btnFilterPreview.FlatStyle = FlatStyle.Flat;
-            btnFilterPreview.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            btnFilterPreview.ForeColor = SystemColors.Highlight;
-            btnFilterPreview.Location = new Point(3, 3);
-            btnFilterPreview.Name = "btnFilterPreview";
-            btnFilterPreview.Size = new Size(385, 44);
-            btnFilterPreview.TabIndex = 11;
-            btnFilterPreview.Text = "◎ 필터 미리보기";
-            btnFilterPreview.UseVisualStyleBackColor = true;
             // 
             // btnFilterReset
             // 
@@ -206,13 +119,11 @@
             // 
             // panelButtons
             // 
-            panelButtons.ColumnCount = 3;
-            panelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
-            panelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
-            panelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
-            panelButtons.Controls.Add(btnFilterPreview, 0, 0);
-            panelButtons.Controls.Add(btnFilterStart, 1, 0);
-            panelButtons.Controls.Add(btnFilterReset, 2, 0);
+            panelButtons.ColumnCount = 2;
+            panelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            panelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            panelButtons.Controls.Add(btnFilterStart, 0, 0);
+            panelButtons.Controls.Add(btnFilterReset, 1, 0);
             panelButtons.Dock = DockStyle.Bottom;
             panelButtons.Location = new Point(0, 550);
             panelButtons.Name = "panelButtons";
@@ -269,7 +180,6 @@
             // groupBox1
             // 
             groupBox1.BackColor = Color.FromArgb(248, 248, 248);
-            groupBox1.Controls.Add(pnlFilterAdditional);
             groupBox1.Controls.Add(pnlFilterSetBasic);
             groupBox1.Dock = DockStyle.Fill;
             groupBox1.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
@@ -285,6 +195,9 @@
             // 
             pnlFilterSetBasic.BackColor = Color.FromArgb(242, 242, 242);
             pnlFilterSetBasic.BorderStyle = BorderStyle.FixedSingle;
+            pnlFilterSetBasic.Controls.Add(btnFilterUnselected);
+            pnlFilterSetBasic.Controls.Add(btnUndoRemove);
+            pnlFilterSetBasic.Controls.Add(btnRemoveSelectedFrame);
             pnlFilterSetBasic.Controls.Add(comboBox1);
             pnlFilterSetBasic.Controls.Add(lblFilterSize);
             pnlFilterSetBasic.Controls.Add(lblFilterThrottlenum);
@@ -304,6 +217,52 @@
             pnlFilterSetBasic.Name = "pnlFilterSetBasic";
             pnlFilterSetBasic.Size = new Size(229, 375);
             pnlFilterSetBasic.TabIndex = 1;
+            // 
+            // btnRemoveSelectedFrame
+            // 
+            btnRemoveSelectedFrame.BackColor = Color.White;
+            btnRemoveSelectedFrame.FlatAppearance.BorderColor = Color.IndianRed;
+            btnRemoveSelectedFrame.FlatAppearance.MouseOverBackColor = Color.MistyRose;
+            btnRemoveSelectedFrame.FlatStyle = FlatStyle.Flat;
+            btnRemoveSelectedFrame.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            btnRemoveSelectedFrame.ForeColor = Color.IndianRed;
+            btnRemoveSelectedFrame.Location = new Point(7, 268);
+            btnRemoveSelectedFrame.Name = "btnRemoveSelectedFrame";
+            btnRemoveSelectedFrame.Size = new Size(215, 32);
+            btnRemoveSelectedFrame.TabIndex = 17;
+            btnRemoveSelectedFrame.Text = "✖ 선택 프레임 제거";
+            btnRemoveSelectedFrame.UseVisualStyleBackColor = false;
+            // 
+            // btnUndoRemove
+            // 
+            btnUndoRemove.BackColor = Color.White;
+            btnUndoRemove.Enabled = false;
+            btnUndoRemove.FlatAppearance.BorderColor = Color.SeaGreen;
+            btnUndoRemove.FlatAppearance.MouseOverBackColor = Color.Honeydew;
+            btnUndoRemove.FlatStyle = FlatStyle.Flat;
+            btnUndoRemove.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            btnUndoRemove.ForeColor = Color.SeaGreen;
+            btnUndoRemove.Location = new Point(7, 305);
+            btnUndoRemove.Name = "btnUndoRemove";
+            btnUndoRemove.Size = new Size(215, 32);
+            btnUndoRemove.TabIndex = 18;
+            btnUndoRemove.Text = "↺ 이전 삭제 되돌리기";
+            btnUndoRemove.UseVisualStyleBackColor = false;
+            // 
+            // btnFilterUnselected
+            // 
+            btnFilterUnselected.BackColor = Color.White;
+            btnFilterUnselected.FlatAppearance.BorderColor = Color.RoyalBlue;
+            btnFilterUnselected.FlatAppearance.MouseOverBackColor = Color.AliceBlue;
+            btnFilterUnselected.FlatStyle = FlatStyle.Flat;
+            btnFilterUnselected.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            btnFilterUnselected.ForeColor = Color.RoyalBlue;
+            btnFilterUnselected.Location = new Point(7, 342);
+            btnFilterUnselected.Name = "btnFilterUnselected";
+            btnFilterUnselected.Size = new Size(215, 32);
+            btnFilterUnselected.TabIndex = 19;
+            btnFilterUnselected.Text = "✂ 미선택 프레임 필터";
+            btnFilterUnselected.UseVisualStyleBackColor = false;
             // 
             // comboBox1
             // 
@@ -393,6 +352,7 @@
             numFilterAngle2.Size = new Size(55, 23);
             numFilterAngle2.TabIndex = 9;
             numFilterAngle2.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            numFilterAngle2.ValueChanged += numFilterAngle2_ValueChanged;
             // 
             // numFilterAngle1
             // 
@@ -505,8 +465,6 @@
             Controls.Add(tableLayoutPanel1);
             Name = "DataFilterControl";
             Size = new Size(1176, 600);
-            pnlFilterAdditional.ResumeLayout(false);
-            pnlFilterAdditional.PerformLayout();
             panelButtons.ResumeLayout(false);
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
@@ -524,14 +482,7 @@
         }
 
         #endregion
-        private Panel pnlFilterAdditional;
-        private CheckBox chkHighlightDel;
-        private Label lblFilterAdditional;
-        private CheckBox chkDelFrames;
-        private MenuStrip menuStrip1;
-        private MenuStrip miniToolStrip;
         private ListView lstFilterSummary;
-        private Button btnFilterPreview;
         private Button btnFilterReset;
         private Button btnFilterStart;
         private TableLayoutPanel panelButtons;
@@ -543,6 +494,9 @@
         private GroupBox pnlFilterResult;
         private Panel pnlFilterSetBasic;
         private ComboBox comboBox1;
+        private Button btnRemoveSelectedFrame;
+        private Button btnUndoRemove;
+        private Button btnFilterUnselected;
         private Label lblFilterSize;
         private Label lblFilterThrottlenum;
         private NumericUpDown numFilterThrottle2;

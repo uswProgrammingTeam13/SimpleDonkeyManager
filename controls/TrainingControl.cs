@@ -23,6 +23,8 @@ namespace SimpleDonkeyManager
         private Process trainingProcess;
         private bool isTraining = false;
         private bool isFiltered = false;  // 필터 여부
+        private bool userStopped = false; // 사용자가 학습을 중지했는지 여부
+        private int currentEpoch = 0;     // 로그에서 추적한 현재 에포크 (loss 줄에 epoch이 없을 때 사용)
         private ChartDataModel chartDataModel = new ChartDataModel();  // 그래프 데이터 모델
         private PlotView plotView = null;  // OxyPlot 뷰어
         private PlotModel plotModel = null;  // 플롯 모델 (Donkey UI 형식)
@@ -467,6 +469,7 @@ namespace SimpleDonkeyManager
             try
             {
                 isTraining = true;
+                userStopped = false;
                 btnStartTraining.Text = "⏹ 학습 중지";
                 prgTrainingProgress.Value = 0;
                 lstTrainingLog.Items.Clear();
@@ -483,6 +486,7 @@ namespace SimpleDonkeyManager
                 {
                     plotView.Model = plotModel;
                 }
+                currentEpoch = 0;
 
                 Task.Run(() =>
                 {
@@ -541,6 +545,21 @@ namespace SimpleDonkeyManager
                             LogDetail($"시스템 전역 Python 사용: {pythonExe}");
                         }
 
+                        // ----- 학습 전 tub 데이터 준비 단계 -----
+                        // donkey 폴더처럼 구형(v3) 형식 데이터는 catalog/manifest 가 없어
+                        // donkeycar 5.x 학습이 실패합니다. prepare_tub.py 를 실행하여
+                        // tub v2 형식(manifest.json + catalog)으로 변환하고 config.py 를 준비합니다.
+                        // (이미 변환된 폴더는 prepare_tub.py 내부에서 자동으로 건너뜁니다.)
+                        bool prepared = PrepareTubData(pythonExe, pythonScriptPath, dataFolder);
+                        if (!prepared)
+                        {
+                            LogWarning("학습 데이터 준비(catalog 생성)에 실패했습니다. 학습을 중단합니다.");
+                            FindMainWindow()?.SetStatusMessage(
+                                "③ 학습 실행 —  학습 데이터 준비(catalog 생성)에 실패했습니다.  로그를 확인하세요.",
+                                MainWindow.StatusLevel.Error);
+                            return;
+                        }
+
                         // Python 인수 구성
                         string arguments = $"--tubs \"{dataFolder}\" --model \"{modelPath}\"";
 
@@ -564,6 +583,23 @@ namespace SimpleDonkeyManager
                         // Python이 UTF-8 모드로 동작하도록 환경 변수 설정
                         psi.EnvironmentVariables["PYTHONUTF8"] = "1";
                         psi.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
+                        // 출력 버퍼링 비활성화 (실시간 로그/그래프 갱신을 위해 필수)
+                        psi.EnvironmentVariables["PYTHONUNBUFFERED"] = "1";
+
+                        // train.py가 위치한 폴더(python)를 작업 디렉터리로 설정하여
+                        // DEPLOYMENT_GUIDE의 실행 환경(config 탐색 등)과 동일하게 동작하도록 합니다.
+                        try
+                        {
+                            string scriptDir = Path.GetDirectoryName(pythonScriptPath);
+                            if (!string.IsNullOrEmpty(scriptDir) && Directory.Exists(scriptDir))
+                            {
+                                psi.WorkingDirectory = scriptDir;
+                            }
+                        }
+                        catch
+                        {
+                            // 작업 디렉터리 설정 실패 시 기본값 사용
+                        }
 
                         LogDetail($"실행 명령어: {psi.FileName} {psi.Arguments}");
 
@@ -602,6 +638,28 @@ namespace SimpleDonkeyManager
                                 FindMainWindow()?.SetStatusMessage(
                                     "③ 학습 실행 —  학습 완료!  →  [학습 결과 확인] 버튼을 눈러 ④ 결과를 확인하세요.",
                                     MainWindow.StatusLevel.Success);
+                            }
+                            else if (userStopped)
+                            {
+                                // 사용자가 중지한 경우에도 donkeycar 가 ModelCheckpoint 로
+                                // 그때까지의 best 모델을 저장해 두었다면 결과를 전달합니다.
+                                if (File.Exists(modelPath))
+                                {
+                                    LogInfo($"학습이 중지되었지만 모델이 저장되었습니다: {modelPath}");
+                                    SaveTrainingMetrics(modelPath);
+                                    NotifyTrainingCompleted(modelPath);
+
+                                    FindMainWindow()?.SetStatusMessage(
+                                        "③ 학습 실행 —  학습이 중지되었습니다.  중지 시점까지의 모델이 저장되었습니다.  →  [학습 결과 확인] 버튼을 눌러 ④ 결과를 확인하세요.",
+                                        MainWindow.StatusLevel.Success);
+                                }
+                                else
+                                {
+                                    LogWarning("학습이 중지되었으나 저장된 모델 파일이 없습니다 (첫 에포크 완료 전에 중지된 것으로 보입니다).");
+                                    FindMainWindow()?.SetStatusMessage(
+                                        "③ 학습 실행 —  학습이 중지되었습니다.  저장된 모델이 없습니다(첫 에포크 완료 전 중지).",
+                                        MainWindow.StatusLevel.Warning);
+                                }
                             }
                             else
                             {
@@ -702,6 +760,100 @@ namespace SimpleDonkeyManager
             {
                 LogDetail($"Python 실행 파일 검색 오류: {ex.Message}");
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// 학습 전에 데이터 폴더를 donkeycar 5.x 가 요구하는 tub v2 형식으로 준비합니다.
+        /// prepare_tub.py 를 동기 실행하여 (1) catalog/manifest 자동 생성,
+        /// (2) config.py 생성을 수행하고, 출력은 학습 로그에 표시합니다.
+        /// 이미 변환된 폴더(manifest.json 존재)는 스크립트 내부에서 건너뜁니다.
+        /// </summary>
+        /// <returns>준비 성공 시 true, 실패 시 false</returns>
+        private bool PrepareTubData(string pythonExe, string trainScriptPath, string dataFolder)
+        {
+            try
+            {
+                // prepare_tub.py 는 train.py 와 같은 python 폴더에 있습니다.
+                string scriptDir = Path.GetDirectoryName(trainScriptPath);
+                string prepareScript = Path.Combine(scriptDir, "prepare_tub.py");
+
+                if (!File.Exists(prepareScript))
+                {
+                    // 준비 스크립트가 없으면 변환 없이 진행 (이미 tub v2 형식일 수 있음)
+                    LogWarning($"prepare_tub.py 를 찾을 수 없습니다. catalog 자동 생성을 건너뜁니다: {prepareScript}");
+                    return true;
+                }
+
+                LogInfo("학습 데이터 준비 중... (catalog/config 자동 생성)");
+                LogDetail($"준비 스크립트: {prepareScript}");
+                LogDetail($"대상 데이터 폴더: {dataFolder}");
+
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = pythonExe,
+                    Arguments = $"\"{prepareScript}\" --tubs \"{dataFolder}\" --config-dir \"{scriptDir}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = System.Text.Encoding.UTF8,
+                    StandardErrorEncoding = System.Text.Encoding.UTF8,
+                    WorkingDirectory = scriptDir,
+                };
+
+                psi.EnvironmentVariables["PYTHONUTF8"] = "1";
+                psi.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
+                psi.EnvironmentVariables["PYTHONUNBUFFERED"] = "1";
+                psi.EnvironmentVariables["NO_ALBUMENTATIONS_UPDATE"] = "1";
+
+                using (Process prepareProcess = new Process { StartInfo = psi })
+                {
+                    prepareProcess.OutputDataReceived += (s, e) =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(e.Data))
+                        {
+                            LogDetail(e.Data);
+                        }
+                    };
+                    prepareProcess.ErrorDataReceived += (s, e) =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(e.Data))
+                        {
+                            LogDetail(e.Data);
+                        }
+                    };
+
+                    prepareProcess.Start();
+                    prepareProcess.BeginOutputReadLine();
+                    prepareProcess.BeginErrorReadLine();
+
+                    // 데이터 변환은 보통 수 분 이내. 넉넉히 30분 타임아웃.
+                    bool exited = prepareProcess.WaitForExit(30 * 60 * 1000);
+                    if (!exited)
+                    {
+                        LogWarning("학습 데이터 준비가 타임아웃(30분)되었습니다. 프로세스를 종료합니다.");
+                        try { prepareProcess.Kill(); } catch { }
+                        return false;
+                    }
+
+                    int exitCode = prepareProcess.ExitCode;
+                    LogDetail($"데이터 준비 프로세스 종료 (코드: {exitCode})");
+
+                    if (exitCode == 0)
+                    {
+                        LogInfo("학습 데이터 준비 완료.");
+                        return true;
+                    }
+
+                    LogWarning($"학습 데이터 준비 실패 (코드: {exitCode}).");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"학습 데이터 준비 오류: {ex.Message}");
+                return false;
             }
         }
 
@@ -837,6 +989,9 @@ namespace SimpleDonkeyManager
                     var epochMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"Epoch\s+(\d+)/(\d+)");
                     if (epochMatch.Success && int.TryParse(epochMatch.Groups[1].Value, out int current) && int.TryParse(epochMatch.Groups[2].Value, out int total))
                     {
+                        // 현재 에포크 추적 (loss 줄에는 Epoch 정보가 없는 경우가 많으므로 별도 보관)
+                        currentEpoch = current;
+
                         int progress = (int)((double)current / total * 100);
                         if (prgTrainingProgress != null && !prgTrainingProgress.IsDisposed)
                         {
@@ -858,9 +1013,10 @@ namespace SimpleDonkeyManager
                 {
                     float? trainLoss = null;
                     float? valLoss = null;
-                    int epochNum = 0;
 
-                    // 에포크 번호 추출
+                    // 에포크 번호 추출: 같은 줄에 Epoch이 있으면 사용하고,
+                    // 없으면 직전에 추적한 currentEpoch 값을 사용 (Keras는 별개 줄로 출력)
+                    int epochNum = currentEpoch;
                     if (logLine.Contains("Epoch"))
                     {
                         var epochMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"Epoch\s+(\d+)");
@@ -870,21 +1026,25 @@ namespace SimpleDonkeyManager
                         }
                     }
 
-                    // 훈련 손실 추출 (loss: 값)
-                    var lossMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"loss:\s*([\d.]+)");
-                    if (lossMatch.Success && float.TryParse(lossMatch.Groups[1].Value, out float loss))
+                    // 훈련 손실 추출 (loss: 값). 진행 줄에서 마지막(최종) 값을 사용하기 위해 모든 매치 중 마지막을 선택
+                    var lossMatches = System.Text.RegularExpressions.Regex.Matches(logLine, @"(?<!val_)loss:\s*([\d.eE+-]+)");
+                    if (lossMatches.Count > 0 && float.TryParse(lossMatches[lossMatches.Count - 1].Groups[1].Value,
+                        System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float loss))
                     {
                         trainLoss = loss;
                     }
 
-                    // 검증 손실 추출 (val_loss: 값 또는 - val_loss: 값)
-                    var valLossMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"val_loss:\s*([\d.]+)");
-                    if (valLossMatch.Success && float.TryParse(valLossMatch.Groups[1].Value, out float vLoss))
+                    // 검증 손실 추출 (val_loss: 값)
+                    var valLossMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"val_loss:\s*([\d.eE+-]+)");
+                    if (valLossMatch.Success && float.TryParse(valLossMatch.Groups[1].Value,
+                        System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float vLoss))
                     {
                         valLoss = vLoss;
                     }
 
-                    // 데이터가 있으면 그래프 업데이트
+                    // 데이터가 있으면 그래프 업데이트.
+                    // 검증 손실(val_loss)이 포함된 줄은 에포크 종료 시점의 최종 값이므로 우선 반영하고,
+                    // val_loss가 없어도 에포크 정보와 train loss가 있으면 갱신합니다.
                     if (trainLoss.HasValue && epochNum > 0)
                     {
                         UpdateChartWithMetric(epochNum, trainLoss.Value, valLoss);
@@ -901,6 +1061,8 @@ namespace SimpleDonkeyManager
         {
             try
             {
+                userStopped = true;
+
                 if (trainingProcess != null && !trainingProcess.HasExited)
                 {
                     trainingProcess.Kill();

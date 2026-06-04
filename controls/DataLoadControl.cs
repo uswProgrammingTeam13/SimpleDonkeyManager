@@ -10,7 +10,7 @@ namespace SimpleDonkeyManager
     {
 
         private controlutils.ImageList imageList = new controlutils.ImageList();
-        private controlutils.ImageViewer imageViewer = new controlutils.ImageViewer();
+        private PictureBox helpImageBox = new PictureBox();
         private MainWindow mainWindow;
         private ImageManager imageManager = new ImageManager();
         private Logger logger;
@@ -24,9 +24,13 @@ namespace SimpleDonkeyManager
             imageList.Visible = true;
             pnlFrameList.Controls.Add(imageList);
 
-            imageViewer.Dock = DockStyle.Fill;
-            imageViewer.Visible = true;
-            pnlImageView.Controls.Add(imageViewer);
+            // pnlImageView에는 ImageViewer 대신 프로그램 도움말 이미지를 표시
+            helpImageBox.Dock = DockStyle.Fill;
+            helpImageBox.SizeMode = PictureBoxSizeMode.Zoom;
+            helpImageBox.BackColor = Color.White;
+            helpImageBox.Visible = true;
+            pnlImageView.Controls.Add(helpImageBox);
+            LoadHelpImage();
 
             // 이미지 선택 이벤트 구독
             imageList.ImageSelected += ImageList_ImageSelected;
@@ -36,11 +40,37 @@ namespace SimpleDonkeyManager
             logger = null;
         }
 
+        /// <summary>
+        /// resources 폴더의 도움말 이미지(dataloadhelp.png)를 로드하여 표시합니다.
+        /// 파일 락을 방지하기 위해 스트림으로 읽은 뒤 즉시 닫습니다.
+        /// </summary>
+        private void LoadHelpImage()
+        {
+            try
+            {
+                string helpImagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources", "dataloadhelp.png");
+                if (!File.Exists(helpImagePath))
+                {
+                    LogWarning($"도움말 이미지를 찾을 수 없습니다: {helpImagePath}");
+                    return;
+                }
+
+                using (FileStream fs = new FileStream(helpImagePath, FileMode.Open, FileAccess.Read))
+                {
+                    helpImageBox.Image?.Dispose();
+                    helpImageBox.Image = Image.FromStream(fs);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"도움말 이미지 로드 실패: {ex.Message}");
+            }
+        }
+
         private void InitializeTooltips()
         {
             var toolTip = new ToolTip { AutoPopDelay = 8000, InitialDelay = 400, ReshowDelay = 200, ShowAlways = true };
-            toolTip.SetToolTip(btnSelectFolder, "학습 데이터가 들어있는 폴더를 선택합니다.\n선택한 폴더 내의 이미지와 JSON 파일을 자동으로 불러옵니다.");
-            toolTip.SetToolTip(btnLoadStart, "선택한 폴더의 데이터를 애플리케이션에 로드합니다.");
+            toolTip.SetToolTip(btnSelectFolder, "데이터 폴더를 선택하면 이미지와 identifier(JSON) 파일을 자동으로 불러옵니다.\ndata 폴더(catalog 포함) 또는 이미지+identifier 폴더를 선택할 수 있습니다.");
         }
 
         /// <summary>
@@ -51,13 +81,10 @@ namespace SimpleDonkeyManager
             logger = log;
             // 자식 컨트롤에도 Logger 전달
             imageList.SetLogger(log);
-            imageViewer.SetLogger(log);
         }
 
         private void ImageList_ImageSelected(object sender, string imagePath)
         {
-            imageViewer.DisplayImage(imagePath);
-
             // 필요하다면 MainWindow를 통해 DataFilterControl 등 다른 뷰에도 이미지 경로를 전달할 수 있습니다.
             if (mainWindow != null)
             {
@@ -83,6 +110,8 @@ namespace SimpleDonkeyManager
             lblImageFormat.Text = "-";
             lblResolutionValue.Text = "- x -";
             lblFileSizeValue.Text = "- byte";
+            lblCatalogStatus.Text = "카탈로그: -";
+            lblCatalogStatus.ForeColor = Color.Gray;
         }
 
 
@@ -94,7 +123,7 @@ namespace SimpleDonkeyManager
             {
                 using (FolderBrowserDialog dialog = new FolderBrowserDialog())
                 {
-                    dialog.Description = "이미지 폴더를 선택하세요";
+                    dialog.Description = "데이터 폴더를 선택하세요 (data 폴더 또는 이미지+identifier 폴더)";
 
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
@@ -111,8 +140,12 @@ namespace SimpleDonkeyManager
                         // 폴더 스캔 (이미지 및 JSON 파일)
                         if (!imageManager.ScanFolder(folderPath))
                         {
-                            MessageBox.Show("폴더 스캔에 실패했습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            LogWarning($"폴더 스캔 실패: {folderPath}");
+                            MessageBox.Show(
+                                "선택한 폴더에서 이미지와 identifier 데이터를 찾을 수 없습니다.\n\n" +
+                                "• data 폴더(catalog + 하위 images 폴더) 또는\n" +
+                                "• 이미지와 identifier(json) 파일이 들어 있는 폴더를 선택해주세요.",
+                                "데이터 없음", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            LogWarning($"폴더 스캔 실패(이미지/identifier 없음): {folderPath}");
                             InitializeDefaultState();
                             return;
                         }
@@ -139,6 +172,18 @@ namespace SimpleDonkeyManager
                                 ? string.Join(", ", stats.Resolutions ?? new List<string>()) 
                                 : "Unknown";
                             lblFileSizeValue.Text = stats.GetFormattedFileSize() ?? "0 byte";
+
+                            // catalog 파일 유무 표시
+                            if (imageManager.HasCatalog)
+                            {
+                                lblCatalogStatus.Text = $"카탈로그: ✔ 있음 ({System.IO.Path.GetFileName(imageManager.CatalogPath)})";
+                                lblCatalogStatus.ForeColor = Color.SeaGreen;
+                            }
+                            else
+                            {
+                                lblCatalogStatus.Text = "카탈로그: ✖ 없음 (이미지/identifier만 로드됨)";
+                                lblCatalogStatus.ForeColor = Color.DarkOrange;
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -156,29 +201,32 @@ namespace SimpleDonkeyManager
                                     folderPath,
                                     stats.TotalImageCount,
                                     0,
-                                    "데이터 로드 준비 완료"
+                                    "데이터 로드 중..."
                                 );
-                                mainWindow.SetStatusMessage(
-                                    $"① 데이터 불러오기 —  폴더 선택 완료 ({stats.TotalImageCount:N0}개 이미지)  →  [데이터 로드] 버튼을 눌러주세요.",
-                                    MainWindow.StatusLevel.Info);
                             }
                             catch (Exception ex)
                             {
                                 LogWarning($"상태 업데이트 오류: {ex.Message}");
                             }
                         }
+
+                        // 폴더 선택과 동시에 데이터를 컨트롤에 로드 (버튼 하나로 통합)
+                        LoadDataToControls();
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"폴더 선택 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LogWarning($"폴더 선택 예외: {ex.Message}");
+                MessageBox.Show($"데이터 열기 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"데이터 열기 예외: {ex.Message}");
                 InitializeDefaultState();
             }
         }
 
-        private void btnLoadStart_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 스캔된 데이터를 ImageList/ImageViewer 및 다른 화면(필터/학습)에 로드합니다.
+        /// </summary>
+        private void LoadDataToControls()
         {
             try
             {
@@ -194,8 +242,8 @@ namespace SimpleDonkeyManager
                 List<FrameData> allFrames = imageManager.GetAllFrameData();
                 if (allFrames == null || allFrames.Count == 0)
                 {
-                    MessageBox.Show("먼저 이미지 폴더를 선택하세요.", "정보", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LogWarning("데이터 로드 실패: 폴더 선택 안 됨");
+                    MessageBox.Show("불러올 프레임 데이터가 없습니다.", "정보", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LogWarning("데이터 로드 실패: 프레임 없음");
                     return;
                 }
 
@@ -209,16 +257,7 @@ namespace SimpleDonkeyManager
 
                 imageList.LoadFrames(allFrames);
 
-                // ImageViewer null 체크
-                if (imageViewer == null)
-                {
-                    LogWarning("데이터 로드 경고: ImageViewer가 null");
-                }
-                else
-                {
-                    imageList.SetImageManager(imageManager);
-                    imageViewer.SetImageManager(imageManager);
-                }
+                imageList.SetImageManager(imageManager);
 
                 // 첫 번째 프레임 표시
                 if (allFrames.Count > 0)

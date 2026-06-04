@@ -1,62 +1,48 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace SimpleDonkeyManager.controlutils
 {
     /// <summary>
-    /// 현재 이미지를 별도 창에서 크게 보여주는 Form입니다.
-    /// 재생/정지/이전/다음 프레임 이동 및 배속 조절 기능을 포함합니다.
+    /// ImageViewer를 전체 화면 크기로 크게 보여주는 Form입니다.
+    /// 하단에 선택 프레임 제거 / 이전 삭제 되돌리기 / 미선택 프레임 필터 버튼을 배치하고
+    /// 실제 필터링 동작(ImageManager 기반)을 수행합니다.
     /// </summary>
     public class ImageLargeViewForm : Form
     {
-        // ── 레이아웃 컨트롤 ──────────────────────────────────────
-        private PictureBox pictureBox;
-        private Panel pnlToolbar;
-        private TrackBar trackBar;
-        private Panel pnlInfo;
-
-        // ── 툴바 버튼 / 컨트롤 ──────────────────────────────────
-        private Button btnFirst;
-        private Button btnPrev;
-        private Button btnPlayPause;
-        private Button btnNext;
-        private Button btnLast;
-        private Label lblSpeed;
-        private ComboBox cmbSpeed;
-        private Label lblFrame;
-
-        // ── 하단 정보 라벨 ───────────────────────────────────────
-        private Label lblAngle;
-        private Label lblThrottle;
-        private Label lblImageName;
-
-        // ── 데이터 ───────────────────────────────────────────────
-        private List<FrameData> frameDataList;
-        private int currentIndex = 0;
-        private System.Windows.Forms.Timer playTimer;
-        private bool isPlaying = false;
-        private double playbackSpeed = 1.0;
-        private const int FPS = 20;
-
-        // ── 툴팁 ─────────────────────────────────────────────────
+        // ── 컨트롤 ──────────────────────────────────────────────
+        private ImageViewer imageViewer;
+        private Panel pnlBottom;
+        private Button btnRemoveSelectedFrame;
+        private Button btnUndoRemove;
+        private Button btnFilterUnselected;
         private ToolTip toolTip;
 
-        public ImageLargeViewForm(List<FrameData> frames, int startIndex = 0)
+        // ── 데이터 / 연동 ───────────────────────────────────────
+        private SimpleDonkeyManager.ImageManager imageManager;
+        private SimpleDonkeyManager.DataFilterControl ownerControl;
+        private SimpleDonkeyManager.Logger logger;
+
+        /// <summary>
+        /// ImageManager와 소유 DataFilterControl을 받아 크게 보기 창을 구성합니다.
+        /// </summary>
+        public ImageLargeViewForm(SimpleDonkeyManager.ImageManager manager, SimpleDonkeyManager.DataFilterControl owner = null, SimpleDonkeyManager.Logger log = null)
         {
-            frameDataList = frames ?? new List<FrameData>();
-            currentIndex = Math.Max(0, Math.Min(startIndex, frameDataList.Count - 1));
+            imageManager = manager;
+            ownerControl = owner;
+            logger = log;
 
             BuildUI();
             InitializeTooltips();
             WireEvents();
 
-            playTimer = new System.Windows.Forms.Timer { Interval = (int)(1000.0 / FPS) };
-            playTimer.Tick += PlayTimer_Tick;
+            if (imageManager != null)
+                imageViewer.SetImageManager(imageManager);
 
-            ShowFrame(currentIndex);
+            UpdateUndoButtonState();
         }
 
         // ────────────────────────────────────────────────────────────
@@ -65,313 +51,267 @@ namespace SimpleDonkeyManager.controlutils
         private void BuildUI()
         {
             Text = "이미지 크게 보기";
-            Size = new Size(960, 780);
-            MinimumSize = new Size(480, 400);
+            Size = new Size(1200, 900);
+            MinimumSize = new Size(640, 480);
             StartPosition = FormStartPosition.CenterScreen;
-            BackColor = Color.FromArgb(20, 20, 20);
+            WindowState = FormWindowState.Maximized;
+            BackColor = Color.FromArgb(30, 30, 30);
             KeyPreview = true;
 
-            // ── 메인 이미지 ──────────────────────────────────────
-            pictureBox = new PictureBox
+            // ── 임베드 ImageViewer ───────────────────────────────
+            imageViewer = new ImageViewer
             {
                 Dock = DockStyle.Fill,
-                SizeMode = PictureBoxSizeMode.Zoom,
-                BackColor = Color.Black
+                AutoSize = false,
+                Visible = true
             };
+            if (logger != null)
+                imageViewer.SetLogger(logger);
 
-            // ── 툴바 패널 ────────────────────────────────────────
-            pnlToolbar = new Panel
-            {
-                Dock = DockStyle.Top,
-                Height = 52,
-                BackColor = Color.FromArgb(40, 40, 40),
-                Padding = new Padding(6, 4, 6, 4)
-            };
-
-            btnFirst = MakeToolbarButton("⏮", Color.DodgerBlue);
-            btnFirst.Location = new Point(8, 8);
-
-            btnPrev = MakeToolbarButton("◀", Color.DodgerBlue);
-            btnPrev.Location = new Point(66, 8);
-
-            btnPlayPause = MakeToolbarButton("▶", Color.SeaGreen);
-            btnPlayPause.Location = new Point(124, 8);
-
-            btnNext = MakeToolbarButton("▶|", Color.DodgerBlue);
-            btnNext.Location = new Point(182, 8);
-
-            btnLast = MakeToolbarButton("⏭", Color.DodgerBlue);
-            btnLast.Location = new Point(240, 8);
-
-            lblSpeed = new Label
-            {
-                Text = "배속:",
-                ForeColor = Color.White,
-                Font = new Font("나눔고딕", 10F, FontStyle.Bold),
-                Location = new Point(316, 16),
-                AutoSize = true
-            };
-
-            cmbSpeed = new ComboBox
-            {
-                Font = new Font("나눔고딕", 10F, FontStyle.Bold),
-                Location = new Point(366, 12),
-                Size = new Size(80, 28),
-                DropDownStyle = ComboBoxStyle.DropDownList
-            };
-            cmbSpeed.Items.AddRange(new object[] { "0.25x", "0.5x", "1.0x", "2.0x", "4.0x" });
-            cmbSpeed.SelectedIndex = 2;
-
-            lblFrame = new Label
-            {
-                Text = "0000 / 0",
-                ForeColor = Color.White,
-                Font = new Font("나눔고딕", 10F, FontStyle.Bold),
-                Location = new Point(466, 16),
-                AutoSize = true
-            };
-
-            pnlToolbar.Controls.AddRange(new Control[]
-            {
-                btnFirst, btnPrev, btnPlayPause, btnNext, btnLast,
-                lblSpeed, cmbSpeed, lblFrame
-            });
-
-            // ── 트랙바 ───────────────────────────────────────────
-            trackBar = new TrackBar
-            {
-                Dock = DockStyle.Top,
-                Height = 36,
-                Minimum = 0,
-                Maximum = Math.Max(0, frameDataList.Count - 1),
-                TickStyle = TickStyle.None,
-                BackColor = Color.FromArgb(30, 30, 30)
-            };
-
-            // ── 하단 정보 패널 ───────────────────────────────────
-            pnlInfo = new Panel
+            // ── 하단 버튼 패널 ───────────────────────────────────
+            pnlBottom = new Panel
             {
                 Dock = DockStyle.Bottom,
                 Height = 56,
-                BackColor = Color.FromArgb(30, 30, 30),
-                Padding = new Padding(10, 4, 10, 4)
+                BackColor = Color.FromArgb(45, 45, 45),
+                Padding = new Padding(8, 8, 8, 8)
             };
 
-            lblImageName = new Label
+            btnRemoveSelectedFrame = MakeBottomButton("✖ 선택 프레임 제거", Color.IndianRed, Color.MistyRose);
+            btnUndoRemove = MakeBottomButton("↺ 이전 삭제 되돌리기", Color.SeaGreen, Color.Honeydew);
+            btnUndoRemove.Enabled = false;
+            btnFilterUnselected = MakeBottomButton("✂ 미선택 프레임 필터", Color.RoyalBlue, Color.AliceBlue);
+
+            // 가로 균등 배치를 위한 TableLayoutPanel
+            var layout = new TableLayoutPanel
             {
-                ForeColor = Color.Silver,
-                Font = new Font("나눔고딕", 9F, FontStyle.Regular),
-                Location = new Point(10, 6),
-                AutoSize = true,
-                Text = ""
+                Dock = DockStyle.Fill,
+                ColumnCount = 3,
+                RowCount = 1,
+                BackColor = Color.Transparent
             };
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
 
-            lblAngle = new Label
-            {
-                ForeColor = Color.LightSkyBlue,
-                Font = new Font("나눔고딕", 11F, FontStyle.Bold),
-                Location = new Point(10, 28),
-                AutoSize = true,
-                Text = "Angle: -"
-            };
+            btnRemoveSelectedFrame.Dock = DockStyle.Fill;
+            btnUndoRemove.Dock = DockStyle.Fill;
+            btnFilterUnselected.Dock = DockStyle.Fill;
+            btnRemoveSelectedFrame.Margin = new Padding(4);
+            btnUndoRemove.Margin = new Padding(4);
+            btnFilterUnselected.Margin = new Padding(4);
 
-            lblThrottle = new Label
-            {
-                ForeColor = Color.LightGreen,
-                Font = new Font("나눔고딕", 11F, FontStyle.Bold),
-                Location = new Point(200, 28),
-                AutoSize = true,
-                Text = "Throttle: -"
-            };
+            layout.Controls.Add(btnRemoveSelectedFrame, 0, 0);
+            layout.Controls.Add(btnUndoRemove, 1, 0);
+            layout.Controls.Add(btnFilterUnselected, 2, 0);
 
-            pnlInfo.Controls.AddRange(new Control[] { lblImageName, lblAngle, lblThrottle });
+            pnlBottom.Controls.Add(layout);
 
-            // ── 컨트롤 배치 (순서 중요: Top → Fill → Bottom) ────
-            Controls.Add(pictureBox);   // Fill
-            Controls.Add(trackBar);     // Top (이미 pnlToolbar 아래)
-            Controls.Add(pnlToolbar);   // Top (가장 위)
-            Controls.Add(pnlInfo);      // Bottom
+            Controls.Add(imageViewer);
+            Controls.Add(pnlBottom);
         }
 
-        private static Button MakeToolbarButton(string text, Color backColor)
+        private Button MakeBottomButton(string text, Color fore, Color hover)
         {
-            return new Button
+            var btn = new Button
             {
                 Text = text,
-                Size = new Size(50, 36),
+                BackColor = Color.White,
+                ForeColor = fore,
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("나눔고딕", 11F, FontStyle.Bold),
-                BackColor = backColor,
-                ForeColor = Color.White,
+                Font = new Font("나눔고딕", 10F, FontStyle.Bold),
                 UseVisualStyleBackColor = false
             };
+            btn.FlatAppearance.BorderColor = fore;
+            btn.FlatAppearance.MouseOverBackColor = hover;
+            return btn;
         }
 
-        // ────────────────────────────────────────────────────────────
-        // 툴팁
-        // ────────────────────────────────────────────────────────────
         private void InitializeTooltips()
         {
-            toolTip = new ToolTip { AutoPopDelay = 8000, InitialDelay = 400, ReshowDelay = 200, ShowAlways = true };
-            toolTip.SetToolTip(btnFirst,     "첫 번째 프레임으로 이동합니다. (Home)");
-            toolTip.SetToolTip(btnPrev,      "이전 프레임으로 이동합니다. (← 방향키)");
-            toolTip.SetToolTip(btnPlayPause, "재생 / 일시정지를 전환합니다. (Space)");
-            toolTip.SetToolTip(btnNext,      "다음 프레임으로 이동합니다. (→ 방향키)");
-            toolTip.SetToolTip(btnLast,      "마지막 프레임으로 이동합니다. (End)");
-            toolTip.SetToolTip(cmbSpeed,     "재생 배속을 선택합니다.");
-            toolTip.SetToolTip(trackBar,     "슬라이더를 드래그하여 원하는 프레임으로 이동합니다.");
-            toolTip.SetToolTip(pictureBox,   "현재 프레임 이미지입니다. ESC 키로 창을 닫습니다.");
+            toolTip = new ToolTip();
+            toolTip.SetToolTip(btnRemoveSelectedFrame, "현재 표시 중인 프레임을 제거합니다.");
+            toolTip.SetToolTip(btnUndoRemove, "직전에 수행한 삭제를 한 번 되돌립니다.");
+            toolTip.SetToolTip(btnFilterUnselected, "타임라인에서 선택한 구간의 프레임만 남기고 나머지를 필터링합니다.");
         }
 
-        // ────────────────────────────────────────────────────────────
-        // 이벤트 연결
-        // ────────────────────────────────────────────────────────────
         private void WireEvents()
         {
-            btnFirst.Click     += (s, e) => MoveToFrame(0);
-            btnPrev.Click      += (s, e) => MoveToFrame(currentIndex - 1);
-            btnPlayPause.Click += BtnPlayPause_Click;
-            btnNext.Click      += (s, e) => MoveToFrame(currentIndex + 1);
-            btnLast.Click      += (s, e) => MoveToFrame(frameDataList.Count - 1);
-
-            cmbSpeed.SelectedIndexChanged += CmbSpeed_SelectedIndexChanged;
-            trackBar.ValueChanged         += TrackBar_ValueChanged;
-
-            KeyDown += ImageLargeViewForm_KeyDown;
-            FormClosed += (s, e) => { playTimer?.Stop(); playTimer?.Dispose(); };
+            btnRemoveSelectedFrame.Click += BtnRemoveSelectedFrame_Click;
+            btnUndoRemove.Click += BtnUndoRemove_Click;
+            btnFilterUnselected.Click += BtnFilterUnselected_Click;
         }
 
         // ────────────────────────────────────────────────────────────
-        // 외부에서 프레임 데이터 전달 (ImageViewer와 연동)
+        // 필터링 동작
         // ────────────────────────────────────────────────────────────
-        public void SyncFrame(int index)
+
+        /// <summary>
+        /// 현재 ImageViewer에서 표시 중인 프레임을 제거합니다.
+        /// </summary>
+        private void BtnRemoveSelectedFrame_Click(object sender, EventArgs e)
         {
-            if (IsDisposed || !Visible) return;
-            currentIndex = Math.Max(0, Math.Min(index, frameDataList.Count - 1));
-            ShowFrame(currentIndex);
-        }
-
-        // ────────────────────────────────────────────────────────────
-        // 프레임 표시
-        // ────────────────────────────────────────────────────────────
-        private void MoveToFrame(int index)
-        {
-            if (frameDataList == null || frameDataList.Count == 0) return;
-            index = Math.Max(0, Math.Min(index, frameDataList.Count - 1));
-            currentIndex = index;
-            ShowFrame(currentIndex);
-        }
-
-        private void ShowFrame(int index)
-        {
-            if (frameDataList == null || frameDataList.Count == 0) return;
-            index = Math.Max(0, Math.Min(index, frameDataList.Count - 1));
-            currentIndex = index;
-
-            var fd = frameDataList[index];
-            if (fd == null || string.IsNullOrEmpty(fd.ImagePath) || !File.Exists(fd.ImagePath))
-                return;
-
             try
             {
-                var oldImg = pictureBox.Image;
-                using (var stream = new FileStream(fd.ImagePath, FileMode.Open, FileAccess.Read))
-                    pictureBox.Image = Image.FromStream(stream);
-                oldImg?.Dispose();
+                if (imageManager == null)
+                {
+                    MessageBox.Show("로드된 데이터가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var frames = imageViewer.FrameDataList;
+                int index = imageViewer.CurrentFrameIndex;
+
+                if (frames == null || frames.Count == 0 || index < 0 || index >= frames.Count)
+                {
+                    MessageBox.Show("제거할 프레임이 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                int frameNumber = frames[index].FrameNumber;
+                bool removed = imageManager.RemoveFrame(frameNumber);
+                if (!removed)
+                {
+                    LogWarning($"프레임 {frameNumber} 제거 실패 또는 대상 파일 없음");
+                }
+
+                ReloadAfterChange();
+                LogInfo($"프레임 {frameNumber} 제거 완료");
             }
-            catch { return; }
-
-            // 정보 업데이트
-            lblFrame.Text    = $"{fd.FrameNumber:0000} / {frameDataList.Count}";
-            lblImageName.Text = fd.ImageFileName ?? "";
-            lblAngle.Text    = $"Angle: {fd.GetAngle():F3} rad";
-            lblThrottle.Text = $"Throttle: {fd.GetThrottle():F3}";
-
-            // 트랙바 동기화 (이벤트 루프 방지)
-            if (trackBar.Maximum != frameDataList.Count - 1)
-                trackBar.Maximum = Math.Max(0, frameDataList.Count - 1);
-            if (trackBar.Value != index)
-                trackBar.Value = index;
+            catch (Exception ex)
+            {
+                MessageBox.Show($"프레임 제거 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"프레임 제거 예외: {ex.Message}");
+            }
         }
 
-        // ────────────────────────────────────────────────────────────
-        // 재생 / 정지
-        // ────────────────────────────────────────────────────────────
-        private void BtnPlayPause_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 직전 삭제를 한 번 되돌립니다.
+        /// </summary>
+        private void BtnUndoRemove_Click(object sender, EventArgs e)
         {
-            if (frameDataList == null || frameDataList.Count == 0) return;
+            try
+            {
+                if (imageManager == null || !imageManager.CanUndoLastRemove)
+                {
+                    MessageBox.Show("되돌릴 직전 삭제 내역이 없습니다.", "삭제 되돌리기", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    UpdateUndoButtonState();
+                    return;
+                }
 
-            if (isPlaying)
-            {
-                isPlaying = false;
-                playTimer.Stop();
-                btnPlayPause.Text      = "▶";
-                btnPlayPause.BackColor = Color.SeaGreen;
+                bool restored = imageManager.UndoLastRemove();
+                if (!restored)
+                {
+                    MessageBox.Show("되돌릴 직전 삭제 내역이 없습니다.", "삭제 되돌리기", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    UpdateUndoButtonState();
+                    return;
+                }
+
+                ReloadAfterChange();
+                LogInfo("직전 삭제 되돌리기 완료");
             }
-            else
+            catch (Exception ex)
             {
-                isPlaying = true;
-                playTimer.Start();
-                btnPlayPause.Text      = "⏸";
-                btnPlayPause.BackColor = Color.DarkOrange;
+                MessageBox.Show($"삭제 되돌리기 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"삭제 되돌리기 예외: {ex.Message}");
             }
         }
 
-        private void PlayTimer_Tick(object sender, EventArgs e)
+        /// <summary>
+        /// 선택된 구간의 프레임만 남기고 나머지를 필터링합니다.
+        /// </summary>
+        private void BtnFilterUnselected_Click(object sender, EventArgs e)
         {
-            if (!isPlaying) return;
-            if (currentIndex < frameDataList.Count - 1)
+            try
             {
-                MoveToFrame(currentIndex + 1);
+                if (imageManager == null)
+                {
+                    MessageBox.Show("로드된 데이터가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!imageViewer.HasRange)
+                {
+                    MessageBox.Show("먼저 타임라인에서 남길 구간을 선택해주세요.\n(더블클릭 후 드래그하여 구간을 지정합니다.)",
+                        "구간 선택 필요", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                int rangeStart = imageViewer.SelectedRangeStart;
+                int rangeEnd = imageViewer.SelectedRangeEnd;
+                var frames = imageViewer.FrameDataList;
+
+                if (frames == null || rangeStart < 0 || rangeEnd < 0 ||
+                    rangeStart >= frames.Count || rangeEnd >= frames.Count)
+                {
+                    MessageBox.Show("선택된 구간이 올바르지 않습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var keepNumbers = new HashSet<int>();
+                for (int i = rangeStart; i <= rangeEnd; i++)
+                {
+                    if (frames[i] != null)
+                        keepNumbers.Add(frames[i].FrameNumber);
+                }
+
+                var removeNumbers = frames
+                    .Where(f => f != null && !keepNumbers.Contains(f.FrameNumber))
+                    .Select(f => f.FrameNumber)
+                    .ToList();
+
+                if (removeNumbers.Count == 0)
+                {
+                    MessageBox.Show("제거할 미선택 프레임이 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                int keepCount = frames.Count - removeNumbers.Count;
+                var confirm = MessageBox.Show(
+                    $"선택된 구간({keepCount:N0}개)만 남기고 나머지 {removeNumbers.Count:N0}개 프레임을 필터링합니다.\n계속하시겠습니까?",
+                    "미선택 프레임 필터", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (confirm != DialogResult.Yes)
+                    return;
+
+                int actuallyRemoved = imageManager.RemoveFrames(removeNumbers);
+
+                ReloadAfterChange();
+                LogInfo($"미선택 프레임 필터 완료: {actuallyRemoved}개 제거");
+
+                MessageBox.Show($"미선택 프레임 {actuallyRemoved:N0}개가 필터링되었습니다.",
+                    "미선택 프레임 필터", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else
+            catch (Exception ex)
             {
-                isPlaying = false;
-                playTimer.Stop();
-                btnPlayPause.Text      = "▶";
-                btnPlayPause.BackColor = Color.SeaGreen;
+                MessageBox.Show($"미선택 프레임 필터 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"미선택 프레임 필터 예외: {ex.Message}");
             }
         }
 
-        // ────────────────────────────────────────────────────────────
-        // 배속
-        // ────────────────────────────────────────────────────────────
-        private void CmbSpeed_SelectedIndexChanged(object sender, EventArgs e)
+        /// <summary>
+        /// ImageManager 변경 후 뷰어를 새로고침하고, 소유 컨트롤도 동기화합니다.
+        /// </summary>
+        private void ReloadAfterChange()
         {
-            string raw = (cmbSpeed.SelectedItem?.ToString() ?? "1.0x").Replace("x", "");
-            if (double.TryParse(raw, out double spd) && spd > 0)
-            {
-                playbackSpeed = spd;
-                playTimer.Interval = (int)(1000.0 / (FPS * playbackSpeed));
-            }
+            if (imageManager != null)
+                imageViewer.SetImageManager(imageManager);
+
+            UpdateUndoButtonState();
+
+            // 메인 화면 DataFilterControl도 동기화
+            ownerControl?.RefreshAfterExternalChange();
+        }
+
+        private void UpdateUndoButtonState()
+        {
+            if (btnUndoRemove != null)
+                btnUndoRemove.Enabled = imageManager != null && imageManager.CanUndoLastRemove;
         }
 
         // ────────────────────────────────────────────────────────────
-        // 트랙바
+        // 로깅
         // ────────────────────────────────────────────────────────────
-        private bool trackBarChanging = false;
-        private void TrackBar_ValueChanged(object sender, EventArgs e)
-        {
-            if (trackBarChanging) return;
-            trackBarChanging = true;
-            try { MoveToFrame(trackBar.Value); }
-            finally { trackBarChanging = false; }
-        }
-
-        // ────────────────────────────────────────────────────────────
-        // 키보드 단축키
-        // ────────────────────────────────────────────────────────────
-        private void ImageLargeViewForm_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.Escape:  Close();                          break;
-                case Keys.Space:   BtnPlayPause_Click(null, null);   break;
-                case Keys.Left:    MoveToFrame(currentIndex - 1);    break;
-                case Keys.Right:   MoveToFrame(currentIndex + 1);    break;
-                case Keys.Home:    MoveToFrame(0);                   break;
-                case Keys.End:     MoveToFrame(frameDataList.Count - 1); break;
-            }
-        }
+        private void LogInfo(string message) => logger?.AppendLog($"[크게보기] {message}");
+        private void LogWarning(string message) => logger?.AppendLog($"[크게보기 경고] {message}");
     }
 }

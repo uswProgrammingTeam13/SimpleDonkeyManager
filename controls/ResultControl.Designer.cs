@@ -41,8 +41,18 @@
             grpChart = new GroupBox();
             pnlResultChart = new Panel();
             pnlRight = new Panel();
-            grpImagePreview = new GroupBox();
-            imageViewerUpper1 = new SimpleDonkeyManager.controlutils.ImageViewerUpper();
+            grpValidation = new GroupBox();
+            tlpValidation = new TableLayoutPanel();
+            pnlValidationTop = new Panel();
+            btnStartValidation = new Button();
+            validationViewer1 = new SimpleDonkeyManager.controlutils.ValidationViewer();
+            grpValidationSummary = new GroupBox();
+            tlpValidationSummary = new TableLayoutPanel();
+            lblValCount = new Label();
+            lblValAvgAngle = new Label();
+            lblValMaxAngle = new Label();
+            lblValAvgThrottle = new Label();
+            lblValVerdict = new Label();
             tlpResultMain.SuspendLayout();
             pnlLeft.SuspendLayout();
             tlpResultLeft.SuspendLayout();
@@ -50,7 +60,11 @@
             tlpSummary.SuspendLayout();
             grpChart.SuspendLayout();
             pnlRight.SuspendLayout();
-            grpImagePreview.SuspendLayout();
+            grpValidation.SuspendLayout();
+            tlpValidation.SuspendLayout();
+            pnlValidationTop.SuspendLayout();
+            grpValidationSummary.SuspendLayout();
+            tlpValidationSummary.SuspendLayout();
             SuspendLayout();
             // 
             // tlpResultMain
@@ -116,52 +130,58 @@
             tlpSummary.Controls.Add(lblTrainingTime, 0, 3);
             tlpSummary.Controls.Add(btnOpenModelFolder, 0, 4);
             tlpSummary.Dock = DockStyle.Fill;
+            tlpSummary.Location = new Point(3, 25);
             tlpSummary.Name = "tlpSummary";
+            tlpSummary.Padding = new Padding(6, 4, 6, 4);
             tlpSummary.RowCount = 5;
             tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             tlpSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpSummary.Size = new Size(769, 263);
             tlpSummary.TabIndex = 4;
-            tlpSummary.Padding = new Padding(6, 4, 6, 4);
             // 
             // lblTotalEpochs
             // 
-            lblTotalEpochs.AutoSize = false;
             lblTotalEpochs.Dock = DockStyle.Fill;
             lblTotalEpochs.Font = new Font("나눔고딕", 18F, FontStyle.Bold);
+            lblTotalEpochs.Location = new Point(9, 4);
             lblTotalEpochs.Name = "lblTotalEpochs";
+            lblTotalEpochs.Size = new Size(751, 51);
             lblTotalEpochs.TabIndex = 0;
             lblTotalEpochs.Text = "총 에포크: 0";
             lblTotalEpochs.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblMinLoss
             // 
-            lblMinLoss.AutoSize = false;
             lblMinLoss.Dock = DockStyle.Fill;
             lblMinLoss.Font = new Font("나눔고딕", 18F, FontStyle.Bold);
+            lblMinLoss.Location = new Point(9, 55);
             lblMinLoss.Name = "lblMinLoss";
+            lblMinLoss.Size = new Size(751, 51);
             lblMinLoss.TabIndex = 1;
             lblMinLoss.Text = "최소 손실값: 0.0000";
             lblMinLoss.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblMaxAccuracy
             // 
-            lblMaxAccuracy.AutoSize = false;
             lblMaxAccuracy.Dock = DockStyle.Fill;
             lblMaxAccuracy.Font = new Font("나눔고딕", 18F, FontStyle.Bold);
+            lblMaxAccuracy.Location = new Point(9, 106);
             lblMaxAccuracy.Name = "lblMaxAccuracy";
+            lblMaxAccuracy.Size = new Size(751, 51);
             lblMaxAccuracy.TabIndex = 2;
             lblMaxAccuracy.Text = "최고 정확도: 0.0000";
             lblMaxAccuracy.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblTrainingTime
             // 
-            lblTrainingTime.AutoSize = false;
             lblTrainingTime.Dock = DockStyle.Fill;
             lblTrainingTime.Font = new Font("나눔고딕", 18F, FontStyle.Bold);
+            lblTrainingTime.Location = new Point(9, 157);
             lblTrainingTime.Name = "lblTrainingTime";
+            lblTrainingTime.Size = new Size(751, 51);
             lblTrainingTime.TabIndex = 3;
             lblTrainingTime.Text = "소요 시간: 0초";
             lblTrainingTime.TextAlign = ContentAlignment.MiddleLeft;
@@ -174,14 +194,16 @@
             btnOpenModelFolder.FlatStyle = FlatStyle.Flat;
             btnOpenModelFolder.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
             btnOpenModelFolder.ForeColor = SystemColors.Highlight;
+            btnOpenModelFolder.Location = new Point(9, 211);
             btnOpenModelFolder.Name = "btnOpenModelFolder";
+            btnOpenModelFolder.Size = new Size(751, 45);
             btnOpenModelFolder.TabIndex = 4;
             btnOpenModelFolder.Text = "📂 저장된 폴더 열기";
             btnOpenModelFolder.UseVisualStyleBackColor = true;
             btnOpenModelFolder.Click += BtnOpenModelFolder_Click;
             // 
             // grpChart
-            //
+            // 
             grpChart.Controls.Add(pnlResultChart);
             grpChart.Dock = DockStyle.Fill;
             grpChart.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
@@ -207,33 +229,172 @@
             // pnlRight
             // 
             pnlRight.BackColor = Color.White;
-            pnlRight.Controls.Add(grpImagePreview);
+            pnlRight.Controls.Add(grpValidation);
             pnlRight.Dock = DockStyle.Fill;
             pnlRight.Location = new Point(790, 3);
             pnlRight.Name = "pnlRight";
             pnlRight.Size = new Size(383, 594);
             pnlRight.TabIndex = 1;
             // 
-            // grpImagePreview
+            // grpValidation
             // 
-            grpImagePreview.Controls.Add(imageViewerUpper1);
-            grpImagePreview.Dock = DockStyle.Fill;
-            grpImagePreview.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
-            grpImagePreview.ForeColor = Color.RoyalBlue;
-            grpImagePreview.Location = new Point(0, 0);
-            grpImagePreview.Name = "grpImagePreview";
-            grpImagePreview.Size = new Size(383, 594);
-            grpImagePreview.TabIndex = 0;
-            grpImagePreview.TabStop = false;
-            grpImagePreview.Text = "이미지 미리보기";
+            grpValidation.Controls.Add(tlpValidation);
+            grpValidation.Dock = DockStyle.Fill;
+            grpValidation.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
+            grpValidation.ForeColor = Color.RoyalBlue;
+            grpValidation.Location = new Point(0, 0);
+            grpValidation.Name = "grpValidation";
+            grpValidation.Size = new Size(383, 594);
+            grpValidation.TabIndex = 0;
+            grpValidation.TabStop = false;
+            grpValidation.Text = "학습 결과 검증";
             // 
-            // imageViewerUpper1
+            // tlpValidation
             // 
-            imageViewerUpper1.Dock = DockStyle.Fill;
-            imageViewerUpper1.Location = new Point(3, 25);
-            imageViewerUpper1.Name = "imageViewerUpper1";
-            imageViewerUpper1.Size = new Size(377, 566);
-            imageViewerUpper1.TabIndex = 0;
+            tlpValidation.ColumnCount = 1;
+            tlpValidation.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tlpValidation.Controls.Add(pnlValidationTop, 0, 0);
+            tlpValidation.Controls.Add(validationViewer1, 0, 1);
+            tlpValidation.Controls.Add(grpValidationSummary, 0, 2);
+            tlpValidation.Dock = DockStyle.Fill;
+            tlpValidation.Location = new Point(3, 25);
+            tlpValidation.Name = "tlpValidation";
+            tlpValidation.RowCount = 3;
+            tlpValidation.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
+            tlpValidation.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tlpValidation.RowStyles.Add(new RowStyle(SizeType.Absolute, 175F));
+            tlpValidation.Size = new Size(377, 566);
+            tlpValidation.TabIndex = 0;
+            // 
+            // pnlValidationTop
+            // 
+            pnlValidationTop.Controls.Add(btnStartValidation);
+            pnlValidationTop.Dock = DockStyle.Fill;
+            pnlValidationTop.Location = new Point(0, 0);
+            pnlValidationTop.Margin = new Padding(0);
+            pnlValidationTop.Name = "pnlValidationTop";
+            pnlValidationTop.Size = new Size(377, 50);
+            pnlValidationTop.TabIndex = 0;
+            // 
+            // btnStartValidation
+            // 
+            btnStartValidation.Dock = DockStyle.Fill;
+            btnStartValidation.FlatAppearance.BorderColor = Color.DodgerBlue;
+            btnStartValidation.FlatAppearance.MouseOverBackColor = Color.Azure;
+            btnStartValidation.FlatStyle = FlatStyle.Flat;
+            btnStartValidation.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnStartValidation.ForeColor = SystemColors.Highlight;
+            btnStartValidation.Location = new Point(0, 0);
+            btnStartValidation.Name = "btnStartValidation";
+            btnStartValidation.Size = new Size(377, 50);
+            btnStartValidation.TabIndex = 0;
+            btnStartValidation.Text = "🔍 검증 시작";
+            btnStartValidation.UseVisualStyleBackColor = true;
+            btnStartValidation.Click += BtnStartValidation_Click;
+            // 
+            // validationViewer1
+            // 
+            validationViewer1.Dock = DockStyle.Fill;
+            validationViewer1.Location = new Point(3, 53);
+            validationViewer1.Name = "validationViewer1";
+            validationViewer1.Size = new Size(371, 335);
+            validationViewer1.TabIndex = 1;
+            validationViewer1.Load += validationViewer1_Load;
+            // 
+            // grpValidationSummary
+            // 
+            grpValidationSummary.Controls.Add(tlpValidationSummary);
+            grpValidationSummary.Dock = DockStyle.Fill;
+            grpValidationSummary.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            grpValidationSummary.ForeColor = Color.RoyalBlue;
+            grpValidationSummary.Location = new Point(3, 394);
+            grpValidationSummary.Name = "grpValidationSummary";
+            grpValidationSummary.Size = new Size(371, 169);
+            grpValidationSummary.TabIndex = 2;
+            grpValidationSummary.TabStop = false;
+            grpValidationSummary.Text = "검증 결과 요약";
+            // 
+            // tlpValidationSummary
+            // 
+            tlpValidationSummary.ColumnCount = 1;
+            tlpValidationSummary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tlpValidationSummary.Controls.Add(lblValCount, 0, 0);
+            tlpValidationSummary.Controls.Add(lblValAvgAngle, 0, 1);
+            tlpValidationSummary.Controls.Add(lblValMaxAngle, 0, 2);
+            tlpValidationSummary.Controls.Add(lblValAvgThrottle, 0, 3);
+            tlpValidationSummary.Controls.Add(lblValVerdict, 0, 4);
+            tlpValidationSummary.Dock = DockStyle.Fill;
+            tlpValidationSummary.Location = new Point(3, 20);
+            tlpValidationSummary.Name = "tlpValidationSummary";
+            tlpValidationSummary.Padding = new Padding(6, 2, 6, 2);
+            tlpValidationSummary.RowCount = 5;
+            tlpValidationSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpValidationSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpValidationSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpValidationSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpValidationSummary.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tlpValidationSummary.Size = new Size(365, 146);
+            tlpValidationSummary.TabIndex = 0;
+            // 
+            // lblValCount
+            // 
+            lblValCount.Dock = DockStyle.Fill;
+            lblValCount.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            lblValCount.ForeColor = Color.Black;
+            lblValCount.Location = new Point(9, 2);
+            lblValCount.Name = "lblValCount";
+            lblValCount.Size = new Size(347, 28);
+            lblValCount.TabIndex = 0;
+            lblValCount.Text = "검증 이미지 수: -";
+            lblValCount.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // lblValAvgAngle
+            // 
+            lblValAvgAngle.Dock = DockStyle.Fill;
+            lblValAvgAngle.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            lblValAvgAngle.ForeColor = Color.Black;
+            lblValAvgAngle.Location = new Point(9, 30);
+            lblValAvgAngle.Name = "lblValAvgAngle";
+            lblValAvgAngle.Size = new Size(347, 28);
+            lblValAvgAngle.TabIndex = 1;
+            lblValAvgAngle.Text = "평균 조향 오차: -";
+            lblValAvgAngle.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // lblValMaxAngle
+            // 
+            lblValMaxAngle.Dock = DockStyle.Fill;
+            lblValMaxAngle.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            lblValMaxAngle.ForeColor = Color.Black;
+            lblValMaxAngle.Location = new Point(9, 58);
+            lblValMaxAngle.Name = "lblValMaxAngle";
+            lblValMaxAngle.Size = new Size(347, 28);
+            lblValMaxAngle.TabIndex = 2;
+            lblValMaxAngle.Text = "최대 조향 오차: -";
+            lblValMaxAngle.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // lblValAvgThrottle
+            // 
+            lblValAvgThrottle.Dock = DockStyle.Fill;
+            lblValAvgThrottle.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            lblValAvgThrottle.ForeColor = Color.Black;
+            lblValAvgThrottle.Location = new Point(9, 86);
+            lblValAvgThrottle.Name = "lblValAvgThrottle";
+            lblValAvgThrottle.Size = new Size(347, 28);
+            lblValAvgThrottle.TabIndex = 3;
+            lblValAvgThrottle.Text = "평균 속도 오차: -";
+            lblValAvgThrottle.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // lblValVerdict
+            // 
+            lblValVerdict.Dock = DockStyle.Fill;
+            lblValVerdict.Font = new Font("나눔고딕", 12F, FontStyle.Bold);
+            lblValVerdict.ForeColor = Color.SeaGreen;
+            lblValVerdict.Location = new Point(9, 114);
+            lblValVerdict.Name = "lblValVerdict";
+            lblValVerdict.Size = new Size(347, 30);
+            lblValVerdict.TabIndex = 4;
+            lblValVerdict.Text = "검증 결과: -";
+            lblValVerdict.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // ResultControl
             // 
@@ -249,9 +410,12 @@
             tlpSummary.ResumeLayout(false);
             grpChart.ResumeLayout(false);
             pnlRight.ResumeLayout(false);
-            grpImagePreview.ResumeLayout(false);
+            grpValidation.ResumeLayout(false);
+            tlpValidation.ResumeLayout(false);
+            pnlValidationTop.ResumeLayout(false);
+            grpValidationSummary.ResumeLayout(false);
+            tlpValidationSummary.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -264,12 +428,22 @@
         private Panel pnlResultChart;
         private GroupBox grpSummary;
         private GroupBox grpChart;
-        private GroupBox grpImagePreview;
+        private GroupBox grpValidation;
         private Label lblTotalEpochs;
         private Label lblMinLoss;
         private Label lblMaxAccuracy;
         private Label lblTrainingTime;
         private Button btnOpenModelFolder;
-        private SimpleDonkeyManager.controlutils.ImageViewerUpper imageViewerUpper1;
+        private TableLayoutPanel tlpValidation;
+        private Panel pnlValidationTop;
+        private Button btnStartValidation;
+        private GroupBox grpValidationSummary;
+        private TableLayoutPanel tlpValidationSummary;
+        private Label lblValCount;
+        private Label lblValAvgAngle;
+        private Label lblValMaxAngle;
+        private Label lblValAvgThrottle;
+        private Label lblValVerdict;
+        private SimpleDonkeyManager.controlutils.ValidationViewer validationViewer1;
     }
 }
