@@ -43,6 +43,48 @@ namespace SimpleDonkeyManager.controlutils
         public event EventHandler<string> ImageSelected;
 
         /// <summary>
+        /// 현재 선택된 프레임 데이터를 반환합니다. 선택된 항목이 없으면 null을 반환합니다.
+        /// </summary>
+        public SimpleDonkeyManager.FrameData SelectedFrame
+        {
+            get
+            {
+                try
+                {
+                    if (listBoxImages == null || frameDataList == null)
+                        return null;
+
+                    int idx = listBoxImages.SelectedIndex;
+                    if (idx >= 0 && idx < frameDataList.Count)
+                        return frameDataList[idx];
+                }
+                catch (Exception ex)
+                {
+                    LogWarning($"SelectedFrame 가져오기 오류: {ex.Message}");
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 현재 선택된 인덱스를 반환합니다.
+        /// </summary>
+        public int SelectedIndex
+        {
+            get
+            {
+                try
+                {
+                    return listBoxImages?.SelectedIndex ?? -1;
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+        }
+
+        /// <summary>
         /// 초기 상태 메시지 표시
         /// </summary>
         private void ShowDefaultMessage()

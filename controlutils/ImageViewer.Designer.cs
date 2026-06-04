@@ -42,10 +42,11 @@
             button2 = new Button();
             pnlControlBar = new Panel();
             comboBox1 = new ComboBox();
-            trackBar1 = new TrackBar();
+            frameTimeline = new FrameTimeline();
             button3 = new Button();
             button4 = new Button();
             label5 = new Label();
+            label6 = new Label();
             lstJSONSummary = new ListView();
             tableLayoutPanel3 = new TableLayoutPanel();
             groupBox1 = new GroupBox();
@@ -59,7 +60,6 @@
             pnlRightThumbnail.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             pnlControlBar.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -211,10 +211,11 @@
             // pnlControlBar
             // 
             pnlControlBar.Controls.Add(comboBox1);
-            pnlControlBar.Controls.Add(trackBar1);
+            pnlControlBar.Controls.Add(frameTimeline);
             pnlControlBar.Controls.Add(button3);
             pnlControlBar.Controls.Add(button4);
             pnlControlBar.Controls.Add(label5);
+            pnlControlBar.Controls.Add(label6);
             pnlControlBar.Controls.Add(lstJSONSummary);
             pnlControlBar.Controls.Add(btnLargeView);
             pnlControlBar.Dock = DockStyle.Fill;
@@ -235,14 +236,14 @@
             comboBox1.TabIndex = 15;
             comboBox1.Text = "1.0";
             // 
-            // trackBar1
+            // frameTimeline
             // 
-            trackBar1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            trackBar1.Location = new Point(10, 5);
-            trackBar1.Maximum = 50;
-            trackBar1.Name = "trackBar1";
-            trackBar1.Size = new Size(620, 45);
-            trackBar1.TabIndex = 1;
+            frameTimeline.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            frameTimeline.BackColor = Color.FromArgb(248, 248, 248);
+            frameTimeline.Location = new Point(10, 5);
+            frameTimeline.Name = "frameTimeline";
+            frameTimeline.Size = new Size(620, 40);
+            frameTimeline.TabIndex = 1;
             // 
             // button3
             // 
@@ -274,10 +275,21 @@
             label5.ForeColor = Color.RoyalBlue;
             label5.Location = new Point(10, 80);
             label5.Name = "label5";
-            label5.Size = new Size(300, 25);
+            label5.Size = new Size(300, 22);
             label5.TabIndex = 10;
             label5.Text = "현재 : 123";
             label5.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label6
+            // 
+            label6.Font = new Font("나눔고딕", 10F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            label6.ForeColor = Color.OrangeRed;
+            label6.Location = new Point(10, 104);
+            label6.Name = "label6";
+            label6.Size = new Size(400, 22);
+            label6.TabIndex = 17;
+            label6.Text = "";
+            label6.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lstJSONSummary
             // 
@@ -341,7 +353,6 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
             pnlControlBar.ResumeLayout(false);
             pnlControlBar.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
             ResumeLayout(false);
         }
 
@@ -359,13 +370,14 @@
         private Button button1;
         private PictureBox pictureBox3;
         private PictureBox pictureBox2;
-        private TrackBar trackBar1;
+        private FrameTimeline frameTimeline;
         private Label label2;
         private Label label1;
         private Button button2;
         private Button button4;
         private Button button3;
         private Label label5;
+        private Label label6;
         private ListView lstJSONSummary;
         private ComboBox comboBox1;
         private Button btnLargeView;

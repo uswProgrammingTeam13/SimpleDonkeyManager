@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using System.IO;
+using System.Linq;
+using System.Diagnostics;
+using System.Text;
+using System.Threading.Tasks;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Axes;
@@ -16,6 +21,9 @@ namespace SimpleDonkeyManager.controls
         private ChartDataModel trainingMetrics = null;
         private List<FrameData> trainingData = null;
         private string lastModelPath = null;
+        private bool isValidationMode = false;
+        private bool isValidating = false;
+        private readonly StringBuilder validationLog = new StringBuilder();
 
         public ResultControl()
         {
@@ -38,7 +46,8 @@ namespace SimpleDonkeyManager.controls
             toolTip.SetToolTip(lblMaxAccuracy, "학습 중 기록된 최고 정확도(Accuracy)입니다. 높을수록 좋습니다.");
             toolTip.SetToolTip(lblTrainingTime, "전체 학습에 소요된 시간입니다.");
             toolTip.SetToolTip(pnlResultChart, "에포크별 Loss / Accuracy 변화 그래프입니다.");
-            toolTip.SetToolTip(imageViewerUpper1, "학습에 사용된 이미지를 미리보기합니다. 재생 버튼으로 슬라이드쇼를 실행할 수 있습니다.");
+            toolTip.SetToolTip(validationViewer1, "검증된 프레임을 미리보기합니다. 재생 버튼으로 슬라이드쇼를 실행할 수 있습니다.");
+            toolTip.SetToolTip(btnStartValidation, "학습된 모델로 프레임별 추론을 수행하여 실제값과 비교 검증합니다.");
             toolTip.SetToolTip(btnOpenModelFolder, "학습된 모델이 저장된 폴더를 파일 탐색기로 엽니다.");
         }
 
@@ -75,15 +84,15 @@ namespace SimpleDonkeyManager.controls
         {
             try
             {
-                if (imageViewerUpper1 != null)
+                // ValidationViewer는 Designer에서 이미 추가됨
+                if (btnStartValidation != null)
                 {
-                    // ImageViewerUpper는 Designer에서 이미 추가됨
-                    // 필요하면 Logger 설정
+                    btnStartValidation.Enabled = false;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"이미지 뷰어 초기화 오류: {ex.Message}");
+                MessageBox.Show($"검증 뷰어 초기화 오류: {ex.Message}");
             }
         }
 
@@ -370,6 +379,8 @@ namespace SimpleDonkeyManager.controls
                 string dir = hasPath ? System.IO.Path.GetDirectoryName(modelPath) : "(없음)";
                 btnOpenModelFolder.Text = $"📂 저장된 폴더 열기  ({System.IO.Path.GetFileName(modelPath)})";
             }
+
+            UpdateValidationButtonState();
         }
 
         private void BtnOpenModelFolder_Click(object sender, EventArgs e)
@@ -410,15 +421,472 @@ namespace SimpleDonkeyManager.controls
 
             try
             {
-                if (imageViewerUpper1 != null)
+                // 학습 데이터가 있고 모델 경로가 준비되면 검증 버튼을 활성화합니다.
+                UpdateValidationButtonState();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"검증 데이터 설정 오류: {ex.Message}");
+            }
+        }
+
+        private void UpdateValidationButtonState()
+        {
+            if (btnStartValidation == null)
+                return;
+
+            bool hasData = trainingData != null && trainingData.Count > 0;
+            bool hasModel = !string.IsNullOrEmpty(lastModelPath) && File.Exists(lastModelPath);
+            btnStartValidation.Enabled = hasData && hasModel && !isValidating;
+        }
+
+        #region 학습 결과 검증
+
+        private async void BtnStartValidation_Click(object sender, EventArgs e)
+        {
+            if (isValidating)
+                return;
+
+            if (trainingData == null || trainingData.Count == 0)
+            {
+                MessageBox.Show("검증할 학습 데이터가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(lastModelPath) || !File.Exists(lastModelPath))
+            {
+                MessageBox.Show("학습된 모델 파일을 찾을 수 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            isValidating = true;
+            btnStartValidation.Enabled = false;
+            btnStartValidation.Text = "⏳ 검증 중...";
+
+            lock (validationLog) { validationLog.Clear(); }
+
+            try
+            {
+                var results = await Task.Run(() => RunValidation());
+
+                if (results == null)
                 {
-                    imageViewerUpper1.LoadFrames(this.trainingData ?? new List<FrameData>());
+                    string log;
+                    lock (validationLog) { log = validationLog.ToString(); }
+                    if (log.Length > 1500)
+                        log = log.Substring(log.Length - 1500);
+
+                    string detail = string.IsNullOrWhiteSpace(log)
+                        ? "추가 로그가 없습니다."
+                        : log.Trim();
+
+                    MessageBox.Show(
+                        $"검증에 실패했습니다.\n\n[상세 로그]\n{detail}",
+                        "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (results.Count == 0)
+                {
+                    MessageBox.Show(
+                        "검증 결과가 비어 있습니다. 이미지 경로가 올바른지 확인하세요.\n" +
+                        "(학습에 사용한 이미지 파일이 현재 위치에 존재해야 합니다.)",
+                        "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // 뷰어에 결과 로드
+                validationViewer1.LoadResults(results);
+
+                // 그래프를 검증 그래프로 전환
+                isValidationMode = true;
+                DisplayValidationGraph(results);
+
+                // 요약 표시
+                var summary = ValidationSummary.FromResults(results);
+                UpdateValidationSummary(summary);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"검증 오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                isValidating = false;
+                btnStartValidation.Text = "🔍 검증 시작";
+                UpdateValidationButtonState();
+            }
+        }
+
+        /// <summary>
+        /// validate_model.py 를 실행하여 프레임별 추론 결과를 받아옵니다.
+        /// 백그라운드 스레드에서 호출됩니다.
+        /// </summary>
+        private List<ValidationResult> RunValidation()
+        {
+            try
+            {
+                string scriptPath = FindValidationScript();
+                if (string.IsNullOrEmpty(scriptPath) || !File.Exists(scriptPath))
+                {
+                    AppendValidationError($"validate_model.py 를 찾을 수 없습니다: {scriptPath}");
+                    return null;
+                }
+
+                string scriptDir = Path.GetDirectoryName(scriptPath);
+                string pythonExe = FindPythonExecutable() ?? "python";
+
+                // 입력 JSON 작성 (프레임 목록 + 실제값)
+                string inputPath = Path.Combine(Path.GetTempPath(), $"validate_input_{Guid.NewGuid():N}.json");
+                string outputPath = Path.Combine(Path.GetTempPath(), $"validate_output_{Guid.NewGuid():N}.json");
+
+                WriteValidationInput(inputPath);
+
+                var psi = new ProcessStartInfo
+                {
+                    FileName = pythonExe,
+                    Arguments = $"\"{scriptPath}\" --model \"{lastModelPath}\" --input \"{inputPath}\" --output \"{outputPath}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8,
+                    WorkingDirectory = Directory.Exists(scriptDir) ? scriptDir : Environment.CurrentDirectory,
+                };
+                psi.EnvironmentVariables["PYTHONUTF8"] = "1";
+                psi.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
+                psi.EnvironmentVariables["PYTHONUNBUFFERED"] = "1";
+                psi.EnvironmentVariables["NO_ALBUMENTATIONS_UPDATE"] = "1";
+
+                using (var process = new Process { StartInfo = psi })
+                {
+                    process.OutputDataReceived += (s, e) => HandleValidationOutput(e.Data);
+                    process.ErrorDataReceived += (s, e) => HandleValidationOutput(e.Data);
+
+                    process.Start();
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+
+                    bool exited = process.WaitForExit(30 * 60 * 1000); // 30분 타임아웃
+                    if (!exited)
+                    {
+                        try { process.Kill(); } catch { }
+                        AppendValidationError("검증이 타임아웃(30분)되었습니다.");
+                        return null;
+                    }
+
+                    if (process.ExitCode != 0)
+                    {
+                        AppendValidationError($"검증 프로세스 오류 코드: {process.ExitCode}");
+                        return null;
+                    }
+                }
+
+                if (!File.Exists(outputPath))
+                {
+                    AppendValidationError("검증 결과 파일이 생성되지 않았습니다.");
+                    return null;
+                }
+
+                var results = ParseValidationOutput(outputPath);
+
+                try { File.Delete(inputPath); } catch { }
+                try { File.Delete(outputPath); } catch { }
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                AppendValidationError($"검증 실행 오류: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 검증할 프레임 목록(이미지 경로 + 실제값)을 JSON 으로 기록합니다.
+        /// </summary>
+        private void WriteValidationInput(string inputPath)
+        {
+            var sb = new StringBuilder();
+            sb.Append("{\"frames\":[");
+
+            bool first = true;
+            foreach (var frame in trainingData)
+            {
+                if (frame == null || string.IsNullOrEmpty(frame.ImagePath))
+                    continue;
+
+                if (!first) sb.Append(',');
+                first = false;
+
+                string img = frame.ImagePath.Replace("\\", "\\\\").Replace("\"", "\\\"");
+                sb.Append('{');
+                sb.Append($"\"frame\":{frame.FrameNumber},");
+                sb.Append($"\"image\":\"{img}\",");
+                sb.Append($"\"actual_angle\":{frame.GetAngle().ToString(System.Globalization.CultureInfo.InvariantCulture)},");
+                sb.Append($"\"actual_throttle\":{frame.GetThrottle().ToString(System.Globalization.CultureInfo.InvariantCulture)}");
+                sb.Append('}');
+            }
+
+            sb.Append("]}");
+            File.WriteAllText(inputPath, sb.ToString(), new UTF8Encoding(false));
+        }
+
+        /// <summary>
+        /// validate_model.py 가 생성한 결과 JSON 을 파싱합니다.
+        /// </summary>
+        private List<ValidationResult> ParseValidationOutput(string outputPath)
+        {
+            using (var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(outputPath)))
+            {
+                var root = doc.RootElement;
+                var list = new List<ValidationResult>();
+
+                if (root.TryGetProperty("results", out var resultsEl) &&
+                    resultsEl.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    foreach (var item in resultsEl.EnumerateArray())
+                    {
+                        list.Add(new ValidationResult
+                        {
+                            Frame = GetInt(item, "frame"),
+                            ImagePath = GetString(item, "image"),
+                            ActualAngle = GetDouble(item, "actual_angle"),
+                            PredAngle = GetDouble(item, "pred_angle"),
+                            ActualThrottle = GetDouble(item, "actual_throttle"),
+                            PredThrottle = GetDouble(item, "pred_throttle"),
+                            AngleError = GetDouble(item, "angle_error"),
+                            ThrottleError = GetDouble(item, "throttle_error"),
+                        });
+                    }
+                }
+
+                return list;
+            }
+        }
+
+        private static int GetInt(System.Text.Json.JsonElement el, string name)
+            => el.TryGetProperty(name, out var v) && v.TryGetInt32(out int i) ? i : 0;
+
+        private static double GetDouble(System.Text.Json.JsonElement el, string name)
+            => el.TryGetProperty(name, out var v) && v.ValueKind == System.Text.Json.JsonValueKind.Number ? v.GetDouble() : 0.0;
+
+        private static string GetString(System.Text.Json.JsonElement el, string name)
+            => el.TryGetProperty(name, out var v) && v.ValueKind == System.Text.Json.JsonValueKind.String ? v.GetString() : null;
+
+        private void AppendValidationError(string message)
+        {
+            Debug.WriteLine($"[검증] {message}");
+            lock (validationLog)
+            {
+                validationLog.AppendLine(message);
+            }
+        }
+
+        /// <summary>
+        /// validate_model.py 의 출력 한 줄을 처리합니다.
+        /// 진행 마커([PROGRESS]\t현재\t전체\t프레임번호\t이미지경로)를 만나면
+        /// 검증 뷰어에 현재 처리 중인 프레임 이미지를 실시간으로 표시합니다.
+        /// </summary>
+        private void HandleValidationOutput(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                return;
+
+            Debug.WriteLine(line);
+
+            const string marker = "[PROGRESS]";
+            int idx = line.IndexOf(marker, StringComparison.Ordinal);
+            if (idx < 0)
+            {
+                // 진행 마커가 아닌 일반 로그/오류 라인은 실패 진단을 위해 수집합니다.
+                lock (validationLog)
+                {
+                    validationLog.AppendLine(line);
+                    // 로그가 과도하게 커지지 않도록 제한
+                    if (validationLog.Length > 8000)
+                        validationLog.Remove(0, validationLog.Length - 8000);
+                }
+                return;
+            }
+
+            try
+            {
+                string payload = line.Substring(idx + marker.Length).Trim();
+                string[] parts = payload.Split('\t');
+                if (parts.Length >= 4)
+                {
+                    int current = int.TryParse(parts[0], out int c) ? c : 0;
+                    int total = int.TryParse(parts[1], out int t) ? t : 0;
+                    int frameNumber = int.TryParse(parts[2], out int f) ? f : 0;
+                    string imagePath = parts[3];
+
+                    validationViewer1?.ShowProgressFrame(imagePath, frameNumber, current, total);
+                }
+            }
+            catch
+            {
+                // 진행 파싱 실패는 무시
+            }
+        }
+
+        /// <summary>
+        /// 검증 요약 라벨을 갱신합니다.
+        /// </summary>
+        private void UpdateValidationSummary(ValidationSummary summary)
+        {
+            if (summary == null)
+                return;
+
+            lblValCount.Text = $"검증 이미지 수: {summary.Count}장";
+            lblValAvgAngle.Text = $"평균 조향 오차: {summary.AvgAngleError:F3}";
+            lblValMaxAngle.Text = $"최대 조향 오차: {summary.MaxAngleError:F3}";
+            lblValAvgThrottle.Text = $"평균 속도 오차: {summary.AvgThrottleError:F3}";
+            lblValVerdict.Text = $"검증 결과: {summary.Verdict}";
+
+            switch (summary.Verdict)
+            {
+                case "양호":
+                    lblValVerdict.ForeColor = Color.SeaGreen;
+                    break;
+                case "보통":
+                    lblValVerdict.ForeColor = Color.DarkOrange;
+                    break;
+                default:
+                    lblValVerdict.ForeColor = Color.OrangeRed;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 좌측 그래프를 검증 그래프(실제 vs 예측 조향)로 전환합니다.
+        /// </summary>
+        private void DisplayValidationGraph(List<ValidationResult> results)
+        {
+            try
+            {
+                if (results == null || results.Count == 0)
+                    return;
+
+                var valModel = new PlotModel
+                {
+                    Title = "검증 결과 (실제 vs AI 예측 조향)",
+                    TitleFontSize = 12,
+                    Background = OxyColors.White,
+                    PlotAreaBorderColor = OxyColors.Black,
+                    PlotAreaBorderThickness = new OxyThickness(1)
+                };
+
+                valModel.Axes.Add(new LinearAxis
+                {
+                    Position = AxisPosition.Bottom,
+                    Title = "프레임 인덱스",
+                    TitleFontSize = 11,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MajorGridlineColor = OxyColor.FromArgb(200, 200, 200, 200)
+                });
+
+                valModel.Axes.Add(new LinearAxis
+                {
+                    Position = AxisPosition.Left,
+                    Title = "조향값",
+                    TitleFontSize = 11,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MajorGridlineColor = OxyColor.FromArgb(200, 200, 200, 200)
+                });
+
+                var actualSeries = new LineSeries
+                {
+                    Title = "실제 조향값",
+                    Color = OxyColors.Blue,
+                    StrokeThickness = 1.5
+                };
+
+                var predSeries = new LineSeries
+                {
+                    Title = "AI 예측 조향값",
+                    Color = OxyColors.Red,
+                    StrokeThickness = 1.5
+                };
+
+                for (int i = 0; i < results.Count; i++)
+                {
+                    actualSeries.Points.Add(new DataPoint(i, results[i].ActualAngle));
+                    predSeries.Points.Add(new DataPoint(i, results[i].PredAngle));
+                }
+
+                valModel.Series.Add(actualSeries);
+                valModel.Series.Add(predSeries);
+
+                plotModel = valModel;
+                if (plotView != null)
+                {
+                    plotView.Model = valModel;
+                    plotView.InvalidatePlot(true);
+                    plotView.Refresh();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"이미지 뷰어 로드 오류: {ex.Message}");
+                MessageBox.Show($"검증 그래프 표시 오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private string FindValidationScript()
+        {
+            return FindPythonScriptByName("validate_model.py");
+        }
+
+        private string FindPythonScriptByName(string scriptName)
+        {
+            try
+            {
+                DirectoryInfo currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                for (int i = 0; i < 8; i++)
+                {
+                    if (currentDir == null) break;
+
+                    string candidate = Path.Combine(currentDir.FullName, "python", scriptName);
+                    if (File.Exists(candidate))
+                        return candidate;
+
+                    string candidate2 = Path.Combine(currentDir.FullName, scriptName);
+                    if (File.Exists(candidate2))
+                        return candidate2;
+
+                    currentDir = currentDir.Parent;
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        private string FindPythonExecutable()
+        {
+            try
+            {
+                DirectoryInfo currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                for (int i = 0; i < 8; i++)
+                {
+                    if (currentDir == null) break;
+
+                    string pythonPath = Path.Combine(currentDir.FullName, "donkey_env", "Scripts", "python.exe");
+                    if (File.Exists(pythonPath))
+                        return pythonPath;
+
+                    currentDir = currentDir.Parent;
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        #endregion
+
+        private void validationViewer1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
