@@ -39,11 +39,11 @@
             lblResolutionValue = new Label();
             lblImageFormat = new Label();
             lblTotalImagesValue = new Label();
-            btnLoadStart = new Button();
             lblFileSizeTitle = new Label();
             lblResolutionTitle = new Label();
             lblFormatTitle = new Label();
             lblTotalImagesTitle = new Label();
+            lblCatalogStatus = new Label();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -129,9 +129,10 @@
             tlpInfoBar.Controls.Add(lblResolutionValue, 2, 1);
             tlpInfoBar.Controls.Add(lblFileSizeTitle, 3, 0);
             tlpInfoBar.Controls.Add(lblFileSizeValue, 3, 1);
-            tlpInfoBar.Controls.Add(btnLoadStart, 4, 0);
-            tlpInfoBar.SetRowSpan(btnLoadStart, 2);
-            tlpInfoBar.Controls.Add(btnSelectFolder, 4, 2);
+            tlpInfoBar.Controls.Add(btnSelectFolder, 4, 0);
+            tlpInfoBar.SetRowSpan(btnSelectFolder, 3);
+            tlpInfoBar.Controls.Add(lblCatalogStatus, 0, 2);
+            tlpInfoBar.SetColumnSpan(lblCatalogStatus, 4);
             tlpInfoBar.RowCount = 3;
             tlpInfoBar.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
             tlpInfoBar.RowStyles.Add(new RowStyle(SizeType.Percent, 35F));
@@ -147,12 +148,12 @@
             btnSelectFolder.FlatAppearance.BorderColor = Color.DodgerBlue;
             btnSelectFolder.FlatAppearance.MouseOverBackColor = Color.Azure;
             btnSelectFolder.FlatStyle = FlatStyle.Flat;
-            btnSelectFolder.Font = new Font("나눔고딕", 11F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnSelectFolder.Font = new Font("나눔고딕", 15F, FontStyle.Bold, GraphicsUnit.Point, 129);
             btnSelectFolder.ForeColor = SystemColors.Highlight;
-            btnSelectFolder.Margin = new Padding(4, 2, 4, 2);
+            btnSelectFolder.Margin = new Padding(6, 4, 6, 4);
             btnSelectFolder.Name = "btnSelectFolder";
             btnSelectFolder.TabIndex = 1;
-            btnSelectFolder.Text = "📁 폴더 선택";
+            btnSelectFolder.Text = "📂 데이터 열기";
             btnSelectFolder.UseVisualStyleBackColor = true;
             btnSelectFolder.Click += btnSelectFolder_Click;
             // 
@@ -191,21 +192,6 @@
             lblTotalImagesValue.Name = "lblTotalImagesValue";
             lblTotalImagesValue.TabIndex = 8;
             lblTotalImagesValue.Text = "- 장";
-            // 
-            // btnLoadStart
-            // 
-            btnLoadStart.Dock = DockStyle.Fill;
-            btnLoadStart.FlatAppearance.BorderColor = Color.DodgerBlue;
-            btnLoadStart.FlatAppearance.MouseOverBackColor = Color.Azure;
-            btnLoadStart.FlatStyle = FlatStyle.Flat;
-            btnLoadStart.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
-            btnLoadStart.ForeColor = SystemColors.Highlight;
-            btnLoadStart.Margin = new Padding(4, 2, 4, 2);
-            btnLoadStart.Name = "btnLoadStart";
-            btnLoadStart.TabIndex = 7;
-            btnLoadStart.Text = "데이터 로드";
-            btnLoadStart.UseVisualStyleBackColor = true;
-            btnLoadStart.Click += btnLoadStart_Click;
             // 
             // lblFileSizeTitle
             // 
@@ -251,6 +237,18 @@
             lblTotalImagesTitle.TabIndex = 1;
             lblTotalImagesTitle.Text = "전체 이미지";
             // 
+            // lblCatalogStatus
+            // 
+            lblCatalogStatus.AutoSize = false;
+            lblCatalogStatus.Dock = DockStyle.Fill;
+            lblCatalogStatus.Font = new Font("맑은 고딕", 10.875F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            lblCatalogStatus.ForeColor = Color.Gray;
+            lblCatalogStatus.Margin = new Padding(4, 0, 4, 2);
+            lblCatalogStatus.Name = "lblCatalogStatus";
+            lblCatalogStatus.TabIndex = 13;
+            lblCatalogStatus.Text = "카탈로그: -";
+            lblCatalogStatus.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // DataLoadControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -277,12 +275,12 @@
         private Label lblResolutionValue;
         private Label lblImageFormat;
         private Label lblTotalImagesValue;
-        private Button btnLoadStart;
         private Label lblFileSizeTitle;
         private Label lblResolutionTitle;
         private Label lblFormatTitle;
         private Label lblTotalImagesTitle;
         private GroupBox groupBox1;
         private TableLayoutPanel tlpInfoBar;
+        private Label lblCatalogStatus;
     }
 }

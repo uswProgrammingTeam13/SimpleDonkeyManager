@@ -17,7 +17,11 @@ namespace SimpleDonkeyManager.controlutils
         private System.Windows.Forms.Timer playTimer;
         private bool isPlaying = false;
         private double playbackSpeed = 1.0;
-        private const int FRAMES_PER_SECOND = 20;
+        private const int FRAMES_PER_SECOND = 60;
+        private double frameAdvanceAccumulator = 0.0;
+        // ImageList 동기화 (일시정지/정지 시 현재 프레임 선택). 재귀 방지 플래그 포함.
+        private SimpleDonkeyManager.controlutils.ImageList linkedImageList;
+        private bool isSyncingSelection = false;
         private SimpleDonkeyManager.Logger logger;
 
         public ImageViewer()
@@ -34,7 +38,10 @@ namespace SimpleDonkeyManager.controlutils
             button3.Click += Button3_Click;
             button4.Click += Button4_Click;
             comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
-            trackBar1.ValueChanged += TrackBar1_ValueChanged;
+            frameTimeline.FramePreviewed += FrameTimeline_FramePreviewed;
+            frameTimeline.FrameAnchored += FrameTimeline_FrameAnchored;
+            frameTimeline.RangeSelected += FrameTimeline_RangeSelected;
+            frameTimeline.SelectionCleared += FrameTimeline_SelectionCleared;
             btnLargeView.Click += BtnLargeView_Click;
 
             InitializeTooltips();
@@ -44,11 +51,13 @@ namespace SimpleDonkeyManager.controlutils
             pnlLeftThumbnail.Resize += PnlThumbnail_Resize;
             pnlRightThumbnail.Resize += PnlThumbnail_Resize;
 
+            // 60fps 고정 타이머. 배속은 틱마다 진행할 프레임 수로 처리.
             playTimer = new System.Windows.Forms.Timer();
-            playTimer.Interval = (int)(1000.0 / (FRAMES_PER_SECOND * playbackSpeed));
+            playTimer.Interval = (int)(1000.0 / FRAMES_PER_SECOND);
             playTimer.Tick += PlayTimer_Tick;
 
             UpdateCurrentFrameDisplay();
+            UpdateSelectionDisplay();
 
             logger = null;
         }
@@ -73,9 +82,9 @@ namespace SimpleDonkeyManager.controlutils
             var toolTip = new ToolTip { AutoPopDelay = 8000, InitialDelay = 400, ReshowDelay = 200, ShowAlways = true };
             toolTip.SetToolTip(button1, "이전 프레임으로 이동합니다.");
             toolTip.SetToolTip(button2, "다음 프레임으로 이동합니다.");
-            toolTip.SetToolTip(button3, "이미지를 자동으로 재생합니다.");
-            toolTip.SetToolTip(button4, "이미지 재생을 정지합니다.");
-            toolTip.SetToolTip(trackBar1, "프레임 위치를 직접 조절합니다. 좌우로 드래그하세요.");
+            toolTip.SetToolTip(button3, "이미지를 자동으로 재생합니다. (재생 중에는 일시정지로 변경)");
+            toolTip.SetToolTip(button4, "재생을 정지하고 첫 프레임으로 돌아갑니다. 재생 중이 아니면 구간 선택을 해제합니다.");
+            toolTip.SetToolTip(frameTimeline, "프레임 타임라인입니다.\n클릭/드래그: 프레임 확인 / 더블클릭: 프레임 선택\n더블클릭 후 드래그: 구간 선택 / 휠 클릭: 현재 지점 선택 / 우클릭: 선택 취소");
             toolTip.SetToolTip(comboBox1, "재생 배속을 선택합니다. (0.25 ~ 4.0배)");
             toolTip.SetToolTip(lstJSONSummary, "현재 프레임의 Angle / Throttle 등 JSON 데이터를 표시합니다.");
             toolTip.SetToolTip(btnLargeView, "현재 이미지를 별도 창에서 크게 봅니다. (단축키: ESC로 닫기)");
@@ -94,7 +103,20 @@ namespace SimpleDonkeyManager.controlutils
                     return;
                 }
 
-                var form = new ImageLargeViewForm(frameDataList, currentFrameIndex);
+                // 부모 DataFilterControl을 찾아 변경 동기화에 사용
+                SimpleDonkeyManager.DataFilterControl ownerControl = null;
+                Control parent = this.Parent;
+                while (parent != null)
+                {
+                    if (parent is SimpleDonkeyManager.DataFilterControl dfc)
+                    {
+                        ownerControl = dfc;
+                        break;
+                    }
+                    parent = parent.Parent;
+                }
+
+                var form = new ImageLargeViewForm(imageManager, ownerControl, logger);
                 form.Show(this.FindForm());
             }
             catch (Exception ex)
@@ -124,14 +146,14 @@ namespace SimpleDonkeyManager.controlutils
                     frameDataList = new List<SimpleDonkeyManager.FrameData>();
                 }
 
-                // TrackBar 설정
-                if (trackBar1 != null && frameDataList.Count > 0)
+                // 프레임 타임라인 설정
+                if (frameTimeline != null && frameDataList.Count > 0)
                 {
-                    trackBar1.Minimum = 0;
-                    trackBar1.Maximum = frameDataList.Count - 1;
-                    trackBar1.Value = 0;
+                    frameTimeline.FrameCount = frameDataList.Count;
+                    frameTimeline.CurrentIndex = 0;
                     currentFrameIndex = 0;
                     UpdateCurrentFrameDisplay();
+                    UpdateSelectionDisplay();
 
                     // 첫 번째 프레임 자동 표시
                     try
@@ -143,11 +165,10 @@ namespace SimpleDonkeyManager.controlutils
                         LogWarning($"첫 번째 프레임 자동 표시 오류: {ex.Message}");
                     }
                 }
-                else if (trackBar1 != null)
+                else if (frameTimeline != null)
                 {
-                    trackBar1.Minimum = 0;
-                    trackBar1.Maximum = 0;
-                    trackBar1.Value = 0;
+                    frameTimeline.FrameCount = 0;
+                    frameTimeline.CurrentIndex = 0;
                 }
 
                 LogInfo($"ImageManager 설정: {frameDataList.Count}개 프레임");
@@ -279,15 +300,15 @@ namespace SimpleDonkeyManager.controlutils
                 UpdateJSONInfo(frameData);
                 UpdateCurrentFrameDisplay();
 
-                if (trackBar1 != null && frameDataList.Count > 0)
+                if (frameTimeline != null)
                 {
                     try
                     {
-                        trackBar1.Value = Math.Min(index, trackBar1.Maximum);
+                        frameTimeline.CurrentIndex = index;
                     }
                     catch
                     {
-                        // 트랙바 값 설정 실패 시 계속
+                        // 타임라인 값 설정 실패 시 계속
                     }
                 }
             }
@@ -527,6 +548,8 @@ namespace SimpleDonkeyManager.controlutils
                 if (currentFrameIndex > 0)
                 {
                     DisplayFrameAtIndex(currentFrameIndex - 1);
+                    UpdateSelectionDisplay();
+                    if (!isPlaying) SyncImageListSelection();
                     if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count && frameDataList[currentFrameIndex] != null)
                     {
                         LogInfo($"이전 프레임으로 이동: {frameDataList[currentFrameIndex].FrameNumber}");
@@ -552,6 +575,8 @@ namespace SimpleDonkeyManager.controlutils
                 if (currentFrameIndex < frameDataList.Count - 1)
                 {
                     DisplayFrameAtIndex(currentFrameIndex + 1);
+                    UpdateSelectionDisplay();
+                    if (!isPlaying) SyncImageListSelection();
                     if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count && frameDataList[currentFrameIndex] != null)
                     {
                         LogInfo($"다음 프레임으로 이동: {frameDataList[currentFrameIndex].FrameNumber}");
@@ -574,35 +599,93 @@ namespace SimpleDonkeyManager.controlutils
                     return;
                 }
 
-                if (!isPlaying && playTimer != null)
+                if (!isPlaying)
                 {
-                    isPlaying = true;
-                    playTimer.Start();
-                    LogInfo("재생 시작");
+                    StartPlayback();
+                }
+                else
+                {
+                    PausePlayback();
                 }
             }
             catch (Exception ex)
             {
-                LogWarning($"재생 시작 예외: {ex.Message}");
+                LogWarning($"재생/일시정지 예외: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// 재생을 시작합니다. 버튼 텍스트를 '일시정지'로 변경합니다.
+        /// 구간이 선택되어 있으면 구간 시작에서 시작합니다.
+        /// </summary>
+        private void StartPlayback()
+        {
+            if (playTimer == null)
+                return;
+
+            // 구간이 선택되어 있고 현재 위치가 구간 밖이면 구간 시작으로 이동
+            if (frameTimeline != null && frameTimeline.HasRange)
+            {
+                int start = Math.Min(frameTimeline.RangeStart, frameTimeline.RangeEnd);
+                int end = Math.Max(frameTimeline.RangeStart, frameTimeline.RangeEnd);
+                if (currentFrameIndex < start || currentFrameIndex >= end)
+                {
+                    DisplayFrameAtIndex(start);
+                }
+            }
+
+            isPlaying = true;
+            frameAdvanceAccumulator = 0.0;
+            playTimer.Start();
+            if (button3 != null) button3.Text = "❚❚ 일시정지";
+            LogInfo("재생 시작");
+        }
+
+        /// <summary>
+        /// 재생을 일시정지합니다. 현재 프레임에서 멈추고 버튼 텍스트를 '재생'으로 변경합니다.
+        /// 일시정지 시 ImageList에서 현재 프레임을 선택합니다.
+        /// </summary>
+        private void PausePlayback()
+        {
+            isPlaying = false;
+            if (playTimer != null) playTimer.Stop();
+            if (button3 != null) button3.Text = "▶ 재생";
+            SyncImageListSelection();
+            LogInfo("일시정지");
         }
 
         private void Button4_Click(object sender, EventArgs e)
         {
             try
             {
-                isPlaying = false;
-                if (playTimer != null)
+                if (isPlaying)
                 {
-                    playTimer.Stop();
+                    // 재생 중 정지: 재생을 멈추고 첫 프레임으로 복귀
+                    isPlaying = false;
+                    if (playTimer != null) playTimer.Stop();
+                    if (button3 != null) button3.Text = "▶ 재생";
+                    currentFrameIndex = 0;
+                    DisplayFrameAtIndex(0);
+                    SyncImageListSelection();
+                    LogInfo("재생 정지 및 첫 프레임 복귀");
                 }
-                currentFrameIndex = 0;
-                DisplayFrameAtIndex(0);
-                LogInfo("재생 정지 및 초기화");
+                else
+                {
+                    // 재생 중이 아닐 때 정지: 구간 선택 해제 후 첫 프레임으로 복귀
+                    if (frameTimeline != null)
+                    {
+                        frameTimeline.ClearSelection();
+                    }
+                    currentFrameIndex = 0;
+                    DisplayFrameAtIndex(0);
+                    UpdateSelectionDisplay();
+                    SyncImageListSelection();
+                    LogInfo("구간 선택 해제 및 첫 프레임 복귀");
+                }
             }
             catch (Exception ex)
             {
-                LogWarning($"재생 정지 예외: {ex.Message}");
+                LogWarning($"정지 예외: {ex.Message}");
             }
         }
 
@@ -610,18 +693,39 @@ namespace SimpleDonkeyManager.controlutils
         {
             try
             {
-                if (isPlaying && frameDataList != null && frameDataList.Count > 0)
+                if (!isPlaying || frameDataList == null || frameDataList.Count == 0)
+                    return;
+
+                // 배속만큼 인덱스를 진행 (60fps 고정, 분수 배속은 누적으로 처리)
+                frameAdvanceAccumulator += playbackSpeed;
+                int advance = (int)frameAdvanceAccumulator;
+                if (advance < 1)
+                    return;
+                frameAdvanceAccumulator -= advance;
+
+                int nextIndex = currentFrameIndex + advance;
+
+                // 구간 재생: 구간 끝에 도달하면 정지
+                if (frameTimeline != null && frameTimeline.HasRange)
                 {
-                    if (currentFrameIndex < frameDataList.Count - 1)
+                    int end = Math.Max(frameTimeline.RangeStart, frameTimeline.RangeEnd);
+                    if (nextIndex >= end)
                     {
-                        DisplayFrameAtIndex(currentFrameIndex + 1);
-                    }
-                    else if (isPlaying && playTimer != null)
-                    {
-                        isPlaying = false;
-                        playTimer.Stop();
+                        DisplayFrameAtIndex(end);
+                        StopPlaybackAtEnd();
+                        return;
                     }
                 }
+
+                // 전체 재생: 마지막 프레임에 도달하면 정지
+                if (nextIndex >= frameDataList.Count - 1)
+                {
+                    DisplayFrameAtIndex(frameDataList.Count - 1);
+                    StopPlaybackAtEnd();
+                    return;
+                }
+
+                DisplayFrameAtIndex(nextIndex);
             }
             catch (Exception ex)
             {
@@ -629,7 +733,21 @@ namespace SimpleDonkeyManager.controlutils
                 isPlaying = false;
                 if (playTimer != null)
                     playTimer.Stop();
+                if (button3 != null) button3.Text = "▶ 재생";
             }
+        }
+
+        /// <summary>
+        /// 재생이 끝(또는 구간 끝)에 도달하여 자동 정지될 때 호출됩니다.
+        /// </summary>
+        private void StopPlaybackAtEnd()
+        {
+            isPlaying = false;
+            if (playTimer != null) playTimer.Stop();
+            if (button3 != null) button3.Text = "▶ 재생";
+            frameAdvanceAccumulator = 0.0;
+            SyncImageListSelection();
+            LogInfo("재생 종료");
         }
 
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -645,10 +763,7 @@ namespace SimpleDonkeyManager.controlutils
                     if (speed > 0)
                     {
                         playbackSpeed = speed;
-                        if (playTimer != null)
-                        {
-                            playTimer.Interval = (int)(1000.0 / (FRAMES_PER_SECOND * playbackSpeed));
-                        }
+                        // 60fps는 고정, 배속은 틱당 진행 프레임 수로 반영되므로 Interval은 그대로 둠.
                         LogInfo($"재생 속도 변경: {speed}x");
                     }
                 }
@@ -659,26 +774,179 @@ namespace SimpleDonkeyManager.controlutils
             }
         }
 
-        private void TrackBar1_ValueChanged(object sender, EventArgs e)
+        // ────────────────────────────────────────────────────────────
+        // 프레임 타임라인 이벤트 핸들러
+        // ────────────────────────────────────────────────────────────
+
+        private void FrameTimeline_FramePreviewed(object sender, int index)
         {
             try
             {
-                if (!isPlaying && trackBar1 != null)
+                if (isPlaying)
+                    return; // 재생 중 타임라인 조작 무시
+                if (index >= 0 && index < frameDataList.Count)
                 {
-                    int value = trackBar1.Value;
-                    if (value >= 0 && value < frameDataList.Count)
-                    {
-                        DisplayFrameAtIndex(value);
-                        if (frameDataList[value] != null)
-                        {
-                            LogInfo($"트랙바로 프레임 이동: {frameDataList[value].FrameNumber}");
-                        }
-                    }
+                    DisplayFrameAtIndex(index);
+                    UpdateSelectionDisplay();
                 }
             }
             catch (Exception ex)
             {
-                LogWarning($"트랙바 값 변경 예외: {ex.Message}");
+                LogWarning($"타임라인 프레임 확인 예외: {ex.Message}");
+            }
+        }
+
+        private void FrameTimeline_FrameAnchored(object sender, int index)
+        {
+            try
+            {
+                if (index >= 0 && index < frameDataList.Count)
+                {
+                    DisplayFrameAtIndex(index);
+                    UpdateSelectionDisplay();
+                    if (!isPlaying) SyncImageListSelection();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"타임라인 프레임 선택 예외: {ex.Message}");
+            }
+        }
+
+        private void FrameTimeline_RangeSelected(object sender, RangeSelectedEventArgs e)
+        {
+            try
+            {
+                UpdateSelectionDisplay();
+                LogInfo($"구간 선택: {e.StartIndex} ~ {e.EndIndex}");
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"타임라인 구간 선택 예외: {ex.Message}");
+            }
+        }
+
+        private void FrameTimeline_SelectionCleared(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateSelectionDisplay();
+                LogInfo("타임라인 선택/구간 취소");
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"타임라인 선택 취소 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// ImageList를 연결하여 일시정지/정지 시 현재 프레임을 리스트에서 선택하도록 합니다.
+        /// </summary>
+        public void SetLinkedImageList(SimpleDonkeyManager.controlutils.ImageList imageList)
+        {
+            linkedImageList = imageList;
+        }
+
+        /// <summary>
+        /// 현재 프레임을 연결된 ImageList에서 선택합니다. (재귀 호출 방지)
+        /// </summary>
+        private void SyncImageListSelection()
+        {
+            try
+            {
+                if (linkedImageList == null || isSyncingSelection)
+                    return;
+                if (currentFrameIndex < 0 || currentFrameIndex >= frameDataList.Count)
+                    return;
+
+                isSyncingSelection = true;
+                try
+                {
+                    linkedImageList.SelectFrame(currentFrameIndex);
+                }
+                finally
+                {
+                    isSyncingSelection = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"ImageList 동기화 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 외부(DataFilterControl 등)에서 ImageList 선택 변경으로 DisplayImage가 호출될 때
+        /// 동기화 재귀를 막기 위해 사용하는 플래그입니다.
+        /// </summary>
+        public bool IsSyncingSelection => isSyncingSelection;
+
+        /// <summary>
+        /// 타임라인에 구간이 선택되어 있는지 여부입니다.
+        /// </summary>
+        public bool HasRange => frameTimeline != null && frameTimeline.HasRange;
+
+        /// <summary>
+        /// 선택된 구간의 시작 인덱스입니다. 구간이 없으면 -1입니다.
+        /// </summary>
+        public int SelectedRangeStart =>
+            (frameTimeline != null && frameTimeline.HasRange)
+                ? Math.Min(frameTimeline.RangeStart, frameTimeline.RangeEnd)
+                : -1;
+
+        /// <summary>
+        /// 선택된 구간의 끝 인덱스입니다. 구간이 없으면 -1입니다.
+        /// </summary>
+        public int SelectedRangeEnd =>
+            (frameTimeline != null && frameTimeline.HasRange)
+                ? Math.Max(frameTimeline.RangeStart, frameTimeline.RangeEnd)
+                : -1;
+
+        /// <summary>
+        /// 현재 표시 중인 프레임의 인덱스입니다.
+        /// </summary>
+        public int CurrentFrameIndex => currentFrameIndex;
+
+        /// <summary>
+        /// 현재 ImageViewer가 보유한 프레임 데이터 목록입니다.
+        /// </summary>
+        public List<SimpleDonkeyManager.FrameData> FrameDataList => frameDataList;
+
+        /// <summary>
+        /// 선택/구간 정보를 라벨에 표시합니다.
+        /// </summary>
+        private void UpdateSelectionDisplay()
+        {
+            try
+            {
+                if (label6 == null)
+                    return;
+
+                if (frameTimeline != null && frameTimeline.HasRange)
+                {
+                    int start = Math.Min(frameTimeline.RangeStart, frameTimeline.RangeEnd);
+                    int end = Math.Max(frameTimeline.RangeStart, frameTimeline.RangeEnd);
+                    string startText = (start >= 0 && start < frameDataList.Count && frameDataList[start] != null)
+                        ? $"Frame {frameDataList[start].FrameNumber}" : $"#{start}";
+                    string endText = (end >= 0 && end < frameDataList.Count && frameDataList[end] != null)
+                        ? $"Frame {frameDataList[end].FrameNumber}" : $"#{end}";
+                    label6.Text = $"선택 : {startText} ~ {endText}";
+                }
+                else if (frameTimeline != null && frameTimeline.AnchorIndex >= 0)
+                {
+                    int a = frameTimeline.AnchorIndex;
+                    string anchorText = (a >= 0 && a < frameDataList.Count && frameDataList[a] != null)
+                        ? $"Frame {frameDataList[a].FrameNumber}" : $"#{a}";
+                    label6.Text = $"선택 : {anchorText}";
+                }
+                else
+                {
+                    label6.Text = "";
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"선택 표시 업데이트 예외: {ex.Message}");
             }
         }
 

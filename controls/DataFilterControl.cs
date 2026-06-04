@@ -19,6 +19,7 @@ namespace SimpleDonkeyManager
         private ImageManager imageManager;
         private List<FrameData> originalFrameDataList = new List<FrameData>();
         private List<FrameData> filteredFrameDataList = new List<FrameData>();
+        private int originalTotalFrameCount = 0;
         private Logger logger;
 
         public DataFilterControl()
@@ -54,11 +55,15 @@ namespace SimpleDonkeyManager
             // 이미지 선택 이벤트 구독
             imageList.ImageSelected += ImageList_ImageSelected;
 
+            // ImageViewer가 일시정지/정지 시 현재 프레임을 ImageList에서 선택하도록 연결
+            imageViewer.SetLinkedImageList(imageList);
+
             // 버튼 이벤트
             btnFilterStart.Click += BtnFilterStart_Click;
-            btnFilterPreview.Click += BtnFilterPreview_Click;
             btnFilterReset.Click += BtnFilterReset_Click;
             btnRemoveSelectedFrame.Click += BtnRemoveSelectedFrame_Click;
+            btnUndoRemove.Click += BtnUndoRemove_Click;
+            btnFilterUnselected.Click += BtnFilterUnselected_Click;
 
             InitializeTooltips();
 
@@ -76,12 +81,11 @@ namespace SimpleDonkeyManager
             toolTip.SetToolTip(numFilterThrottle1, "Throttle 필터의 최솟값을 설정합니다.");
             toolTip.SetToolTip(numFilterThrottle2, "Throttle 필터의 최댓값을 설정합니다.");
             toolTip.SetToolTip(comboBox1, "해상도 필터를 선택합니다. '(전체)'를 선택하면 모든 해상도를 포함합니다.");
-            toolTip.SetToolTip(chkDelFrames, "완전히 동일한 중복 프레임을 제거합니다.");
-            toolTip.SetToolTip(chkHighlightDel, "조향 값이 급격히 변하는 구간의 프레임을 제거합니다.");
-            toolTip.SetToolTip(btnFilterPreview, "현재 필터 조건으로 미리보기를 수행합니다. 실제 데이터는 변경되지 않습니다.");
-            toolTip.SetToolTip(btnFilterStart, "현재 필터 조건을 적용하여 데이터를 필터링합니다.");
-            toolTip.SetToolTip(btnFilterReset, "모든 필터 조건을 초기값으로 되돌립니다.");
+            toolTip.SetToolTip(btnFilterStart, "현재 필터 조건을 적용하여 데이터를 필터링합니다. 제외된 프레임은 filtered 폴더로 백업됩니다.");
+            toolTip.SetToolTip(btnFilterReset, "filtered 폴더의 백업을 토대로 원본 데이터를 모두 복구합니다.");
             toolTip.SetToolTip(btnRemoveSelectedFrame, "ImageList에서 현재 선택된 프레임을 필터링 결과에서 제거합니다.");
+            toolTip.SetToolTip(btnUndoRemove, "직전에 수행한 삭제(프레임 제거 또는 필터 적용)를 한 번 되돌립니다.");
+            toolTip.SetToolTip(btnFilterUnselected, "타임라인에서 선택한 구간의 프레임만 남기고 나머지를 필터링합니다.");
             toolTip.SetToolTip(lstFilterSummary, "필터링 결과 요약 정보를 표시합니다.");
         }
 
@@ -119,6 +123,7 @@ namespace SimpleDonkeyManager
                     LogWarning("SetFrameData: 프레임 데이터가 없습니다");
                     this.originalFrameDataList = new List<FrameData>();
                     this.filteredFrameDataList = new List<FrameData>();
+                    this.originalTotalFrameCount = 0;
                     UpdateStatistics();
                     return;
                 }
@@ -126,6 +131,7 @@ namespace SimpleDonkeyManager
                 this.imageManager = manager;
                 this.originalFrameDataList = new List<FrameData>(frameDataList);
                 this.filteredFrameDataList = new List<FrameData>(frameDataList);
+                this.originalTotalFrameCount = frameDataList.Count;
 
                 // 첫 몇 프레임의 메타데이터 디버깅 로깅
                 try
@@ -181,6 +187,9 @@ namespace SimpleDonkeyManager
 
                 // 해상도 필터 초기화
                 InitializeResolutionFilter(frameDataList);
+
+                // 삭제 되돌리기 버튼 상태 갱신
+                UpdateUndoButtonState();
 
                 LogInfo($"필터 컨트롤에 데이터 로드됨: {frameDataList.Count}개 프레임");
             }
@@ -323,22 +332,6 @@ namespace SimpleDonkeyManager
                     LogWarning($"해상도 필터 조건 수집 오류: {ex.Message}");
                 }
 
-                // 중복 프레임 제거
-                if (chkDelFrames != null)
-                {
-                    conditions.RemoveDuplicateFrames = chkDelFrames.Checked;
-                    if (conditions.RemoveDuplicateFrames)
-                        LogInfo($"추가 필터: 중복 프레임 제거");
-                }
-
-                // 조향 값 급변 구간 제거
-                if (chkHighlightDel != null)
-                {
-                    conditions.RemoveHighlightChanges = chkHighlightDel.Checked;
-                    if (conditions.RemoveHighlightChanges)
-                        LogInfo($"추가 필터: 조향 값 급변 제거");
-                }
-
                 return conditions;
             }
             catch (Exception ex)
@@ -355,22 +348,23 @@ namespace SimpleDonkeyManager
         {
             try
             {
-                if (imageManager == null || originalFrameDataList == null || originalFrameDataList.Count == 0 ||
-                    filteredFrameDataList == null || filteredFrameDataList.Count == 0)
+                if (imageManager == null || originalTotalFrameCount <= 0 ||
+                    filteredFrameDataList == null)
                 {
                     SetSummaryData("0", "0", "0 (0.0%)", "0.0%");
                     return;
                 }
 
-                int totalFrames = originalFrameDataList.Count;
+                int totalFrames = originalTotalFrameCount;
                 int filteredFrames = filteredFrameDataList.Count;
                 int deletedFrames = totalFrames - filteredFrames;
+                if (deletedFrames < 0) deletedFrames = 0;
                 double activeRatio = totalFrames > 0 ? (double)filteredFrames / totalFrames * 100 : 0;
 
                 SetSummaryData(
                     totalFrames.ToString("N0"),
                     filteredFrames.ToString("N0"),
-                    $"{deletedFrames} ({(totalFrames > 0 ? (double)deletedFrames / totalFrames * 100 : 0):F1}%)",
+                    $"{deletedFrames:N0} ({(totalFrames > 0 ? (double)deletedFrames / totalFrames * 100 : 0):F1}%)",
                     $"{activeRatio:F1}%"
                 );
             }
@@ -422,11 +416,17 @@ namespace SimpleDonkeyManager
         {
             try
             {
-                // 필터 적용 - 필터링된 데이터로 학습 진행
-                if (filteredFrameDataList == null || filteredFrameDataList.Count == 0)
+                if (imageManager == null)
                 {
-                    MessageBox.Show("필터링된 데이터가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    LogWarning("필터 적용 실패: 필터링된 데이터가 없음");
+                    MessageBox.Show("로드된 데이터가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    LogWarning("필터 적용 실패: ImageManager가 없음");
+                    return;
+                }
+
+                if (originalFrameDataList == null || originalFrameDataList.Count == 0)
+                {
+                    MessageBox.Show("필터링할 데이터가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    LogWarning("필터 적용 실패: 원본 데이터가 없음");
                     return;
                 }
 
@@ -438,22 +438,90 @@ namespace SimpleDonkeyManager
                     return;
                 }
 
-                // 필터 적용 (영구 변경)
-                ApplyFilters(conditions);
+                int totalBefore = originalFrameDataList.Count;
 
-                LogInfo($"필터가 적용됨: {filteredFrameDataList.Count}개 프레임 선택");
-                MessageBox.Show($"{filteredFrameDataList.Count}개의 프레임으로 학습을 시작합니다.", "필터 적용", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // 조건을 통과(유지)하는 프레임 계산
+                List<FrameData> keepList = ApplyFiltersTemporarily(conditions);
+                if (keepList == null)
+                    keepList = new List<FrameData>();
+
+                // 제외 대상(유지되지 않는) 프레임 번호 계산
+                var keepNumbers = new HashSet<int>(keepList.Where(f => f != null).Select(f => f.FrameNumber));
+                var removeNumbers = originalFrameDataList
+                    .Where(f => f != null && !keepNumbers.Contains(f.FrameNumber))
+                    .Select(f => f.FrameNumber)
+                    .Distinct()
+                    .ToList();
+
+                if (removeNumbers.Count == 0)
+                {
+                    MessageBox.Show("필터 조건에 해당하여 제외되는 프레임이 없습니다.", "필터 적용", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LogInfo("필터 적용: 제외 대상 프레임 없음");
+                    UpdateStatistics();
+                    return;
+                }
+
+                var confirm = MessageBox.Show(
+                    $"필터 조건에 따라 {removeNumbers.Count:N0}개의 프레임이 제외됩니다.\n" +
+                    "제외된 프레임은 filtered 폴더로 백업되며 [필터 초기화] 또는 [삭제 되돌리기]로 복구할 수 있습니다.\n\n계속하시겠습니까?",
+                    "필터 적용 확인", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                if (confirm != DialogResult.OK)
+                {
+                    LogInfo("필터 적용 취소됨");
+                    return;
+                }
+
+                // 실제 파일을 filtered 폴더로 백업하며 제거
+                int actuallyRemoved = imageManager.RemoveFrames(removeNumbers);
+                LogInfo($"필터 적용: {actuallyRemoved}개 프레임 제거 및 filtered 백업 완료");
+
+                // 메모리 목록 갱신 (제거된 프레임 반영)
+                originalFrameDataList = imageManager.GetAllFrameData();
+                filteredFrameDataList = new List<FrameData>(originalFrameDataList);
+
+                if (imageList != null)
+                    imageList.LoadFrames(filteredFrameDataList);
+                if (imageViewer != null)
+                    imageViewer.SetImageManager(imageManager);
+
+                UpdateStatistics();
+                UpdateUndoButtonState();
+
+                int totalAfter = filteredFrameDataList.Count;
+
+                // 원본 총 프레임 수 기준 누적 제거 통계
+                int totalRemovedFromOriginal = originalTotalFrameCount - totalAfter;
+                if (totalRemovedFromOriginal < 0) totalRemovedFromOriginal = 0;
+                double totalRemovedRatio = originalTotalFrameCount > 0
+                    ? (double)totalRemovedFromOriginal / originalTotalFrameCount * 100 : 0;
+
+                // 필터링 결과 요약 출력
+                string summary =
+                    $"필터링 결과 요약\n" +
+                    $"────────────────────\n" +
+                    $"원본 전체 프레임 수 : {originalTotalFrameCount:N0}\n" +
+                    $"이번 필터로 제외된 수 : {actuallyRemoved:N0}\n" +
+                    $"남은 프레임 수 : {totalAfter:N0}\n" +
+                    $"누적 제거된 프레임 수 : {totalRemovedFromOriginal:N0} ({totalRemovedRatio:F1}%)";
+                MessageBox.Show(summary, "필터 적용 완료", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // 첫 번째 프레임 선택
+                if (filteredFrameDataList.Count > 0 && imageList != null)
+                {
+                    try { imageList.SelectFrame(0); }
+                    catch (Exception ex) { LogWarning($"첫 번째 프레임 선택 실패: {ex.Message}"); }
+                }
 
                 // 필터된 데이터를 Training으로 전달
                 MainWindow mainWindow = FindMainWindow();
-                if (mainWindow != null && imageManager != null)
+                if (mainWindow != null)
                 {
                     string dataFolder = imageManager.SelectedFolderPath ?? "";
                     mainWindow.SetTrainingData(filteredFrameDataList, dataFolder);
                     mainWindow.SetStatusMessage(
-                        $"② 데이터 필터링 —  필터 적용 완료 ({filteredFrameDataList.Count:N0}개 프레임)  →  ③ [학습 실행] 화면으로 이동해주세요.",
+                        $"② 데이터 필터링 —  필터 적용 완료 (남은 프레임: {totalAfter:N0}개, 제외: {actuallyRemoved:N0}개)  →  ③ [학습 실행] 화면으로 이동해주세요.",
                         MainWindow.StatusLevel.Success);
-                    LogInfo($"학습 데이터 전달: {filteredFrameDataList.Count}개 프레임, 폴더: {dataFolder}");
+                    LogInfo($"학습 데이터 전달: {totalAfter}개 프레임, 폴더: {dataFolder}");
                 }
             }
             catch (Exception ex)
@@ -463,78 +531,163 @@ namespace SimpleDonkeyManager
             }
         }
 
-        private void BtnFilterPreview_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 직전 삭제(필터 적용 또는 선택 프레임 제거)를 한 번 되돌립니다.
+        /// </summary>
+        private void BtnUndoRemove_Click(object sender, EventArgs e)
         {
             try
             {
-                // 필터 미리보기 (임시 적용)
-                FilterConditions conditions = GetFilterConditions();
-                if (conditions == null)
+                if (imageManager == null)
                 {
-                    LogWarning("필터 조건을 수집할 수 없습니다");
+                    LogWarning("삭제 되돌리기 실패: ImageManager가 없습니다");
                     return;
                 }
 
-                // 임시 필터링
-                List<FrameData> previewList = ApplyFiltersTemporarily(conditions);
-                if (previewList == null)
+                if (!imageManager.CanUndoLastRemove)
                 {
-                    LogWarning("필터링된 리스트가 null입니다");
+                    MessageBox.Show("되돌릴 직전 삭제 내역이 없습니다.", "삭제 되돌리기", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    UpdateUndoButtonState();
                     return;
                 }
 
-                // UI 업데이트 (임시)
-                filteredFrameDataList = previewList;
+                bool restored = imageManager.UndoLastRemove();
+                if (!restored)
+                {
+                    MessageBox.Show("되돌릴 직전 삭제 내역이 없습니다.", "삭제 되돌리기", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    UpdateUndoButtonState();
+                    return;
+                }
+
+                // 복구 후 재스캔된 데이터로 메모리 목록 갱신
+                originalFrameDataList = imageManager.GetAllFrameData();
+                filteredFrameDataList = new List<FrameData>(originalFrameDataList);
+
                 if (imageList != null)
-                {
                     imageList.LoadFrames(filteredFrameDataList);
-                }
+                if (imageViewer != null)
+                    imageViewer.SetImageManager(imageManager);
+
                 UpdateStatistics();
+                UpdateUndoButtonState();
 
-                LogInfo($"필터 미리보기: {filteredFrameDataList.Count}개 프레임");
+                LogInfo($"직전 삭제 되돌리기 완료 (현재 프레임: {filteredFrameDataList.Count}개)");
 
-                MainWindow mainWindowPreview = FindMainWindow();
-                mainWindowPreview?.SetStatusMessage(
-                    $"② 데이터 필터링 —  미리보기: {filteredFrameDataList.Count:N0}개 프레임 선택됨  →  결과 확인 후 [필터 적용]을 눌러주세요.",
-                    MainWindow.StatusLevel.Info);
-
-                // 첫 번째 프레임 선택
                 if (filteredFrameDataList.Count > 0 && imageList != null)
                 {
-                    try
-                    {
-                        imageList.SelectFrame(0);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogWarning($"첫 번째 프레임 선택 실패: {ex.Message}");
-                    }
+                    try { imageList.SelectFrame(0); }
+                    catch (Exception ex) { LogWarning($"첫 번째 프레임 선택 실패: {ex.Message}"); }
                 }
 
-                MessageBox.Show($"미리보기: {filteredFrameDataList.Count}개 프레임이 선택됩니다.", "필터 미리보기", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MainWindow mainWindow = FindMainWindow();
+                mainWindow?.SetStatusMessage(
+                    $"② 데이터 필터링 —  직전 삭제 되돌리기 완료 (현재 프레임: {filteredFrameDataList.Count:N0}개)",
+                    MainWindow.StatusLevel.Info);
+
+                MessageBox.Show("직전 삭제가 되돌려졌습니다.", "삭제 되돌리기", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"필터 미리보기 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LogWarning($"필터 미리보기 예외: {ex.Message}");
+                MessageBox.Show($"삭제 되돌리기 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"삭제 되돌리기 예외: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// 삭제 되돌리기 버튼의 활성화 상태를 갱신합니다.
+        /// </summary>
+        private void UpdateUndoButtonState()
+        {
+            try
+            {
+                if (btnUndoRemove != null)
+                    btnUndoRemove.Enabled = imageManager != null && imageManager.CanUndoLastRemove;
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"되돌리기 버튼 상태 갱신 오류: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 외부(크게 보기 창 등)에서 ImageManager를 직접 변경한 뒤,
+        /// 메모리 목록/리스트/뷰어/통계를 디스크 상태로 다시 동기화합니다.
+        /// </summary>
+        public void RefreshAfterExternalChange()
+        {
+            try
+            {
+                if (imageManager == null)
+                    return;
+
+                originalFrameDataList = imageManager.GetAllFrameData();
+                filteredFrameDataList = new List<FrameData>(originalFrameDataList);
+
+                if (imageList != null)
+                    imageList.LoadFrames(filteredFrameDataList);
+                if (imageViewer != null)
+                    imageViewer.SetImageManager(imageManager);
+
+                UpdateStatistics();
+                UpdateUndoButtonState();
+
+                if (filteredFrameDataList.Count > 0 && imageList != null)
+                {
+                    try { imageList.SelectFrame(0); }
+                    catch (Exception ex) { LogWarning($"첫 번째 프레임 선택 실패: {ex.Message}"); }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"외부 변경 후 새로고침 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 현재 ImageManager를 반환합니다. (크게 보기 창 연동용)
+        /// </summary>
+        public ImageManager GetImageManager() => imageManager;
 
         private void BtnFilterReset_Click(object sender, EventArgs e)
         {
             try
             {
                 // 필터 초기화
-                if (imageManager == null || originalFrameDataList == null || originalFrameDataList.Count == 0)
+                if (imageManager == null)
+                {
+                    LogWarning("필터 초기화 실패: ImageManager가 없습니다");
+                    return;
+                }
+
+                // filtered 폴더의 백업 파일을 토대로 실제 원본 폴더 복구
+                bool restored = imageManager.RestoreAllFrames();
+                if (restored)
+                {
+                    // 복구 후 재스캔된 데이터로 메모리 목록 갱신
+                    originalFrameDataList = imageManager.GetAllFrameData();
+                    LogInfo($"filtered 폴더 기반 원본 복구 완료 ({originalFrameDataList.Count}개 프레임)");
+                }
+                else
+                {
+                    LogInfo("복구할 filtered 백업이 없거나 복구가 필요하지 않습니다");
+                }
+
+                if (originalFrameDataList == null || originalFrameDataList.Count == 0)
                 {
                     LogWarning("필터 초기화 실패: 원본 데이터가 없습니다");
                     return;
                 }
 
                 filteredFrameDataList = new List<FrameData>(originalFrameDataList);
+                // 모든 프레임이 복구되었으므로 원본 총 프레임 수도 갱신 (제거 0개 상태)
+                originalTotalFrameCount = originalFrameDataList.Count;
                 if (imageList != null)
                 {
                     imageList.LoadFrames(filteredFrameDataList);
+                }
+                if (imageViewer != null)
+                {
+                    imageViewer.SetImageManager(imageManager);
                 }
                 UpdateStatistics();
 
@@ -560,10 +713,15 @@ namespace SimpleDonkeyManager
                 MessageBox.Show($"필터 초기화 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 LogWarning($"필터 초기화 예외: {ex.Message}");
             }
+            finally
+            {
+                UpdateUndoButtonState();
+            }
         }
 
         /// <summary>
         /// ImageList에서 현재 선택된 프레임을 필터링 결과에서 제거합니다.
+        /// ImageViewer 타임라인에서 구간이 선택된 경우, 해당 구간의 모든 프레임을 한 번에 제거합니다.
         /// </summary>
         private void BtnRemoveSelectedFrame_Click(object sender, EventArgs e)
         {
@@ -582,17 +740,38 @@ namespace SimpleDonkeyManager
                     return;
                 }
 
+                // ImageViewer 타임라인에서 구간이 선택된 경우 → 구간 전체 삭제
+                if (imageViewer != null && imageViewer.HasRange)
+                {
+                    RemoveSelectedRangeFrames();
+                    return;
+                }
+
                 int selectedIndex = imageList.SelectedIndex;
                 FrameData selectedFrame = imageList.SelectedFrame;
 
                 if (selectedFrame == null || selectedIndex < 0)
                 {
-                    MessageBox.Show("제거할 프레임을 ImageList에서 먼저 선택해주세요.", "선택 필요", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("제거할 프레임을 ImageList에서 먼저 선택하거나\n타임라인에서 구간을 선택해주세요.", "선택 필요", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LogWarning("프레임 제거 실패: 선택된 프레임 없음");
                     return;
                 }
 
                 int frameNumber = selectedFrame.FrameNumber;
+
+                // 실제 폴더의 이미지/identifier/catalog에서 해당 프레임 삭제 (filtered 폴더로 백업)
+                if (imageManager != null)
+                {
+                    bool fileRemoved = imageManager.RemoveFrame(frameNumber);
+                    if (!fileRemoved)
+                    {
+                        LogWarning($"프레임 {frameNumber} 실제 파일 삭제 실패 또는 대상 파일 없음");
+                    }
+                    else
+                    {
+                        LogInfo($"프레임 {frameNumber} 실제 파일 삭제 및 filtered 백업 완료");
+                    }
+                }
 
                 // 필터링된 리스트에서 제거
                 bool removed = filteredFrameDataList.Remove(selectedFrame);
@@ -603,6 +782,9 @@ namespace SimpleDonkeyManager
                     removed = removedCount > 0;
                 }
 
+                // 원본 리스트에서도 제거하여 필터 미리보기/적용 시 재등장 방지
+                originalFrameDataList?.RemoveAll(f => f != null && f.FrameNumber == frameNumber);
+
                 if (!removed)
                 {
                     LogWarning($"프레임 {frameNumber} 제거 실패: 리스트에서 찾을 수 없음");
@@ -611,6 +793,11 @@ namespace SimpleDonkeyManager
 
                 // UI 갱신
                 imageList.LoadFrames(filteredFrameDataList);
+                if (imageViewer != null && imageManager != null)
+                {
+                    // ImageViewer의 내부 프레임 목록도 갱신
+                    imageViewer.SetImageManager(imageManager);
+                }
                 UpdateStatistics();
 
                 // 인접 프레임으로 선택 이동
@@ -638,6 +825,206 @@ namespace SimpleDonkeyManager
             {
                 MessageBox.Show($"프레임 제거 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 LogWarning($"프레임 제거 예외: {ex.Message}");
+            }
+            finally
+            {
+                UpdateUndoButtonState();
+            }
+        }
+
+        /// <summary>
+        /// ImageViewer 타임라인에서 선택된 구간의 모든 프레임을 한 번에 제거합니다.
+        /// 제거된 프레임은 filtered 폴더로 백업되어 되돌리기/초기화로 복구할 수 있습니다.
+        /// </summary>
+        private void RemoveSelectedRangeFrames()
+        {
+            try
+            {
+                int rangeStart = imageViewer.SelectedRangeStart;
+                int rangeEnd = imageViewer.SelectedRangeEnd;
+                var viewerFrames = imageViewer.FrameDataList;
+
+                if (viewerFrames == null || rangeStart < 0 || rangeEnd < 0 ||
+                    rangeStart >= viewerFrames.Count || rangeEnd >= viewerFrames.Count)
+                {
+                    MessageBox.Show("선택된 구간이 올바르지 않습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    LogWarning($"구간 프레임 제거 실패: 구간 인덱스 오류 ({rangeStart}~{rangeEnd})");
+                    return;
+                }
+
+                // 선택 구간에 해당하는 프레임 번호 수집
+                var removeNumbers = new List<int>();
+                for (int i = rangeStart; i <= rangeEnd; i++)
+                {
+                    if (viewerFrames[i] != null)
+                        removeNumbers.Add(viewerFrames[i].FrameNumber);
+                }
+
+                if (removeNumbers.Count == 0)
+                {
+                    MessageBox.Show("제거할 프레임이 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                var confirm = MessageBox.Show(
+                    $"선택된 구간의 {removeNumbers.Count:N0}개 프레임을 제거합니다.\n" +
+                    "제거된 프레임은 filtered 폴더로 백업되며 [삭제 되돌리기] 또는 [필터 초기화]로 복구할 수 있습니다.\n\n계속하시겠습니까?",
+                    "선택 구간 프레임 제거", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (confirm != DialogResult.Yes)
+                    return;
+
+                // 실제 파일을 filtered 폴더로 백업하며 일괄 제거
+                int actuallyRemoved = imageManager != null ? imageManager.RemoveFrames(removeNumbers) : 0;
+
+                // 복구된 디스크 상태로 메모리 목록 갱신
+                if (imageManager != null)
+                {
+                    originalFrameDataList = imageManager.GetAllFrameData();
+                    filteredFrameDataList = new List<FrameData>(originalFrameDataList);
+                }
+
+                // UI 갱신
+                if (imageList != null)
+                    imageList.LoadFrames(filteredFrameDataList);
+                if (imageViewer != null && imageManager != null)
+                    imageViewer.SetImageManager(imageManager);
+
+                UpdateStatistics();
+
+                // 첫 번째 프레임 선택
+                if (filteredFrameDataList.Count > 0 && imageList != null)
+                {
+                    try { imageList.SelectFrame(0); }
+                    catch (Exception ex) { LogWarning($"첫 번째 프레임 선택 실패: {ex.Message}"); }
+                }
+
+                LogInfo($"선택 구간 프레임 제거 완료: {actuallyRemoved}개 제거 (남은 프레임: {filteredFrameDataList.Count}개)");
+
+                MainWindow mainWindow = FindMainWindow();
+                mainWindow?.SetStatusMessage(
+                    $"② 데이터 필터링 —  선택 구간 {actuallyRemoved:N0}개 프레임 제거됨  (남은 프레임: {filteredFrameDataList.Count:N0}개)",
+                    MainWindow.StatusLevel.Info);
+
+                MessageBox.Show($"선택 구간의 {actuallyRemoved:N0}개 프레임이 제거되었습니다.\n(남은 프레임: {filteredFrameDataList.Count:N0}개)",
+                    "선택 구간 프레임 제거", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"구간 프레임 제거 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"구간 프레임 제거 예외: {ex.Message}");
+            }
+            finally
+            {
+                UpdateUndoButtonState();
+            }
+        }
+
+        /// <summary>
+        /// 현재 ImageViewer에서 선택된 구간의 프레임만 남기고 나머지 프레임을 필터링(제거)합니다.
+        /// </summary>
+        private void BtnFilterUnselected_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (imageManager == null)
+                {
+                    MessageBox.Show("로드된 데이터가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    LogWarning("미선택 프레임 필터 실패: ImageManager가 없습니다");
+                    return;
+                }
+
+                if (filteredFrameDataList == null || filteredFrameDataList.Count == 0)
+                {
+                    MessageBox.Show("필터링할 데이터가 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    LogWarning("미선택 프레임 필터 실패: 필터링된 데이터 없음");
+                    return;
+                }
+
+                if (imageViewer == null || !imageViewer.HasRange)
+                {
+                    MessageBox.Show("먼저 타임라인에서 남길 구간을 선택해주세요.\n(더블클릭 후 드래그하여 구간을 지정합니다.)",
+                        "구간 선택 필요", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LogWarning("미선택 프레임 필터 실패: 선택된 구간 없음");
+                    return;
+                }
+
+                int rangeStart = imageViewer.SelectedRangeStart;
+                int rangeEnd = imageViewer.SelectedRangeEnd;
+                var viewerFrames = imageViewer.FrameDataList;
+
+                if (viewerFrames == null || rangeStart < 0 || rangeEnd < 0 ||
+                    rangeStart >= viewerFrames.Count || rangeEnd >= viewerFrames.Count)
+                {
+                    MessageBox.Show("선택된 구간이 올바르지 않습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    LogWarning($"미선택 프레임 필터 실패: 구간 인덱스 오류 ({rangeStart}~{rangeEnd})");
+                    return;
+                }
+
+                // 남길 프레임 번호 집합 (선택 구간)
+                var keepNumbers = new HashSet<int>();
+                for (int i = rangeStart; i <= rangeEnd; i++)
+                {
+                    if (viewerFrames[i] != null)
+                        keepNumbers.Add(viewerFrames[i].FrameNumber);
+                }
+
+                // 제거 대상: 선택 구간 밖의 모든 프레임
+                var removeNumbers = filteredFrameDataList
+                    .Where(f => f != null && !keepNumbers.Contains(f.FrameNumber))
+                    .Select(f => f.FrameNumber)
+                    .ToList();
+
+                if (removeNumbers.Count == 0)
+                {
+                    MessageBox.Show("제거할 미선택 프레임이 없습니다.", "알림", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                int keepCount = filteredFrameDataList.Count - removeNumbers.Count;
+                var confirm = MessageBox.Show(
+                    $"선택된 구간({keepCount:N0}개)만 남기고 나머지 {removeNumbers.Count:N0}개 프레임을 필터링합니다.\n계속하시겠습니까?",
+                    "미선택 프레임 필터", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (confirm != DialogResult.Yes)
+                    return;
+
+                int actuallyRemoved = imageManager.RemoveFrames(removeNumbers);
+
+                // 복구된 디스크 상태로 메모리 목록 갱신
+                originalFrameDataList = imageManager.GetAllFrameData();
+                filteredFrameDataList = new List<FrameData>(originalFrameDataList);
+
+                if (imageList != null)
+                    imageList.LoadFrames(filteredFrameDataList);
+                if (imageViewer != null)
+                    imageViewer.SetImageManager(imageManager);
+
+                UpdateStatistics();
+                UpdateUndoButtonState();
+
+                if (filteredFrameDataList.Count > 0 && imageList != null)
+                {
+                    try { imageList.SelectFrame(0); }
+                    catch (Exception ex) { LogWarning($"첫 번째 프레임 선택 실패: {ex.Message}"); }
+                }
+
+                LogInfo($"미선택 프레임 필터 완료: {actuallyRemoved}개 제거 (남은 프레임: {filteredFrameDataList.Count}개)");
+
+                MainWindow mainWindow = FindMainWindow();
+                mainWindow?.SetStatusMessage(
+                    $"② 데이터 필터링 —  미선택 프레임 필터: {actuallyRemoved:N0}개 제거  (남은 프레임: {filteredFrameDataList.Count:N0}개)",
+                    MainWindow.StatusLevel.Info);
+
+                MessageBox.Show($"미선택 프레임 {actuallyRemoved:N0}개가 필터링되었습니다.\n(남은 프레임: {filteredFrameDataList.Count:N0}개)",
+                    "미선택 프레임 필터", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"미선택 프레임 필터 중 오류 발생: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"미선택 프레임 필터 예외: {ex.Message}");
+            }
+            finally
+            {
+                UpdateUndoButtonState();
             }
         }
 
@@ -985,6 +1372,11 @@ namespace SimpleDonkeyManager
                 parent = parent.Parent;
             }
             return null;
+        }
+
+        private void numFilterAngle2_ValueChanged(object sender, EventArgs e)
+        {
+
         }
     }
 

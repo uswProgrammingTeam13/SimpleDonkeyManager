@@ -48,6 +48,20 @@ namespace SimpleDonkeyManager
         public void AddMetric(int epoch, float trainLoss, float? validationLoss = null, 
                             float? accuracy = null, float? validationAccuracy = null)
         {
+            // 동일 에포크가 이미 있으면 갱신합니다.
+            // Keras는 한 에포크 동안 진행 줄을 여러 번 출력하므로(중간 loss → 최종 loss/val_loss),
+            // 같은 에포크에 대해 최신 값으로 덮어써서 그래프에 중복 점이 쌓이지 않도록 합니다.
+            var existing = metrics.FirstOrDefault(m => m.Epoch == epoch);
+            if (existing != null)
+            {
+                existing.TrainLoss = trainLoss;
+                if (validationLoss.HasValue) existing.ValidationLoss = validationLoss;
+                if (accuracy.HasValue) existing.Accuracy = accuracy;
+                if (validationAccuracy.HasValue) existing.ValidationAccuracy = validationAccuracy;
+                existing.Timestamp = DateTime.Now;
+                return;
+            }
+
             var metric = new TrainingMetric
             {
                 Epoch = epoch,
