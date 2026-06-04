@@ -951,6 +951,92 @@ namespace SimpleDonkeyManager.controlutils
         }
 
         /// <summary>
+        /// 키보드 방향키로 프레임을 이동합니다.
+        /// - 좌/우: 1프레임 이동, Shift+좌/우: 10프레임 이동
+        /// - 구간/앵커가 선택되어 있으면 고정점(앵커)은 유지하고
+        ///   현재 위치 이동에 따라 구간이 재설정됩니다.
+        /// </summary>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            Keys key = keyData & Keys.KeyCode;
+            if (key == Keys.Left || key == Keys.Right)
+            {
+                bool shift = (keyData & Keys.Shift) == Keys.Shift;
+                int step = shift ? 10 : 1;
+                int direction = (key == Keys.Left) ? -1 : 1;
+                if (HandleArrowNavigation(direction * step))
+                {
+                    return true;
+                }
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        /// <summary>
+        /// 방향키 이동 처리. delta 만큼 현재 프레임을 이동하고,
+        /// 앵커가 있으면 앵커를 고정한 채 구간을 갱신합니다.
+        /// </summary>
+        private bool HandleArrowNavigation(int delta)
+        {
+            try
+            {
+                if (frameDataList == null || frameDataList.Count == 0)
+                    return false;
+                if (isPlaying)
+                    return false;
+
+                int target = currentFrameIndex + delta;
+                if (target < 0) target = 0;
+                if (target > frameDataList.Count - 1) target = frameDataList.Count - 1;
+
+                if (target == currentFrameIndex)
+                    return true; // 경계에서 더 이동할 수 없어도 키 입력은 소비
+
+                // 이동 전, 고정해야 할 앵커(고정점)를 먼저 결정합니다.
+                int prevIndex = currentFrameIndex;
+                int anchor = -1;
+                if (frameTimeline != null)
+                {
+                    if (frameTimeline.HasRange)
+                    {
+                        // 현재 위치(prevIndex)는 구간의 한쪽 끝이므로 반대쪽 끝을 고정 앵커로 사용
+                        int start = frameTimeline.RangeStart;
+                        int end = frameTimeline.RangeEnd;
+                        if (prevIndex == end) anchor = start;
+                        else if (prevIndex == start) anchor = end;
+                        else anchor = (frameTimeline.AnchorIndex >= 0) ? frameTimeline.AnchorIndex : start;
+                    }
+                    else if (frameTimeline.AnchorIndex >= 0)
+                    {
+                        anchor = frameTimeline.AnchorIndex;
+                    }
+                }
+
+                DisplayFrameAtIndex(target);
+
+                // 구간 또는 앵커가 선택되어 있으면 고정점을 유지한 채 구간 갱신
+                if (frameTimeline != null && anchor >= 0)
+                {
+                    frameTimeline.SetRangeFromAnchor(anchor, target);
+                }
+
+                UpdateSelectionDisplay();
+                if (!isPlaying) SyncImageListSelection();
+
+                if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count && frameDataList[currentFrameIndex] != null)
+                {
+                    LogInfo($"키보드 이동: Frame {frameDataList[currentFrameIndex].FrameNumber}");
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"키보드 프레임 이동 예외: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 정보 로그를 기록합니다.
         /// </summary>
         private void LogInfo(string message)

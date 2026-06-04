@@ -123,6 +123,36 @@ namespace SimpleDonkeyManager.controlutils
             ClearSelectionInternal(true);
         }
 
+        /// <summary>
+        /// 키보드 탐색용: 고정 앵커를 유지한 채 현재 인덱스를 이동하며 구간을 갱신합니다.
+        /// anchor 와 current 가 같으면 구간 없이 앵커만 유지하고,
+        /// 다르면 anchor~current 구간을 설정하고 RangeSelected 이벤트를 발생시킵니다.
+        /// </summary>
+        public void SetRangeFromAnchor(int anchor, int current)
+        {
+            anchor = Clamp(anchor);
+            current = Clamp(current);
+            currentIndex = current;
+
+            if (anchor == current)
+            {
+                // 같은 지점으로 모이면 구간을 해제하고 앵커만 유지
+                anchorIndex = anchor;
+                rangeStart = -1;
+                rangeEnd = -1;
+                Invalidate();
+            }
+            else
+            {
+                // 앵커는 고정하고 현재 위치까지를 구간으로 설정
+                anchorIndex = anchor;
+                rangeStart = anchor;
+                rangeEnd = current;
+                Invalidate();
+                RaiseRangeSelected();
+            }
+        }
+
         private void ClearSelectionInternal(bool raiseEvent)
         {
             bool had = anchorIndex >= 0 || HasRange;
