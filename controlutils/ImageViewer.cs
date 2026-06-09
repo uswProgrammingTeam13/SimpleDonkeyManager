@@ -24,6 +24,14 @@ namespace SimpleDonkeyManager.controlutils
         private bool isSyncingSelection = false;
         private SimpleDonkeyManager.Logger logger;
 
+        // 제거 예정(pending) 프레임 번호 집합. 빨간 오버레이/타임라인 마커/재생 스킵에 사용.
+        private HashSet<int> pendingRemovedNumbers = new HashSet<int>();
+
+        /// <summary>
+        /// 제거 예정으로 표시된 프레임을 우클릭하여 취소를 요청했을 때 발생합니다. 인자는 프레임 번호입니다.
+        /// </summary>
+        public event EventHandler<int> PendingRemoveCancelRequested;
+
         public ImageViewer()
         {
             InitializeComponent();
@@ -42,7 +50,11 @@ namespace SimpleDonkeyManager.controlutils
             frameTimeline.FrameAnchored += FrameTimeline_FrameAnchored;
             frameTimeline.RangeSelected += FrameTimeline_RangeSelected;
             frameTimeline.SelectionCleared += FrameTimeline_SelectionCleared;
+            frameTimeline.PendingRemoveCancelRequested += FrameTimeline_PendingRemoveCancelRequested;
             btnLargeView.Click += BtnLargeView_Click;
+
+            // 현재 프레임이 제거 예정일 때 빨간 테두리+오버레이를 그리기 위한 Paint 핸들러
+            pictureBox1.Paint += PictureBox1_Paint;
 
             InitializeTooltips();
 
@@ -170,6 +182,9 @@ namespace SimpleDonkeyManager.controlutils
                     frameTimeline.FrameCount = 0;
                     frameTimeline.CurrentIndex = 0;
                 }
+
+                // 프레임 목록 갱신 후 제거 마커(제거 예정/이미 삭제)를 다시 동기화
+                SyncTimelineRemovalMarks();
 
                 LogInfo($"ImageManager 설정: {frameDataList.Count}개 프레임");
             }
@@ -300,6 +315,10 @@ namespace SimpleDonkeyManager.controlutils
                 UpdateJSONInfo(frameData);
                 UpdateCurrentFrameDisplay();
 
+                // 제거 예정 오버레이 갱신
+                if (pictureBox1 != null)
+                    pictureBox1.Invalidate();
+
                 if (frameTimeline != null)
                 {
                     try
@@ -315,6 +334,40 @@ namespace SimpleDonkeyManager.controlutils
             catch (Exception ex)
             {
                 LogWarning($"프레임 표시 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 현재 프레임이 제거 예정일 때 pictureBox1 위에 빨간 테두리와 반투명 오버레이를 그립니다.
+        /// </summary>
+        private void PictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            try
+            {
+                if (!IsPendingIndex(currentFrameIndex))
+                    return;
+
+                var g = e.Graphics;
+                Rectangle rect = pictureBox1.ClientRectangle;
+                if (rect.Width <= 2 || rect.Height <= 2)
+                    return;
+
+                // 반투명 빨간 오버레이
+                using (var overlay = new SolidBrush(Color.FromArgb(70, 220, 40, 40)))
+                {
+                    g.FillRectangle(overlay, rect);
+                }
+
+                // 빨간 테두리 (안쪽으로 들여 그려 잘리지 않게 함)
+                var borderRect = new Rectangle(rect.X + 2, rect.Y + 2, rect.Width - 5, rect.Height - 5);
+                using (var borderPen = new Pen(Color.FromArgb(220, 40, 40), 4f))
+                {
+                    g.DrawRectangle(borderPen, borderRect);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"제거 예정 오버레이 그리기 예외: {ex.Message}");
             }
         }
 
@@ -547,7 +600,10 @@ namespace SimpleDonkeyManager.controlutils
 
                 if (currentFrameIndex > 0)
                 {
-                    DisplayFrameAtIndex(currentFrameIndex - 1);
+                    int target = FindNextNonPending(currentFrameIndex, -1);
+                    if (target < 0)
+                        return; // 더 이전에 표시 가능한(제거 예정 아닌) 프레임 없음
+                    DisplayFrameAtIndex(target);
                     UpdateSelectionDisplay();
                     if (!isPlaying) SyncImageListSelection();
                     if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count && frameDataList[currentFrameIndex] != null)
@@ -574,7 +630,10 @@ namespace SimpleDonkeyManager.controlutils
 
                 if (currentFrameIndex < frameDataList.Count - 1)
                 {
-                    DisplayFrameAtIndex(currentFrameIndex + 1);
+                    int target = FindNextNonPending(currentFrameIndex, 1);
+                    if (target < 0)
+                        return; // 더 이후에 표시 가능한(제거 예정 아닌) 프레임 없음
+                    DisplayFrameAtIndex(target);
                     UpdateSelectionDisplay();
                     if (!isPlaying) SyncImageListSelection();
                     if (currentFrameIndex >= 0 && currentFrameIndex < frameDataList.Count && frameDataList[currentFrameIndex] != null)
@@ -704,6 +763,22 @@ namespace SimpleDonkeyManager.controlutils
                 frameAdvanceAccumulator -= advance;
 
                 int nextIndex = currentFrameIndex + advance;
+
+                // 제거 예정 프레임은 재생 시 건너뜀: nextIndex가 pending이면 다음 non-pending으로 전진
+                if (IsPendingIndex(nextIndex))
+                {
+                    int skipped = FindNextNonPending(nextIndex, 1);
+                    if (skipped < 0)
+                    {
+                        // 이후 표시 가능한 프레임이 없으면 마지막 non-pending에서 정지
+                        int lastVisible = FindNextNonPending(nextIndex, -1);
+                        if (lastVisible >= 0)
+                            DisplayFrameAtIndex(lastVisible);
+                        StopPlaybackAtEnd();
+                        return;
+                    }
+                    nextIndex = skipped;
+                }
 
                 // 구간 재생: 구간 끝에 도달하면 정지
                 if (frameTimeline != null && frameTimeline.HasRange)
@@ -840,11 +915,129 @@ namespace SimpleDonkeyManager.controlutils
         }
 
         /// <summary>
+        /// 타임라인에서 제거 예정 프레임을 우클릭하여 취소를 요청했을 때, 부모(DataFilterControl)로 전달합니다.
+        /// </summary>
+        private void FrameTimeline_PendingRemoveCancelRequested(object sender, int index)
+        {
+            try
+            {
+                if (frameDataList == null || index < 0 || index >= frameDataList.Count)
+                    return;
+                var fd = frameDataList[index];
+                if (fd == null)
+                    return;
+                PendingRemoveCancelRequested?.Invoke(this, fd.FrameNumber);
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"제거 예정 취소 요청 전달 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// ImageList를 연결하여 일시정지/정지 시 현재 프레임을 리스트에서 선택하도록 합니다.
         /// </summary>
         public void SetLinkedImageList(SimpleDonkeyManager.controlutils.ImageList imageList)
         {
             linkedImageList = imageList;
+        }
+
+        /// <summary>
+        /// 제거 예정(pending) 프레임 번호 집합을 설정합니다.
+        /// 현재 프레임 빨간 오버레이, 타임라인 마커, 재생 스킵에 반영됩니다.
+        /// </summary>
+        public void SetPendingRemovedNumbers(System.Collections.Generic.IEnumerable<int> numbers)
+        {
+            pendingRemovedNumbers = numbers != null
+                ? new HashSet<int>(numbers)
+                : new HashSet<int>();
+            SyncTimelineRemovalMarks();
+            if (pictureBox1 != null)
+                pictureBox1.Invalidate();
+        }
+
+        /// <summary>
+        /// 특정 프레임 인덱스가 제거 예정 상태인지 여부를 반환합니다.
+        /// </summary>
+        private bool IsPendingIndex(int index)
+        {
+            if (pendingRemovedNumbers == null || pendingRemovedNumbers.Count == 0)
+                return false;
+            if (frameDataList == null || index < 0 || index >= frameDataList.Count)
+                return false;
+            var fd = frameDataList[index];
+            return fd != null && pendingRemovedNumbers.Contains(fd.FrameNumber);
+        }
+
+        /// <summary>
+        /// from 인덱스에서 direction(+1/-1) 방향으로 제거 예정이 아닌 첫 프레임 인덱스를 찾습니다.
+        /// from 자체는 검사하지 않고 그 다음부터 탐색합니다. 못 찾으면 -1을 반환합니다.
+        /// </summary>
+        private int FindNextNonPending(int from, int direction)
+        {
+            if (frameDataList == null || frameDataList.Count == 0)
+                return -1;
+            int i = from + direction;
+            while (i >= 0 && i < frameDataList.Count)
+            {
+                if (!IsPendingIndex(i))
+                    return i;
+                i += direction;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// 현재 pending 집합과 원본 대비 삭제 위치를 타임라인 마커로 동기화합니다.
+        /// </summary>
+        private void SyncTimelineRemovalMarks()
+        {
+            if (frameTimeline == null)
+                return;
+
+            // 제거 예정: 현재 프레임 목록에서 pending 번호에 해당하는 인덱스
+            var pendingIndices = new System.Collections.Generic.List<int>();
+            if (frameDataList != null && pendingRemovedNumbers != null && pendingRemovedNumbers.Count > 0)
+            {
+                for (int i = 0; i < frameDataList.Count; i++)
+                {
+                    if (frameDataList[i] != null && pendingRemovedNumbers.Contains(frameDataList[i].FrameNumber))
+                        pendingIndices.Add(i);
+                }
+            }
+            frameTimeline.SetPendingRemovedIndices(pendingIndices);
+
+            // 이미 삭제(확정)된 위치: 원본 프레임 번호 대비 현재 누락된 번호의 비율
+            var appliedRatios = new System.Collections.Generic.List<double>();
+            if (imageManager != null && frameDataList != null && frameDataList.Count > 0)
+            {
+                try
+                {
+                    var deletedNumbers = imageManager.GetCurrentDeletedFrameNumbers();
+                    if (deletedNumbers != null && deletedNumbers.Count > 0)
+                    {
+                        int minNum = frameDataList[0].FrameNumber;
+                        int maxNum = frameDataList[frameDataList.Count - 1].FrameNumber;
+                        foreach (var fd in frameDataList)
+                        {
+                            if (fd == null) continue;
+                            if (fd.FrameNumber < minNum) minNum = fd.FrameNumber;
+                            if (fd.FrameNumber > maxNum) maxNum = fd.FrameNumber;
+                        }
+                        double span = Math.Max(1, maxNum - minNum);
+                        foreach (int dn in deletedNumbers)
+                        {
+                            double ratio = (dn - minNum) / span;
+                            appliedRatios.Add(ratio);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogWarning($"삭제 위치 마커 계산 예외: {ex.Message}");
+                }
+            }
+            frameTimeline.SetAppliedRemovedRatios(appliedRatios);
         }
 
         /// <summary>
@@ -885,6 +1078,21 @@ namespace SimpleDonkeyManager.controlutils
         /// 타임라인에 구간이 선택되어 있는지 여부입니다.
         /// </summary>
         public bool HasRange => frameTimeline != null && frameTimeline.HasRange;
+
+        /// <summary>
+        /// 타임라인의 선택/구간을 해제합니다.
+        /// </summary>
+        public void ClearTimelineSelection()
+        {
+            try
+            {
+                frameTimeline?.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"타임라인 선택 해제 예외: {ex.Message}");
+            }
+        }
 
         /// <summary>
         /// 선택된 구간의 시작 인덱스입니다. 구간이 없으면 -1입니다.

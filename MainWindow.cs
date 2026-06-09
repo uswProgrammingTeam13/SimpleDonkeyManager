@@ -86,6 +86,7 @@ namespace SimpleDonkeyManager
             initialScreen.BringToFront();
 
             // 버튼 클릭 이벤트 연결
+            btnHome.Click += BtnHome_Click;
             btnDataLoadCon.Click += BtnDataLoadCon_Click;
             btnDataFilterCon.Click += BtnDataFilterCon_Click;
             btnTraningCon.Click += BtnTraningCon_Click;
@@ -124,6 +125,27 @@ namespace SimpleDonkeyManager
                     SetStatusMessage("④ 학습 결과 확인 —  학습이 완료된 결과 그래프와 이미지를 확인하세요.", StatusLevel.Wait);
                     break;
             }
+        }
+
+        /// <summary>
+        /// 초기 화면(InitialScreen)으로 돌아갑니다.
+        /// </summary>
+        private void ShowInitialScreen()
+        {
+            if (currentControlIndex != -1)
+            {
+                controls[currentControlIndex].Visible = false;
+                currentControlIndex = -1;
+            }
+
+            initialScreen.Visible = true;
+            initialScreen.BringToFront();
+
+            // 모든 단계 버튼의 강조 표시 해제
+            UpdateButtonIndicator(-1);
+
+            // 초기 화면 도움말 탭으로 전환
+            ShowHelpTab(HelpManager.HELP_INITIAL);
         }
 
         /// <summary>
@@ -166,6 +188,11 @@ namespace SimpleDonkeyManager
                     btnResultCon.BackColor = Color.LightSkyBlue;
                     break;
             }
+        }
+
+        private void BtnHome_Click(object? sender, EventArgs e)
+        {
+            ShowInitialScreen();
         }
 
         private void BtnDataLoadCon_Click(object? sender, EventArgs e)

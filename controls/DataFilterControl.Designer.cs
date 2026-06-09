@@ -37,9 +37,10 @@
             tableLayoutPanel3 = new TableLayoutPanel();
             groupBox1 = new GroupBox();
             pnlFilterSetBasic = new Panel();
+            lblPendingRemove = new Label();
+            btnFilterUnselected = new Button();
             btnUndoRemove = new Button();
             btnRemoveSelectedFrame = new Button();
-            btnFilterUnselected = new Button();
             comboBox1 = new ComboBox();
             lblFilterSize = new Label();
             lblFilterThrottlenum = new Label();
@@ -56,6 +57,16 @@
             pnlImageView = new Panel();
             tableLayoutPanel4 = new TableLayoutPanel();
             pnlFilterResult = new GroupBox();
+            pnlSnapshot = new GroupBox();
+            pnlSnapshotLayout = new Panel();
+            txtSnapshotMemo = new TextBox();
+            lblSnapshotMemo = new Label();
+            pnlSnapshotAuthorRow = new Panel();
+            txtSnapshotAuthor = new TextBox();
+            lblSnapshotAuthor = new Label();
+            pnlSnapshotButtons = new Panel();
+            btnSaveSnapshot = new Button();
+            btnSnapshotHistory = new Button();
             pnlFrameList = new Panel();
             panelButtons.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -69,6 +80,10 @@
             ((System.ComponentModel.ISupportInitialize)numFilterAngle1).BeginInit();
             tableLayoutPanel4.SuspendLayout();
             pnlFilterResult.SuspendLayout();
+            pnlSnapshot.SuspendLayout();
+            pnlSnapshotLayout.SuspendLayout();
+            pnlSnapshotAuthorRow.SuspendLayout();
+            pnlSnapshotButtons.SuspendLayout();
             SuspendLayout();
             // 
             // lstFilterSummary
@@ -81,7 +96,7 @@
             lstFilterSummary.HideSelection = true;
             lstFilterSummary.Location = new Point(3, 25);
             lstFilterSummary.Name = "lstFilterSummary";
-            lstFilterSummary.Size = new Size(882, 139);
+            lstFilterSummary.Size = new Size(435, 139);
             lstFilterSummary.TabIndex = 0;
             lstFilterSummary.UseCompatibleStateImageBehavior = false;
             lstFilterSummary.View = View.Details;
@@ -95,9 +110,9 @@
             btnFilterReset.FlatStyle = FlatStyle.Flat;
             btnFilterReset.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
             btnFilterReset.ForeColor = SystemColors.Highlight;
-            btnFilterReset.Location = new Point(785, 3);
+            btnFilterReset.Location = new Point(591, 3);
             btnFilterReset.Name = "btnFilterReset";
-            btnFilterReset.Size = new Size(388, 44);
+            btnFilterReset.Size = new Size(582, 44);
             btnFilterReset.TabIndex = 12;
             btnFilterReset.Text = "필터 초기화";
             btnFilterReset.UseVisualStyleBackColor = true;
@@ -110,9 +125,9 @@
             btnFilterStart.FlatStyle = FlatStyle.Flat;
             btnFilterStart.Font = new Font("나눔고딕", 12F, FontStyle.Bold, GraphicsUnit.Point, 129);
             btnFilterStart.ForeColor = SystemColors.Highlight;
-            btnFilterStart.Location = new Point(394, 3);
+            btnFilterStart.Location = new Point(3, 3);
             btnFilterStart.Name = "btnFilterStart";
-            btnFilterStart.Size = new Size(385, 44);
+            btnFilterStart.Size = new Size(582, 44);
             btnFilterStart.TabIndex = 13;
             btnFilterStart.Text = "▷ 필터 적용";
             btnFilterStart.UseVisualStyleBackColor = true;
@@ -195,6 +210,7 @@
             // 
             pnlFilterSetBasic.BackColor = Color.FromArgb(242, 242, 242);
             pnlFilterSetBasic.BorderStyle = BorderStyle.FixedSingle;
+            pnlFilterSetBasic.Controls.Add(lblPendingRemove);
             pnlFilterSetBasic.Controls.Add(btnFilterUnselected);
             pnlFilterSetBasic.Controls.Add(btnUndoRemove);
             pnlFilterSetBasic.Controls.Add(btnRemoveSelectedFrame);
@@ -218,20 +234,34 @@
             pnlFilterSetBasic.Size = new Size(229, 375);
             pnlFilterSetBasic.TabIndex = 1;
             // 
-            // btnRemoveSelectedFrame
+            // lblPendingRemove
             // 
-            btnRemoveSelectedFrame.BackColor = Color.White;
-            btnRemoveSelectedFrame.FlatAppearance.BorderColor = Color.IndianRed;
-            btnRemoveSelectedFrame.FlatAppearance.MouseOverBackColor = Color.MistyRose;
-            btnRemoveSelectedFrame.FlatStyle = FlatStyle.Flat;
-            btnRemoveSelectedFrame.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
-            btnRemoveSelectedFrame.ForeColor = Color.IndianRed;
-            btnRemoveSelectedFrame.Location = new Point(7, 268);
-            btnRemoveSelectedFrame.Name = "btnRemoveSelectedFrame";
-            btnRemoveSelectedFrame.Size = new Size(215, 32);
-            btnRemoveSelectedFrame.TabIndex = 17;
-            btnRemoveSelectedFrame.Text = "✖ 선택 프레임 제거";
-            btnRemoveSelectedFrame.UseVisualStyleBackColor = false;
+            lblPendingRemove.BackColor = Color.FromArgb(255, 235, 235);
+            lblPendingRemove.BorderStyle = BorderStyle.FixedSingle;
+            lblPendingRemove.Font = new Font("나눔고딕", 8.5F, FontStyle.Bold);
+            lblPendingRemove.ForeColor = Color.IndianRed;
+            lblPendingRemove.Location = new Point(7, 356);
+            lblPendingRemove.Name = "lblPendingRemove";
+            lblPendingRemove.Size = new Size(215, 16);
+            lblPendingRemove.TabIndex = 20;
+            lblPendingRemove.Text = "제거 예정 프레임 : 0개";
+            lblPendingRemove.TextAlign = ContentAlignment.MiddleCenter;
+            lblPendingRemove.Visible = false;
+            // 
+            // btnFilterUnselected
+            // 
+            btnFilterUnselected.BackColor = Color.White;
+            btnFilterUnselected.FlatAppearance.BorderColor = Color.RoyalBlue;
+            btnFilterUnselected.FlatAppearance.MouseOverBackColor = Color.AliceBlue;
+            btnFilterUnselected.FlatStyle = FlatStyle.Flat;
+            btnFilterUnselected.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            btnFilterUnselected.ForeColor = Color.RoyalBlue;
+            btnFilterUnselected.Location = new Point(7, 322);
+            btnFilterUnselected.Name = "btnFilterUnselected";
+            btnFilterUnselected.Size = new Size(215, 30);
+            btnFilterUnselected.TabIndex = 19;
+            btnFilterUnselected.Text = "✂ 미선택 프레임 필터";
+            btnFilterUnselected.UseVisualStyleBackColor = false;
             // 
             // btnUndoRemove
             // 
@@ -242,27 +272,27 @@
             btnUndoRemove.FlatStyle = FlatStyle.Flat;
             btnUndoRemove.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
             btnUndoRemove.ForeColor = Color.SeaGreen;
-            btnUndoRemove.Location = new Point(7, 305);
+            btnUndoRemove.Location = new Point(7, 290);
             btnUndoRemove.Name = "btnUndoRemove";
-            btnUndoRemove.Size = new Size(215, 32);
+            btnUndoRemove.Size = new Size(215, 30);
             btnUndoRemove.TabIndex = 18;
             btnUndoRemove.Text = "↺ 이전 삭제 되돌리기";
             btnUndoRemove.UseVisualStyleBackColor = false;
             // 
-            // btnFilterUnselected
+            // btnRemoveSelectedFrame
             // 
-            btnFilterUnselected.BackColor = Color.White;
-            btnFilterUnselected.FlatAppearance.BorderColor = Color.RoyalBlue;
-            btnFilterUnselected.FlatAppearance.MouseOverBackColor = Color.AliceBlue;
-            btnFilterUnselected.FlatStyle = FlatStyle.Flat;
-            btnFilterUnselected.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
-            btnFilterUnselected.ForeColor = Color.RoyalBlue;
-            btnFilterUnselected.Location = new Point(7, 342);
-            btnFilterUnselected.Name = "btnFilterUnselected";
-            btnFilterUnselected.Size = new Size(215, 32);
-            btnFilterUnselected.TabIndex = 19;
-            btnFilterUnselected.Text = "✂ 미선택 프레임 필터";
-            btnFilterUnselected.UseVisualStyleBackColor = false;
+            btnRemoveSelectedFrame.BackColor = Color.White;
+            btnRemoveSelectedFrame.FlatAppearance.BorderColor = Color.IndianRed;
+            btnRemoveSelectedFrame.FlatAppearance.MouseOverBackColor = Color.MistyRose;
+            btnRemoveSelectedFrame.FlatStyle = FlatStyle.Flat;
+            btnRemoveSelectedFrame.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            btnRemoveSelectedFrame.ForeColor = Color.IndianRed;
+            btnRemoveSelectedFrame.Location = new Point(7, 258);
+            btnRemoveSelectedFrame.Name = "btnRemoveSelectedFrame";
+            btnRemoveSelectedFrame.Size = new Size(215, 30);
+            btnRemoveSelectedFrame.TabIndex = 17;
+            btnRemoveSelectedFrame.Text = "✖ 선택 프레임 제거";
+            btnRemoveSelectedFrame.UseVisualStyleBackColor = false;
             // 
             // comboBox1
             // 
@@ -422,9 +452,11 @@
             // 
             // tableLayoutPanel4
             // 
-            tableLayoutPanel4.ColumnCount = 1;
-            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel4.ColumnCount = 2;
+            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel4.Controls.Add(pnlFilterResult, 0, 0);
+            tableLayoutPanel4.Controls.Add(pnlSnapshot, 1, 0);
             tableLayoutPanel4.Dock = DockStyle.Fill;
             tableLayoutPanel4.Location = new Point(3, 418);
             tableLayoutPanel4.Name = "tableLayoutPanel4";
@@ -442,10 +474,138 @@
             pnlFilterResult.ForeColor = Color.RoyalBlue;
             pnlFilterResult.Location = new Point(3, 3);
             pnlFilterResult.Name = "pnlFilterResult";
-            pnlFilterResult.Size = new Size(888, 167);
+            pnlFilterResult.Size = new Size(441, 167);
             pnlFilterResult.TabIndex = 0;
             pnlFilterResult.TabStop = false;
             pnlFilterResult.Text = "필터링 결과 요약";
+            // 
+            // pnlSnapshot
+            // 
+            pnlSnapshot.BackColor = Color.FromArgb(248, 248, 248);
+            pnlSnapshot.Controls.Add(pnlSnapshotLayout);
+            pnlSnapshot.Dock = DockStyle.Fill;
+            pnlSnapshot.Font = new Font("나눔고딕", 14.2499981F, FontStyle.Bold);
+            pnlSnapshot.ForeColor = Color.RoyalBlue;
+            pnlSnapshot.Location = new Point(450, 3);
+            pnlSnapshot.Name = "pnlSnapshot";
+            pnlSnapshot.Padding = new Padding(8, 4, 8, 8);
+            pnlSnapshot.Size = new Size(441, 167);
+            pnlSnapshot.TabIndex = 1;
+            pnlSnapshot.TabStop = false;
+            pnlSnapshot.Text = "필터 스냅샷 저장";
+            // 
+            // pnlSnapshotLayout
+            // 
+            pnlSnapshotLayout.Controls.Add(txtSnapshotMemo);
+            pnlSnapshotLayout.Controls.Add(lblSnapshotMemo);
+            pnlSnapshotLayout.Controls.Add(pnlSnapshotAuthorRow);
+            pnlSnapshotLayout.Controls.Add(pnlSnapshotButtons);
+            pnlSnapshotLayout.Dock = DockStyle.Fill;
+            pnlSnapshotLayout.Font = new Font("나눔고딕", 9F);
+            pnlSnapshotLayout.Location = new Point(8, 26);
+            pnlSnapshotLayout.Name = "pnlSnapshotLayout";
+            pnlSnapshotLayout.Size = new Size(425, 133);
+            pnlSnapshotLayout.TabIndex = 0;
+            // 
+            // txtSnapshotMemo
+            // 
+            txtSnapshotMemo.Dock = DockStyle.Top;
+            txtSnapshotMemo.Font = new Font("나눔고딕", 9F);
+            txtSnapshotMemo.ForeColor = Color.Black;
+            txtSnapshotMemo.Location = new Point(0, 50);
+            txtSnapshotMemo.Multiline = true;
+            txtSnapshotMemo.Name = "txtSnapshotMemo";
+            txtSnapshotMemo.ScrollBars = ScrollBars.Vertical;
+            txtSnapshotMemo.Size = new Size(425, 25);
+            txtSnapshotMemo.TabIndex = 2;
+            // 
+            // lblSnapshotMemo
+            // 
+            lblSnapshotMemo.AutoSize = true;
+            lblSnapshotMemo.Dock = DockStyle.Top;
+            lblSnapshotMemo.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            lblSnapshotMemo.ForeColor = Color.DimGray;
+            lblSnapshotMemo.Location = new Point(0, 30);
+            lblSnapshotMemo.Name = "lblSnapshotMemo";
+            lblSnapshotMemo.Padding = new Padding(3, 4, 0, 2);
+            lblSnapshotMemo.Size = new Size(62, 20);
+            lblSnapshotMemo.TabIndex = 1;
+            lblSnapshotMemo.Text = "변경 내역";
+            // 
+            // pnlSnapshotAuthorRow
+            // 
+            pnlSnapshotAuthorRow.Controls.Add(txtSnapshotAuthor);
+            pnlSnapshotAuthorRow.Controls.Add(lblSnapshotAuthor);
+            pnlSnapshotAuthorRow.Dock = DockStyle.Top;
+            pnlSnapshotAuthorRow.Location = new Point(0, 0);
+            pnlSnapshotAuthorRow.Name = "pnlSnapshotAuthorRow";
+            pnlSnapshotAuthorRow.Size = new Size(425, 30);
+            pnlSnapshotAuthorRow.TabIndex = 0;
+            // 
+            // txtSnapshotAuthor
+            // 
+            txtSnapshotAuthor.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtSnapshotAuthor.Font = new Font("나눔고딕", 9F);
+            txtSnapshotAuthor.ForeColor = Color.Black;
+            txtSnapshotAuthor.Location = new Point(78, 3);
+            txtSnapshotAuthor.Name = "txtSnapshotAuthor";
+            txtSnapshotAuthor.Size = new Size(344, 21);
+            txtSnapshotAuthor.TabIndex = 1;
+            // 
+            // lblSnapshotAuthor
+            // 
+            lblSnapshotAuthor.AutoSize = true;
+            lblSnapshotAuthor.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            lblSnapshotAuthor.ForeColor = Color.DimGray;
+            lblSnapshotAuthor.Location = new Point(3, 6);
+            lblSnapshotAuthor.Name = "lblSnapshotAuthor";
+            lblSnapshotAuthor.Size = new Size(61, 14);
+            lblSnapshotAuthor.TabIndex = 0;
+            lblSnapshotAuthor.Text = "작성자 ID";
+            // 
+            // pnlSnapshotButtons
+            // 
+            pnlSnapshotButtons.Controls.Add(btnSaveSnapshot);
+            pnlSnapshotButtons.Controls.Add(btnSnapshotHistory);
+            pnlSnapshotButtons.Location = new Point(0, 81);
+            pnlSnapshotButtons.Name = "pnlSnapshotButtons";
+            pnlSnapshotButtons.Padding = new Padding(0, 6, 0, 0);
+            pnlSnapshotButtons.Size = new Size(425, 35);
+            pnlSnapshotButtons.TabIndex = 2;
+            // 
+            // btnSaveSnapshot
+            // 
+            btnSaveSnapshot.BackColor = Color.White;
+            btnSaveSnapshot.Dock = DockStyle.Left;
+            btnSaveSnapshot.FlatAppearance.BorderColor = Color.RoyalBlue;
+            btnSaveSnapshot.FlatAppearance.MouseOverBackColor = Color.AliceBlue;
+            btnSaveSnapshot.FlatStyle = FlatStyle.Flat;
+            btnSaveSnapshot.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            btnSaveSnapshot.ForeColor = Color.RoyalBlue;
+            btnSaveSnapshot.Location = new Point(0, 6);
+            btnSaveSnapshot.Name = "btnSaveSnapshot";
+            btnSaveSnapshot.Size = new Size(165, 29);
+            btnSaveSnapshot.TabIndex = 0;
+            btnSaveSnapshot.Text = "💾 필터 저장";
+            btnSaveSnapshot.UseVisualStyleBackColor = false;
+            btnSaveSnapshot.Click += btnSaveSnapshot_Click;
+            // 
+            // btnSnapshotHistory
+            // 
+            btnSnapshotHistory.BackColor = Color.White;
+            btnSnapshotHistory.Dock = DockStyle.Right;
+            btnSnapshotHistory.FlatAppearance.BorderColor = Color.MediumPurple;
+            btnSnapshotHistory.FlatAppearance.MouseOverBackColor = Color.Lavender;
+            btnSnapshotHistory.FlatStyle = FlatStyle.Flat;
+            btnSnapshotHistory.Font = new Font("나눔고딕", 9F, FontStyle.Bold);
+            btnSnapshotHistory.ForeColor = Color.MediumPurple;
+            btnSnapshotHistory.Location = new Point(260, 6);
+            btnSnapshotHistory.Name = "btnSnapshotHistory";
+            btnSnapshotHistory.Size = new Size(165, 29);
+            btnSnapshotHistory.TabIndex = 1;
+            btnSnapshotHistory.Text = "📋 내역 확인";
+            btnSnapshotHistory.UseVisualStyleBackColor = false;
+            btnSnapshotHistory.Click += btnSnapshotHistory_Click;
             // 
             // pnlFrameList
             // 
@@ -478,6 +638,12 @@
             ((System.ComponentModel.ISupportInitialize)numFilterAngle1).EndInit();
             tableLayoutPanel4.ResumeLayout(false);
             pnlFilterResult.ResumeLayout(false);
+            pnlSnapshot.ResumeLayout(false);
+            pnlSnapshotLayout.ResumeLayout(false);
+            pnlSnapshotLayout.PerformLayout();
+            pnlSnapshotAuthorRow.ResumeLayout(false);
+            pnlSnapshotAuthorRow.PerformLayout();
+            pnlSnapshotButtons.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -492,11 +658,21 @@
         private GroupBox groupBox1;
         private TableLayoutPanel tableLayoutPanel4;
         private GroupBox pnlFilterResult;
+        private GroupBox pnlSnapshot;
+        private Panel pnlSnapshotAuthorRow;
+        private Panel pnlSnapshotButtons;
+        private Label lblSnapshotAuthor;
+        private TextBox txtSnapshotAuthor;
+        private Label lblSnapshotMemo;
+        private TextBox txtSnapshotMemo;
+        private Button btnSaveSnapshot;
+        private Button btnSnapshotHistory;
         private Panel pnlFilterSetBasic;
         private ComboBox comboBox1;
         private Button btnRemoveSelectedFrame;
         private Button btnUndoRemove;
         private Button btnFilterUnselected;
+        private Label lblPendingRemove;
         private Label lblFilterSize;
         private Label lblFilterThrottlenum;
         private NumericUpDown numFilterThrottle2;
@@ -511,5 +687,6 @@
         private Label lblFilterBasic;
         private Panel pnlImageView;
         private Panel pnlFrameList;
+        private Panel pnlSnapshotLayout;
     }
 }

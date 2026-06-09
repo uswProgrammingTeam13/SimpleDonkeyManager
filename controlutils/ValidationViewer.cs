@@ -84,55 +84,6 @@ namespace SimpleDonkeyManager.controlutils
             LoadResults(new List<SimpleDonkeyManager.ValidationResult>());
         }
 
-        /// <summary>
-        /// 검증이 진행되는 동안 현재 처리 중인 프레임 이미지를 실시간으로 표시합니다.
-        /// 백그라운드 스레드에서 호출될 수 있으므로 UI 스레드로 전환합니다.
-        /// </summary>
-        public void ShowProgressFrame(string imagePath, int frameNumber, int current, int total)
-        {
-            if (InvokeRequired)
-            {
-                try { BeginInvoke(new Action(() => ShowProgressFrame(imagePath, frameNumber, current, total))); }
-                catch { }
-                return;
-            }
-
-            try
-            {
-                if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
-                {
-                    if (pictureBox1.Image != null)
-                    {
-                        try
-                        {
-                            var old = pictureBox1.Image;
-                            pictureBox1.Image = null;
-                            old.Dispose();
-                        }
-                        catch { }
-                    }
-
-                    using (var stream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
-                    {
-                        pictureBox1.Image = Image.FromStream(stream);
-                    }
-                }
-
-                lblFrame.Text = $"검증 중... ({current}/{total})  Frame {frameNumber}";
-                lblAngle.Text = "실제 조향값: -    AI 예측 조향값: -";
-                lblThrottle.Text = "실제 속도값: -    AI 예측 속도값: -";
-                lblError.Text = "오차 계산 중...";
-
-                // 검증 진행 중에는 아직 예측값이 없으므로 화살표를 숨깁니다.
-                showArrows = false;
-                pictureBox1.Invalidate();
-            }
-            catch
-            {
-                // 진행 표시 실패는 무시
-            }
-        }
-
         private void DisplayFrameAtIndex(int index)
         {
             try

@@ -463,6 +463,10 @@ namespace SimpleDonkeyManager.controls
             btnStartValidation.Enabled = false;
             btnStartValidation.Text = "⏳ 검증 중...";
 
+            // 진행률 상태바 초기화 및 표시 (이미지 미리보기 대신 진행도만 표시)
+            int totalFrames = trainingData.Count(f => f != null && !string.IsNullOrEmpty(f.ImagePath));
+            ShowValidationProgress(0, totalFrames);
+
             lock (validationLog) { validationLog.Clear(); }
 
             try
@@ -514,6 +518,7 @@ namespace SimpleDonkeyManager.controls
             {
                 isValidating = false;
                 btnStartValidation.Text = "🔍 검증 시작";
+                HideValidationProgress();
                 UpdateValidationButtonState();
             }
         }
@@ -685,9 +690,79 @@ namespace SimpleDonkeyManager.controls
         }
 
         /// <summary>
+        /// 검증 진행률 상태바를 표시하고 초기화합니다. (UI 스레드 안전)
+        /// </summary>
+        private void ShowValidationProgress(int current, int total)
+        {
+            if (lblValidationProgress == null || prgValidation == null)
+                return;
+
+            Action update = () =>
+            {
+                prgValidation.Maximum = total > 0 ? total : 1;
+                prgValidation.Value = Math.Min(current, prgValidation.Maximum);
+                prgValidation.Visible = true;
+                lblValidationProgress.Text = total > 0
+                    ? $"검증 진행 중...  {current} / {total} 프레임"
+                    : "검증 준비 중...";
+                lblValidationProgress.Visible = true;
+            };
+
+            if (InvokeRequired)
+                BeginInvoke(update);
+            else
+                update();
+        }
+
+        /// <summary>
+        /// 검증 진행률 상태바를 갱신합니다. (UI 스레드 안전)
+        /// </summary>
+        private void UpdateValidationProgress(int current, int total)
+        {
+            if (lblValidationProgress == null || prgValidation == null)
+                return;
+
+            Action update = () =>
+            {
+                if (total > 0)
+                    prgValidation.Maximum = total;
+                prgValidation.Value = Math.Min(current, prgValidation.Maximum);
+
+                int percent = total > 0 ? (int)((double)current / total * 100) : 0;
+                lblValidationProgress.Text = $"검증 진행 중...  {current} / {total} 프레임 ({percent}%)";
+            };
+
+            if (InvokeRequired)
+                BeginInvoke(update);
+            else
+                update();
+        }
+
+        /// <summary>
+        /// 검증 진행률 상태바를 숨깁니다. (UI 스레드 안전)
+        /// </summary>
+        private void HideValidationProgress()
+        {
+            if (lblValidationProgress == null || prgValidation == null)
+                return;
+
+            Action update = () =>
+            {
+                prgValidation.Visible = false;
+                lblValidationProgress.Visible = false;
+                lblValidationProgress.Text = "";
+            };
+
+            if (InvokeRequired)
+                BeginInvoke(update);
+            else
+                update();
+        }
+
+        /// <summary>
         /// validate_model.py 의 출력 한 줄을 처리합니다.
-        /// 진행 마커([PROGRESS]\t현재\t전체\t프레임번호\t이미지경로)를 만나면
-        /// 검증 뷰어에 현재 처리 중인 프레임 이미지를 실시간으로 표시합니다.
+        /// 진행 마커([PROGRESS]\t현재\t전체\t프레임번호)를 만나면
+        /// 검증 진행률 상태바를 갱신합니다. (이미지 미리보기는 검증 속도를 위해 표시하지 않음)
         /// </summary>
         private void HandleValidationOutput(string line)
         {
@@ -715,14 +790,13 @@ namespace SimpleDonkeyManager.controls
             {
                 string payload = line.Substring(idx + marker.Length).Trim();
                 string[] parts = payload.Split('\t');
-                if (parts.Length >= 4)
+                if (parts.Length >= 2)
                 {
                     int current = int.TryParse(parts[0], out int c) ? c : 0;
                     int total = int.TryParse(parts[1], out int t) ? t : 0;
-                    int frameNumber = int.TryParse(parts[2], out int f) ? f : 0;
-                    string imagePath = parts[3];
 
-                    validationViewer1?.ShowProgressFrame(imagePath, frameNumber, current, total);
+                    // 이미지 로드/표시 없이 진행률만 갱신하여 검증 속도를 극대화합니다.
+                    UpdateValidationProgress(current, total);
                 }
             }
             catch
