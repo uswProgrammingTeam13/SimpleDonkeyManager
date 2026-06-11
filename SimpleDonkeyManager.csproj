@@ -46,5 +46,8 @@
   <ItemGroup>
     <PackageReference Include="OxyPlot.WindowsForms" Version="2.1.2" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="resources\readme_screenchots\" />
+  </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Windows.Forms;
 
@@ -341,24 +342,37 @@ namespace SimpleDonkeyManager.controlutils
             float tipX = originX + (float)(Math.Sin(rad) * length);
             float tipY = originY - (float)(Math.Cos(rad) * length);
 
-            using (var pen = new Pen(color, 4f))
+            Color outlineColor = Color.FromArgb(235, 0, 0, 0);
+            const float outlineWidth = 10f;
+            const float arrowWidth = 6f;
+
+            using (var outlinePen = new Pen(outlineColor, outlineWidth))
+            using (var pen = new Pen(color, arrowWidth))
             {
-                pen.StartCap = System.Drawing.Drawing2D.LineCap.Round;
-                pen.EndCap = System.Drawing.Drawing2D.LineCap.Round;
+                outlinePen.StartCap = LineCap.Round;
+                outlinePen.EndCap = LineCap.Round;
+                pen.StartCap = LineCap.Round;
+                pen.EndCap = LineCap.Round;
+                g.DrawLine(outlinePen, originX, originY, tipX, tipY);
                 g.DrawLine(pen, originX, originY, tipX, tipY);
 
                 // 화살촉
-                DrawArrowHead(g, color, originX, originY, tipX, tipY);
+                DrawArrowHead(g, color, outlineColor, originX, originY, tipX, tipY);
             }
 
             // 시작점 표시
+            using (var outlineBrush = new SolidBrush(outlineColor))
+            {
+                g.FillEllipse(outlineBrush, originX - 6f, originY - 6f, 12f, 12f);
+            }
+
             using (var dotBrush = new SolidBrush(color))
             {
                 g.FillEllipse(dotBrush, originX - 4f, originY - 4f, 8f, 8f);
             }
         }
 
-        private void DrawArrowHead(Graphics g, Color color, float x1, float y1, float x2, float y2)
+        private void DrawArrowHead(Graphics g, Color color, Color outlineColor, float x1, float y1, float x2, float y2)
         {
             double dx = x2 - x1;
             double dy = y2 - y1;
@@ -369,7 +383,7 @@ namespace SimpleDonkeyManager.controlutils
             double ux = dx / len;
             double uy = dy / len;
 
-            float headSize = 14f;
+            float headSize = 20f;
             double angleSpread = 25.0 * Math.PI / 180.0;
 
             // 화살촉 양쪽 점 계산
@@ -381,15 +395,59 @@ namespace SimpleDonkeyManager.controlutils
             double rightX = x2 - headSize * (ux * cos - uy * sin);
             double rightY = y2 - headSize * (uy * cos + ux * sin);
 
+            PointF[] headPoints =
+            {
+                new PointF(x2, y2),
+                new PointF((float)leftX, (float)leftY),
+                new PointF((float)rightX, (float)rightY)
+            };
+
+            using (var outlineBrush = new SolidBrush(outlineColor))
+            using (var outlinePen = new Pen(outlineColor, 3f))
             using (var brush = new SolidBrush(color))
             {
-                g.FillPolygon(brush, new[]
+                using (GraphicsPath outlinePath = CreateExpandedArrowHeadPath(headPoints, 3.5f))
                 {
-                    new PointF(x2, y2),
-                    new PointF((float)leftX, (float)leftY),
-                    new PointF((float)rightX, (float)rightY)
-                });
+                    g.FillPath(outlineBrush, outlinePath);
+                }
+
+                g.FillPolygon(brush, headPoints);
+                g.DrawPolygon(outlinePen, headPoints);
             }
+        }
+
+        private GraphicsPath CreateExpandedArrowHeadPath(PointF[] points, float expansion)
+        {
+            float cx = 0f;
+            float cy = 0f;
+            foreach (var point in points)
+            {
+                cx += point.X;
+                cy += point.Y;
+            }
+            cx /= points.Length;
+            cy /= points.Length;
+
+            PointF[] expanded = new PointF[points.Length];
+            for (int i = 0; i < points.Length; i++)
+            {
+                float vx = points[i].X - cx;
+                float vy = points[i].Y - cy;
+                double len = Math.Sqrt(vx * vx + vy * vy);
+                if (len < 1e-3)
+                {
+                    expanded[i] = points[i];
+                    continue;
+                }
+
+                expanded[i] = new PointF(
+                    points[i].X + (float)(vx / len * expansion),
+                    points[i].Y + (float)(vy / len * expansion));
+            }
+
+            var path = new GraphicsPath();
+            path.AddPolygon(expanded);
+            return path;
         }
 
         private void DrawLegend(Graphics g, int width)
