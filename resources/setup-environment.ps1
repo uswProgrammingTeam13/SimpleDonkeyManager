@@ -1,391 +1,436 @@
 #!/usr/bin/env powershell
-# ============================================================================
-# SimpleDonkeyManager - Auto Environment Setup Script
-# ============================================================================
-# Purpose: Automatically install and configure .NET 10, Python 3.11, Donkeycar
-# Usage: powershell.exe -ExecutionPolicy Bypass -File setup-environment.ps1
-# ============================================================================
+<#
+SimpleDonkeyManager - automatic training environment setup
+
+Run from an elevated PowerShell:
+  powershell.exe -ExecutionPolicy Bypass -File .\resources\setup-environment.ps1
+
+The script is intentionally usable both from the source tree and from the
+WinForms app's copied resources folder under bin\...\resources.
+#>
+
+param(
+    [switch]$NoPause,
+    [switch]$SkipPackageInstall,
+    [switch]$CheckOnly
+)
 
 $ErrorActionPreference = "Continue"
 
-# ============================================================================
-# 1. Utility Functions
-# ============================================================================
-
 function Write-Header {
-	param([string]$Text)
-	Write-Host ""
-	Write-Host "╔════════════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-	Write-Host "║ $($Text.PadRight(66)) ║" -ForegroundColor Cyan
-	Write-Host "╚════════════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
-	Write-Host ""
+    param([string]$Text)
+    Write-Host ""
+    Write-Host "==============================================================================" -ForegroundColor Cyan
+    Write-Host " $Text" -ForegroundColor Cyan
+    Write-Host "==============================================================================" -ForegroundColor Cyan
 }
 
 function Write-Success {
-	param([string]$Text)
-	Write-Host "OK $Text" -ForegroundColor Green
+    param([string]$Text)
+    Write-Host "OK      $Text" -ForegroundColor Green
 }
 
 function Write-Warning-Custom {
-	param([string]$Text)
-	Write-Host "WARNING $Text" -ForegroundColor Yellow
+    param([string]$Text)
+    Write-Host "WARNING $Text" -ForegroundColor Yellow
 }
 
 function Write-Error-Custom {
-	param([string]$Text)
-	Write-Host "ERROR $Text" -ForegroundColor Red
+    param([string]$Text)
+    Write-Host "ERROR   $Text" -ForegroundColor Red
 }
 
 function Write-Info {
-	param([string]$Text)
-	Write-Host "INFO $Text" -ForegroundColor Cyan
+    param([string]$Text)
+    Write-Host "INFO    $Text" -ForegroundColor Cyan
 }
 
-function Check-Admin {
-	$currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
-	$principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
-	return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+function Pause-IfNeeded {
+    if (-not $NoPause) {
+        Read-Host "Press Enter to exit"
+    }
 }
 
-# ============================================================================
-# 2. Admin Check
-# ============================================================================
+function Stop-WithError {
+    param(
+        [string]$Message,
+        [int]$Code = 1
+    )
+    Write-Error-Custom $Message
+    Pause-IfNeeded
+    exit $Code
+}
+
+function Test-Admin {
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object Security.Principal.WindowsPrincipal($currentUser)
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+function Invoke-CommandCapture {
+    param(
+        [string]$FilePath,
+        [string[]]$Arguments = @()
+    )
+
+    try {
+        $output = & $FilePath @Arguments 2>&1
+        return @{
+            Success = ($LASTEXITCODE -eq 0)
+            ExitCode = $LASTEXITCODE
+            Output = ($output -join [Environment]::NewLine)
+        }
+    } catch {
+        return @{
+            Success = $false
+            ExitCode = -1
+            Output = $_.Exception.Message
+        }
+    }
+}
+
+function Find-ProjectRoot {
+    param([string]$StartDirectory)
+
+    $current = Get-Item -LiteralPath $StartDirectory
+    while ($null -ne $current) {
+        $csproj = Join-Path $current.FullName "SimpleDonkeyManager.csproj"
+        $trainPy = Join-Path $current.FullName "python\train.py"
+
+        if ((Test-Path -LiteralPath $csproj) -or (Test-Path -LiteralPath $trainPy)) {
+            return $current.FullName
+        }
+
+        $current = $current.Parent
+    }
+
+    # Published builds may not include the project file. In that case, use the
+    # app directory that owns the copied resources folder.
+    if ($StartDirectory -match "\\resources$") {
+        return (Split-Path -Parent $StartDirectory)
+    }
+
+    return $StartDirectory
+}
+
+function Resolve-Python {
+    $candidates = @()
+
+    $pythonCommand = Get-Command "python.exe" -ErrorAction SilentlyContinue
+    if ($pythonCommand) {
+        $candidates += @{
+            File = $pythonCommand.Source
+            Args = @()
+            Label = "python.exe from PATH"
+        }
+    }
+
+    $pyLauncher = Get-Command "py.exe" -ErrorAction SilentlyContinue
+    if ($pyLauncher) {
+        $candidates += @{
+            File = $pyLauncher.Source
+            Args = @("-3.11")
+            Label = "Python Launcher py -3.11"
+        }
+        $candidates += @{
+            File = $pyLauncher.Source
+            Args = @("-3")
+            Label = "Python Launcher py -3"
+        }
+    }
+
+    $localAppData = [Environment]::GetFolderPath("LocalApplicationData")
+    if ($localAppData) {
+        $commonPython = Join-Path $localAppData "Programs\Python\Python311\python.exe"
+        if (Test-Path -LiteralPath $commonPython) {
+            $candidates += @{
+                File = $commonPython
+                Args = @()
+                Label = "Python 3.11 default user install"
+            }
+        }
+    }
+
+    foreach ($candidate in $candidates) {
+        $result = Invoke-CommandCapture -FilePath $candidate.File -Arguments ($candidate.Args + @("--version"))
+        if (-not $result.Success) {
+            continue
+        }
+
+        $versionText = $result.Output.Trim()
+        if ($versionText -match "Python\s+(\d+)\.(\d+)\.(\d+)") {
+            $major = [int]$Matches[1]
+            $minor = [int]$Matches[2]
+            if ($major -eq 3 -and $minor -ge 10) {
+                return @{
+                    File = $candidate.File
+                    Args = $candidate.Args
+                    Label = $candidate.Label
+                    Version = $versionText
+                }
+            }
+        }
+    }
+
+    return $null
+}
+
+function Invoke-Python {
+    param(
+        [hashtable]$Python,
+        [string[]]$Arguments
+    )
+
+    return Invoke-CommandCapture -FilePath $Python.File -Arguments ($Python.Args + $Arguments)
+}
+
+function Test-VenvPython {
+    param([string]$VenvPython)
+
+    if (-not (Test-Path -LiteralPath $VenvPython)) {
+        return $false
+    }
+
+    $result = Invoke-CommandCapture -FilePath $VenvPython -Arguments @("--version")
+    return $result.Success
+}
+
+function Install-Package {
+    param(
+        [string]$VenvPython,
+        [string[]]$PackageArgs,
+        [string]$DisplayName
+    )
+
+    Write-Info "Installing $DisplayName..."
+    $result = Invoke-CommandCapture -FilePath $VenvPython -Arguments (@("-m", "pip", "install") + $PackageArgs + @("--quiet"))
+    if ($result.Success) {
+        Write-Success "$DisplayName installed"
+        return $true
+    }
+
+    Write-Warning-Custom "$DisplayName installation failed"
+    if ($result.Output) {
+        Write-Warning-Custom $result.Output
+    }
+    return $false
+}
 
 Write-Header "Admin Privilege Check"
-
-if (-not (Check-Admin)) {
-	Write-Error-Custom "This script requires administrator privileges!"
-	Write-Info "Please run PowerShell as Administrator and try again."
-	Read-Host "Press Enter to exit"
-	exit 1
+if (-not (Test-Admin)) {
+    Stop-WithError "This script must be run as administrator. Right-click PowerShell and choose 'Run as administrator'."
 }
-
 Write-Success "Running with administrator privileges"
 
-# ============================================================================
-# 3. .NET Version Check
-# ============================================================================
-
 Write-Header ".NET 10 Environment Check"
-
-Write-Info "Checking .NET installation..."
-$dotnetVersion = & dotnet --version 2>&1
-
-if ($LASTEXITCODE -eq 0) {
-	Write-Success ".NET is installed: $dotnetVersion"
-
-	if ($dotnetVersion -like "10.*") {
-		Write-Success ".NET 10 is installed - OK"
-	} else {
-		Write-Warning-Custom ".NET version is not 10 (current: $dotnetVersion)"
-		Write-Warning-Custom "Please install .NET 10: https://dotnet.microsoft.com/download/dotnet/10.0"
-	}
-} else {
-	Write-Error-Custom ".NET is not installed!"
-	Write-Info "Installation link: https://dotnet.microsoft.com/download/dotnet/10.0"
-	Write-Info ""
-	Write-Warning-Custom "Please install .NET 10 before continuing."
-	Write-Info ""
-	Write-Info "Run this script again after installation."
-	Read-Host "Press Enter to exit"
-	exit 1
+$dotnet = Get-Command "dotnet.exe" -ErrorAction SilentlyContinue
+if (-not $dotnet) {
+    Stop-WithError ".NET SDK/Runtime was not found. Install .NET 10 from https://dotnet.microsoft.com/download/dotnet/10.0"
 }
 
-# ============================================================================
-# 4. Python 3.11 Check
-# ============================================================================
-
-Write-Header "Python 3.11 Environment Check"
-
-Write-Info "Checking Python installation..."
-$pythonVersion = & python --version 2>&1
-
-if ($LASTEXITCODE -eq 0) {
-	Write-Success "Python is installed: $pythonVersion"
-
-	if ($pythonVersion -like "*3.11*") {
-		Write-Success "Python 3.11 is installed - OK"
-	} else {
-		Write-Warning-Custom "Python version is not 3.11 (current: $pythonVersion)"
-		Write-Warning-Custom "Recommended: Python 3.11 from https://www.python.org/downloads/"
-	}
-} else {
-	Write-Error-Custom "Python is not installed!"
-	Write-Info "Please install Python 3.11 from: https://www.python.org/downloads/"
-	Read-Host "Press Enter to exit"
-	exit 1
+$dotnetCheck = Invoke-CommandCapture -FilePath $dotnet.Source -Arguments @("--version")
+if (-not $dotnetCheck.Success) {
+    Stop-WithError "dotnet --version failed: $($dotnetCheck.Output)"
 }
 
-# ============================================================================
-# 5. Project Root Detection
-# ============================================================================
+$dotnetVersion = $dotnetCheck.Output.Trim()
+Write-Success ".NET found: $dotnetVersion"
+if ($dotnetVersion -notlike "10.*") {
+    Write-Warning-Custom "This project targets .NET 10. Current dotnet version is $dotnetVersion."
+}
 
-Write-Header "Project Configuration"
+Write-Header "Python Environment Check"
+$python = Resolve-Python
+if (-not $python) {
+    Stop-WithError "Python 3.10+ was not found. Install Python 3.11 and enable either PATH or the Python Launcher (py.exe)."
+}
+Write-Success "$($python.Label): $($python.Version)"
 
-# Get the directory where this script is located
+Write-Header "Project Root Detection"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Write-Info "Script location: $scriptDir"
+$projectRoot = Find-ProjectRoot -StartDirectory $scriptDir
+$pythonDir = Join-Path $projectRoot "python"
+$trainPyPath = Join-Path $pythonDir "train.py"
+$prepareScript = Join-Path $pythonDir "prepare_tub.py"
 
-# Try to find the project root
-# If script is in resources/, go up two levels to project root
-# If script is in root/, stay at current location
-if ($scriptDir -match "\\resources$") {
-	$projectRoot = Split-Path -Parent $scriptDir
-	Write-Info "Detected resources folder, moving up to: $projectRoot"
-} else {
-	$projectRoot = $scriptDir
-	Write-Info "Using current directory as project root: $projectRoot"
-}
-
+Write-Info "Script directory: $scriptDir"
 Write-Success "Project root: $projectRoot"
 
-# ============================================================================
-# 6. Virtual Environment Setup
-# ============================================================================
-
-Write-Header "Virtual Environment Setup"
+if (-not (Test-Path -LiteralPath $trainPyPath)) {
+    Stop-WithError "python\train.py was not found under project root: $trainPyPath"
+}
 
 $venvPath = Join-Path $projectRoot "donkey_env"
-$venvPython = Join-Path $venvPath "Scripts" "python.exe"
+$venvPython = Join-Path $venvPath "Scripts\python.exe"
 
-if (-not (Test-Path $venvPath)) {
-	Write-Info "Creating virtual environment: $venvPath"
-	& python -m venv $venvPath
-
-	if ($LASTEXITCODE -eq 0) {
-		Write-Success "Virtual environment created successfully"
-	} else {
-		Write-Error-Custom "Failed to create virtual environment"
-		Read-Host "Press Enter to exit"
-		exit 1
-	}
+Write-Header "Virtual Environment Setup"
+if (-not (Test-Path -LiteralPath $venvPath)) {
+    Write-Info "Creating virtual environment: $venvPath"
+    $createResult = Invoke-Python -Python $python -Arguments @("-m", "venv", $venvPath)
+    if (-not $createResult.Success) {
+        Stop-WithError "Failed to create virtual environment: $($createResult.Output)"
+    }
+    Write-Success "Virtual environment created"
+} elseif (-not (Test-VenvPython -VenvPython $venvPython)) {
+    Write-Warning-Custom "Existing virtual environment is not runnable. Attempting venv repair with --upgrade."
+    $repairResult = Invoke-Python -Python $python -Arguments @("-m", "venv", "--upgrade", $venvPath)
+    if (-not $repairResult.Success -or -not (Test-VenvPython -VenvPython $venvPython)) {
+        Stop-WithError "Failed to repair donkey_env. Rename or remove '$venvPath' and run this script again. Details: $($repairResult.Output)"
+    }
+    Write-Success "Virtual environment repaired"
 } else {
-	Write-Success "Virtual environment already exists: $venvPath"
+    Write-Success "Virtual environment is ready: $venvPath"
 }
 
-# ============================================================================
-# 7. Package Installation
-# ============================================================================
+$venvVersion = Invoke-CommandCapture -FilePath $venvPython -Arguments @("--version")
+if ($venvVersion.Success) {
+    Write-Success "venv Python: $($venvVersion.Output.Trim())"
+}
+
+if ($CheckOnly) {
+    Write-Header "Check Complete"
+    Write-Success "Required tools and project paths are valid."
+    Pause-IfNeeded
+    exit 0
+}
 
 Write-Header "Package Installation"
-
-Write-Info "Upgrading pip..."
-& $venvPython -m pip install --upgrade pip --quiet 2>&1 | Out-Null
-
-if ($LASTEXITCODE -eq 0) {
-	Write-Success "pip upgraded successfully"
+if ($SkipPackageInstall) {
+    Write-Warning-Custom "Skipping package installation because -SkipPackageInstall was supplied."
 } else {
-	Write-Warning-Custom "pip upgrade encountered issues"
+    Write-Info "Upgrading pip..."
+    $pipResult = Invoke-CommandCapture -FilePath $venvPython -Arguments @("-m", "pip", "install", "--upgrade", "pip", "--quiet")
+    if ($pipResult.Success) {
+        Write-Success "pip upgraded"
+    } else {
+        Write-Warning-Custom "pip upgrade failed: $($pipResult.Output)"
+    }
+
+    Write-Info "Installing pinned packages for donkeycar 5.3.0 / TensorFlow 2.15 / NumPy 1.x"
+    $failedPackages = @()
+
+    $packages = @(
+        @{ Args = @("donkeycar==5.3.0"); DisplayName = "DonkeyCar 5.3.0" },
+        @{ Args = @("numpy==1.26.4"); DisplayName = "NumPy 1.26.4" },
+        @{ Args = @("tensorflow==2.15.1"); DisplayName = "TensorFlow 2.15.1" },
+        @{ Args = @("albumentations==1.4.18"); DisplayName = "Albumentations 1.4.18" },
+        @{ Args = @("opencv-python-headless==4.9.0.80"); DisplayName = "OpenCV headless 4.9.0.80" },
+        @{ Args = @("Pillow"); DisplayName = "Pillow" },
+        @{ Args = @("docopt"); DisplayName = "docopt" },
+        @{ Args = @("h5py"); DisplayName = "h5py" },
+        @{ Args = @("pyyaml"); DisplayName = "PyYAML" }
+    )
+
+    foreach ($pkg in $packages) {
+        if (-not (Install-Package -VenvPython $venvPython -PackageArgs $pkg.Args -DisplayName $pkg.DisplayName)) {
+            $failedPackages += $pkg.DisplayName
+        }
+    }
+
+    if (-not (Install-Package -VenvPython $venvPython -PackageArgs @("numpy==1.26.4") -DisplayName "NumPy final pin 1.26.4")) {
+        $failedPackages += "NumPy final pin"
+    }
+
+    if ($failedPackages.Count -gt 0) {
+        Write-Warning-Custom "Some packages failed: $($failedPackages -join ', ')"
+        Write-Warning-Custom "Check network access and rerun this script."
+    }
 }
-
-Write-Info ""
-Write-Info "Installing required packages..."
-Write-Info "Versions are pinned for donkeycar 5.3.0 compatibility (TensorFlow 2.15 / Keras 2 / NumPy 1.x)."
-
-# ----------------------------------------------------------------------------
-# IMPORTANT: donkeycar 5.3.0 requires a very specific dependency set.
-# Installing the latest versions breaks training with errors such as:
-#   - ModuleNotFoundError: No module named 'albumentations'
-#   - AttributeError: 'Functional' object has no attribute 'input_names'  (Keras 3)
-#   - numpy 2.x incompatibility (donkeycar requires numpy<2.0)
-# The packages below are pinned and installed in the correct order so that
-# `python\train.py` runs end-to-end without manual fixes.
-# ----------------------------------------------------------------------------
-$packages = @(
-	# Install donkeycar first so it pins its own core dependencies.
-	@{ name = "donkeycar==5.3.0"; displayName = "DonkeyCar 5.3.0" },
-	# Pin NumPy < 2.0 (donkeycar requirement) BEFORE TensorFlow.
-	@{ name = "numpy==1.26.4"; displayName = "NumPy 1.26.4" },
-	# TensorFlow 2.15 ships Keras 2.x which donkeycar's training pipeline needs.
-	@{ name = "tensorflow==2.15.1"; displayName = "TensorFlow 2.15.1" },
-	# Image augmentation used by donkeycar.pipeline.augmentations.
-	# 1.4.18 + opencv-headless 4.9 are the last versions compatible with numpy 1.x.
-	@{ name = "albumentations==1.4.18"; displayName = "Albumentations 1.4.18" },
-	@{ name = "opencv-python-headless==4.9.0.80"; displayName = "OpenCV (headless) 4.9.0.80" },
-	@{ name = "Pillow"; displayName = "Pillow" },
-	@{ name = "docopt"; displayName = "docopt" },
-	@{ name = "h5py"; displayName = "h5py" },
-	@{ name = "pyyaml"; displayName = "PyYAML" }
-)
-
-$failedPackages = @()
-
-foreach ($pkg in $packages) {
-	Write-Info "Installing $($pkg.displayName)..."
-
-	try {
-		& $venvPython -m pip install $pkg.name --quiet 2>&1 | Out-Null
-
-		if ($LASTEXITCODE -eq 0) {
-			Write-Success "$($pkg.displayName) installed successfully"
-		} else {
-			Write-Warning-Custom "$($pkg.displayName) installation error"
-			$failedPackages += $pkg.displayName
-		}
-	} catch {
-		Write-Warning-Custom "$($pkg.displayName) failed: $_"
-		$failedPackages += $pkg.displayName
-	}
-}
-
-# ----------------------------------------------------------------------------
-# Re-pin NumPy last. Some packages (e.g. opencv/albumentations) may try to pull
-# in numpy 2.x as a transitive dependency, which breaks donkeycar. Force the
-# compatible version one more time to guarantee a working environment.
-# ----------------------------------------------------------------------------
-Write-Info "Re-pinning NumPy < 2.0 for donkeycar compatibility..."
-& $venvPython -m pip install "numpy==1.26.4" --quiet 2>&1 | Out-Null
-if ($LASTEXITCODE -eq 0) {
-	Write-Success "NumPy pinned to 1.26.4"
-} else {
-	Write-Warning-Custom "Failed to re-pin NumPy"
-}
-
-if ($failedPackages.Count -gt 0) {
-	Write-Warning-Custom "Failed to install: $($failedPackages -join ', ')"
-	Write-Info "Check network connection and run again."
-}
-
-# ============================================================================
-# 8. Installation Verification
-# ============================================================================
 
 Write-Header "Installation Verification"
-
-Write-Info "Verifying installed packages..."
-
+$env:NO_ALBUMENTATIONS_UPDATE = "1"
 $verifyCommands = @(
-	@{ name = "tensorflow"; cmd = "import tensorflow as tf; print(tf.__version__)" },
-	@{ name = "keras"; cmd = "import keras; print(keras.__version__)" },
-	@{ name = "donkeycar"; cmd = "import donkeycar; print(donkeycar.__version__)" },
-	@{ name = "numpy"; cmd = "import numpy; print(numpy.__version__)" },
-	@{ name = "albumentations"; cmd = "import albumentations; print(albumentations.__version__)" },
-	@{ name = "PIL"; cmd = "from PIL import Image; print('Pillow OK')" },
-	@{ name = "docopt"; cmd = "import docopt; print('docopt OK')" },
-	@{ name = "training pipeline"; cmd = "from donkeycar.pipeline.training import train; print('donkeycar training pipeline OK')" }
+    @{ Name = "tensorflow"; Code = "import tensorflow as tf; print(tf.__version__)" },
+    @{ Name = "keras"; Code = "import keras; print(keras.__version__)" },
+    @{ Name = "donkeycar"; Code = "import donkeycar; print(donkeycar.__version__)" },
+    @{ Name = "numpy"; Code = "import numpy; print(numpy.__version__)" },
+    @{ Name = "albumentations"; Code = "import albumentations; print(albumentations.__version__)" },
+    @{ Name = "Pillow"; Code = "from PIL import Image; print('Pillow OK')" },
+    @{ Name = "docopt"; Code = "import docopt; print('docopt OK')" },
+    @{ Name = "training pipeline"; Code = "from donkeycar.pipeline.training import train; print('donkeycar training pipeline OK')" }
 )
 
 $installedPackages = @()
 $missingPackages = @()
-
 foreach ($verify in $verifyCommands) {
-	$result = & $venvPython -c $verify.cmd 2>&1
-
-	if ($LASTEXITCODE -eq 0) {
-		Write-Success "$($verify.name): $result"
-		$installedPackages += $verify.name
-	} else {
-		Write-Warning-Custom "$($verify.name): Not installed or error"
-		$missingPackages += $verify.name
-	}
+    $result = Invoke-CommandCapture -FilePath $venvPython -Arguments @("-c", $verify.Code)
+    if ($result.Success) {
+        $lastLine = (($result.Output -split "(`r`n|`n|`r)") | Where-Object { $_.Trim() -ne "" } | Select-Object -Last 1)
+        Write-Success "$($verify.Name): $lastLine"
+        $installedPackages += $verify.Name
+    } else {
+        Write-Warning-Custom "$($verify.Name): missing or failed"
+        if ($result.Output) {
+            Write-Warning-Custom $result.Output
+        }
+        $missingPackages += $verify.Name
+    }
 }
-
-# ============================================================================
-# 9. train.py Verification
-# ============================================================================
 
 Write-Header "Training Script Verification"
-
-$trainPyPath = Join-Path $projectRoot "python\train.py"
-
-if (Test-Path $trainPyPath) {
-	Write-Success "Found train.py: $trainPyPath"
-
-	Write-Info "Checking train.py syntax..."
-	& $venvPython -m py_compile $trainPyPath 2>&1 | Out-Null
-
-	if ($LASTEXITCODE -eq 0) {
-		Write-Success "train.py syntax is OK"
-	} else {
-		Write-Warning-Custom "train.py has syntax errors"
-	}
+$compileResult = Invoke-CommandCapture -FilePath $venvPython -Arguments @("-m", "py_compile", $trainPyPath)
+if ($compileResult.Success) {
+    Write-Success "train.py syntax is OK"
 } else {
-	Write-Error-Custom "train.py not found: $trainPyPath"
+    Write-Warning-Custom "train.py syntax check failed: $($compileResult.Output)"
 }
-
-# ============================================================================
-# 10. config.py Setup (auto-generate via prepare_tub.py)
-# ============================================================================
 
 Write-Header "Configuration File Setup"
-
-# train.py runs with the working directory set to the `python` folder, so
-# donkeycar's load_config() looks for `python\config.py`. We auto-generate it
-# from donkeycar's default template using prepare_tub.py so training works
-# out of the box on a fresh machine.
-$configPath = Join-Path $projectRoot "python\config.py"
-$prepareScript = Join-Path $projectRoot "python\prepare_tub.py"
-
-if (Test-Path $configPath) {
-	Write-Success "Found config.py: $configPath"
-} elseif (Test-Path $prepareScript) {
-	Write-Info "config.py not found. Generating it from donkeycar template..."
-	$pythonDir = Join-Path $projectRoot "python"
-	& $venvPython -c "import os, shutil, donkeycar; src=os.path.join(os.path.dirname(donkeycar.__file__),'templates','cfg_complete.py'); dst=r'$configPath'; shutil.copyfile(src,dst); open(dst,'a',encoding='utf-8').write('\n# ----- setup-environment.ps1 auto settings -----\nSHOW_PLOT = False\nPRINT_MODEL_SUMMARY = True\nCREATE_TF_LITE = False\nCREATE_TENSOR_RT = False\n'); print('config.py created')" 2>&1 | Out-Null
-
-	if (Test-Path $configPath) {
-		Write-Success "config.py generated: $configPath"
-	} else {
-		Write-Warning-Custom "Failed to generate config.py automatically"
-		Write-Info "It will be auto-created on first training run by prepare_tub.py."
-	}
+$configPath = Join-Path $pythonDir "config.py"
+if (Test-Path -LiteralPath $configPath) {
+    Write-Success "Found config.py: $configPath"
+} elseif (Test-Path -LiteralPath $prepareScript) {
+    Write-Info "config.py not found. Generating it from donkeycar's cfg_complete.py template."
+    $configCode = @"
+import os, shutil, donkeycar
+src = os.path.join(os.path.dirname(donkeycar.__file__), 'templates', 'cfg_complete.py')
+dst = r'$configPath'
+shutil.copyfile(src, dst)
+with open(dst, 'a', encoding='utf-8') as f:
+    f.write('\n# ----- setup-environment.ps1 auto settings -----\n')
+    f.write('SHOW_PLOT = False\n')
+    f.write('PRINT_MODEL_SUMMARY = True\n')
+    f.write('CREATE_TF_LITE = False\n')
+    f.write('CREATE_TENSOR_RT = False\n')
+print('config.py created')
+"@
+    $configResult = Invoke-CommandCapture -FilePath $venvPython -Arguments @("-c", $configCode)
+    if ($configResult.Success -and (Test-Path -LiteralPath $configPath)) {
+        Write-Success "config.py generated: $configPath"
+    } else {
+        Write-Warning-Custom "config.py generation failed: $($configResult.Output)"
+        Write-Warning-Custom "prepare_tub.py will try to generate config.py before training."
+    }
 } else {
-	Write-Warning-Custom "config.py not found and prepare_tub.py missing: $configPath"
-	Write-Info "config.py will be auto-created on first training run."
+    Write-Warning-Custom "prepare_tub.py not found. config.py cannot be auto-generated now."
 }
-
-# ============================================================================
-# 11. Environment Test (Optional)
-# ============================================================================
 
 Write-Header "Environment Test"
-
-Write-Info ""
-Write-Info "Run these commands to test the environment:"
-Write-Host ""
-Write-Host "  1. Activate virtual environment:" -ForegroundColor Yellow
-Write-Host "     .\donkey_env\Scripts\Activate.ps1" -ForegroundColor White
-Write-Host ""
-Write-Host "  2. Check train.py help:" -ForegroundColor Yellow
-Write-Host "     python python\train.py --help" -ForegroundColor White
-Write-Host ""
-Write-Host "  3. Check installed packages:" -ForegroundColor Yellow
-Write-Host "     pip list" -ForegroundColor White
-Write-Host ""
-
-# ============================================================================
-# 12. Completion Summary
-# ============================================================================
+$helpResult = Invoke-CommandCapture -FilePath $venvPython -Arguments @($trainPyPath, "--help")
+if ($helpResult.Success) {
+    Write-Success "train.py --help runs successfully"
+} else {
+    Write-Warning-Custom "train.py --help failed: $($helpResult.Output)"
+}
 
 Write-Header "Setup Complete"
-
-Write-Info "Next steps:"
-Write-Info ""
-Write-Host "  1. Open SimpleDonkeyManager.sln in Visual Studio" -ForegroundColor Green
-Write-Host "  2. Build project: Ctrl+Shift+B" -ForegroundColor Green
-Write-Host "  3. Run app: F5 (or SimpleDonkeyManager.exe)" -ForegroundColor Green
-Write-Host "  4. Select training data folder in Data tab" -ForegroundColor Green
-Write-Host "  5. Start training!" -ForegroundColor Green
-Write-Info ""
-
-Write-Info "Setup Summary:"
-Write-Host "  - .NET: $dotnetVersion" -ForegroundColor White
-Write-Host "  - Python: $pythonVersion" -ForegroundColor White
-Write-Host "  - Virtual env: $venvPath" -ForegroundColor White
-Write-Host "  - Installed packages: $($installedPackages.Count)" -ForegroundColor White
+Write-Info "Project root: $projectRoot"
+Write-Info "Virtual env:  $venvPath"
+Write-Info ".NET:         $dotnetVersion"
+Write-Info "Python:       $($python.Version)"
+Write-Info "Verified:     $($installedPackages.Count) package checks passed"
 
 if ($missingPackages.Count -gt 0) {
-	Write-Warning-Custom "Missing packages: $($missingPackages -join ', ')"
-	Write-Info "Install manually:"
-	Write-Host "  $venvPython -m pip install $($missingPackages -join ' ')" -ForegroundColor Yellow
+    Write-Warning-Custom "Missing checks: $($missingPackages -join ', ')"
 }
 
 Write-Info ""
-Write-Info "See DEPLOYMENT_GUIDE.md for troubleshooting."
+Write-Info "Next steps:"
+Write-Host "  1. Build/run the WinForms app." -ForegroundColor Green
+Write-Host "  2. Load DonkeyCar tub data." -ForegroundColor Green
+Write-Host "  3. Start training from the Training screen." -ForegroundColor Green
 Write-Info ""
+Write-Info "Manual test command:"
+Write-Host "  .\donkey_env\Scripts\python.exe python\train.py --help" -ForegroundColor White
 
-# ============================================================================
-# 13. Exit
-# ============================================================================
-
-Read-Host "Press Enter to exit"
+Pause-IfNeeded

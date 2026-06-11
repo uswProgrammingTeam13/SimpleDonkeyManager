@@ -27,6 +27,12 @@ namespace SimpleDonkeyManager.controlutils
         private int rangeStart = -1;
         private int rangeEnd = -1;
 
+        // 제거 예정(pending) 프레임 인덱스 집합. 트랙 하단에 빨간 마커로 표시.
+        private System.Collections.Generic.HashSet<int> pendingRemovedIndices = new System.Collections.Generic.HashSet<int>();
+
+        // 이미 삭제(확정)된 위치 비율(0.0~1.0) 목록. 트랙 하단에 연한 마커로 표시.
+        private System.Collections.Generic.List<double> appliedRemovedRatios = new System.Collections.Generic.List<double>();
+
         // 드래그 상태
         // isPreviewDragging: 일반 클릭&드래그 → 미리보기만(구간 선택 안 함)
         // isRangeDragging: 더블클릭&드래그 → 클릭 지점부터 구간 선택
@@ -66,6 +72,9 @@ namespace SimpleDonkeyManager.controlutils
 
         /// <summary>프레임/구간 선택이 취소되었을 때 발생합니다.</summary>
         public event EventHandler SelectionCleared;
+
+        /// <summary>제거 예정(pending)으로 표시된 프레임 위에서 우클릭하여 취소를 요청했을 때 발생합니다. 인자는 프레임 인덱스입니다.</summary>
+        public event EventHandler<int> PendingRemoveCancelRequested;
 
         // ────────────────────────────────────────────────────────────
         // 공개 속성/메서드
@@ -121,6 +130,58 @@ namespace SimpleDonkeyManager.controlutils
         public void ClearSelection()
         {
             ClearSelectionInternal(true);
+        }
+
+        /// <summary>
+        /// 제거 예정(pending) 프레임 인덱스 집합을 설정합니다. 트랙 하단에 빨간 마커로 표시됩니다.
+        /// </summary>
+        public void SetPendingRemovedIndices(System.Collections.Generic.IEnumerable<int> indices)
+        {
+            pendingRemovedIndices = indices != null
+                ? new System.Collections.Generic.HashSet<int>(indices)
+                : new System.Collections.Generic.HashSet<int>();
+            Invalidate();
+        }
+
+        /// <summary>
+        /// 이미 삭제(확정)된 위치의 비율(0.0~1.0) 목록을 설정합니다. 트랙 하단에 연한 마커로 표시됩니다.
+        /// </summary>
+        public void SetAppliedRemovedRatios(System.Collections.Generic.IEnumerable<double> ratios)
+        {
+            appliedRemovedRatios = ratios != null
+                ? new System.Collections.Generic.List<double>(ratios)
+                : new System.Collections.Generic.List<double>();
+            Invalidate();
+        }
+
+        /// <summary>
+        /// 키보드 탐색용: 고정 앵커를 유지한 채 현재 인덱스를 이동하며 구간을 갱신합니다.
+        /// anchor 와 current 가 같으면 구간 없이 앵커만 유지하고,
+        /// 다르면 anchor~current 구간을 설정하고 RangeSelected 이벤트를 발생시킵니다.
+        /// </summary>
+        public void SetRangeFromAnchor(int anchor, int current)
+        {
+            anchor = Clamp(anchor);
+            current = Clamp(current);
+            currentIndex = current;
+
+            if (anchor == current)
+            {
+                // 같은 지점으로 모이면 구간을 해제하고 앵커만 유지
+                anchorIndex = anchor;
+                rangeStart = -1;
+                rangeEnd = -1;
+                Invalidate();
+            }
+            else
+            {
+                // 앵커는 고정하고 현재 위치까지를 구간으로 설정
+                anchorIndex = anchor;
+                rangeStart = anchor;
+                rangeEnd = current;
+                Invalidate();
+                RaiseRangeSelected();
+            }
         }
 
         private void ClearSelectionInternal(bool raiseEvent)
@@ -195,6 +256,9 @@ namespace SimpleDonkeyManager.controlutils
             if (frameCount <= 0)
                 return;
 
+            // 제거 마커 (트랙 하단). 구간/현재 마커보다 먼저 그려 배경처럼 깔리게 함.
+            DrawRemovalMarks(g, track);
+
             // 구간 하이라이트
             if (HasRange)
             {
@@ -242,6 +306,46 @@ namespace SimpleDonkeyManager.controlutils
             }
         }
 
+        /// <summary>
+        /// 트랙 하단에 제거 마커를 그립니다.
+        /// - 이미 삭제(확정)된 위치: 연한 회색 눈금
+        /// - 제거 예정(pending) 위치: 진한 빨간 눈금
+        /// </summary>
+        private void DrawRemovalMarks(Graphics g, Rectangle track)
+        {
+            int markTop = track.Bottom + 1;
+            int markHeight = 5;
+
+            // 이미 삭제된 위치 (연한 마커) — 비율 기반
+            if (appliedRemovedRatios != null && appliedRemovedRatios.Count > 0)
+            {
+                using (var appliedPen = new Pen(Color.FromArgb(150, 170, 170, 170), 1f))
+                {
+                    foreach (double ratio in appliedRemovedRatios)
+                    {
+                        double r = Math.Max(0.0, Math.Min(1.0, ratio));
+                        int x = track.Left + (int)Math.Round(r * track.Width);
+                        g.DrawLine(appliedPen, x, markTop, x, markTop + markHeight);
+                    }
+                }
+            }
+
+            // 제거 예정 위치 (진한 빨강 마커) — 인덱스 기반
+            if (pendingRemovedIndices != null && pendingRemovedIndices.Count > 0)
+            {
+                using (var pendingPen = new Pen(Color.FromArgb(230, 60, 60), 2f))
+                {
+                    foreach (int idx in pendingRemovedIndices)
+                    {
+                        if (idx < 0 || idx >= frameCount)
+                            continue;
+                        int x = XFromIndex(idx);
+                        g.DrawLine(pendingPen, x, markTop, x, markTop + markHeight + 2);
+                    }
+                }
+            }
+        }
+
         // ────────────────────────────────────────────────────────────
         // 마우스 상호작용
         // ────────────────────────────────────────────────────────────
@@ -254,7 +358,13 @@ namespace SimpleDonkeyManager.controlutils
 
             if (e.Button == MouseButtons.Right)
             {
-                // 우클릭: 프레임/구간 선택 취소
+                // 우클릭: 제거 예정 프레임 위면 취소 요청, 아니면 프레임/구간 선택 취소
+                int idx = IndexFromX(e.X);
+                if (pendingRemovedIndices != null && pendingRemovedIndices.Contains(idx))
+                {
+                    PendingRemoveCancelRequested?.Invoke(this, idx);
+                    return;
+                }
                 ClearSelectionInternal(true);
                 return;
             }
