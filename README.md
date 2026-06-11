@@ -42,7 +42,7 @@ powershell.exe -ExecutionPolicy Bypass -File setup-environment.ps1
 
 자동 설정 스크립트는 다음 작업을 처리합니다.
 
-- .NET 10 설치 여부 확인
+- .NET 10 설치 여부 확인.
 - Python 3.10 이상 감지
 - `donkey_env` 가상환경 생성 또는 복구
 - DonkeyCar 학습에 필요한 패키지 설치
@@ -125,6 +125,7 @@ Visual Studio에서 솔루션을 열어 실행해도 됩니다.
 ## 지원 데이터 형식
 
 DonkeyCar tub 데이터 형식을 기준으로 합니다.
+
 
 ```text
 data_folder/
