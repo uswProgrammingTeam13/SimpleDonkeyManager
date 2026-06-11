@@ -22,6 +22,26 @@ namespace SimpleDonkeyManager
         private int originalTotalFrameCount = 0;
         private Logger logger;
 
+        /// <summary>
+        /// 제거 예정(pending) 프레임 번호 집합. "필터 적용"을 누르기 전까지 실제 삭제하지 않고 시각 표시만 합니다.
+        /// </summary>
+        private readonly HashSet<int> pendingRemovedNumbers = new HashSet<int>();
+
+        /// <summary>
+        /// 필터 적용 버튼의 원래 배경색. 제거 예정 강조 후 복원에 사용합니다.
+        /// </summary>
+        private Color? filterStartOriginalBackColor = null;
+
+        /// <summary>
+        /// 필터 스냅샷(버전) 저장소. 데이터 폴더 로드 시 초기화됩니다.
+        /// </summary>
+        private SnapshotStore snapshotStore;
+
+        /// <summary>
+        /// 현재 열려 있는 스냅샷 내역 창 (non-modal, 단일 인스턴스).
+        /// </summary>
+        private SnapshotHistoryForm snapshotHistoryForm;
+
         public DataFilterControl()
         {
             InitializeComponent();
@@ -57,6 +77,9 @@ namespace SimpleDonkeyManager
 
             // ImageViewer가 일시정지/정지 시 현재 프레임을 ImageList에서 선택하도록 연결
             imageViewer.SetLinkedImageList(imageList);
+
+            // 제거 예정 프레임 우클릭 취소 요청 처리
+            imageViewer.PendingRemoveCancelRequested += ImageViewer_PendingRemoveCancelRequested;
 
             // 버튼 이벤트
             btnFilterStart.Click += BtnFilterStart_Click;
@@ -190,6 +213,9 @@ namespace SimpleDonkeyManager
 
                 // 삭제 되돌리기 버튼 상태 갱신
                 UpdateUndoButtonState();
+
+                // 스냅샷 저장소 초기화 및 마지막 작성자 ID 복원
+                InitializeSnapshotStore();
 
                 LogInfo($"필터 컨트롤에 데이터 로드됨: {frameDataList.Count}개 프레임");
             }
@@ -453,6 +479,16 @@ namespace SimpleDonkeyManager
                     .Distinct()
                     .ToList();
 
+                // 사용자가 수동으로 '제거 예정'으로 표시한 프레임도 함께 제외 대상에 포함
+                int pendingCount = pendingRemovedNumbers.Count;
+                if (pendingCount > 0)
+                {
+                    var combined = new HashSet<int>(removeNumbers);
+                    foreach (int n in pendingRemovedNumbers)
+                        combined.Add(n);
+                    removeNumbers = combined.ToList();
+                }
+
                 if (removeNumbers.Count == 0)
                 {
                     MessageBox.Show("필터 조건에 해당하여 제외되는 프레임이 없습니다.", "필터 적용", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -461,8 +497,12 @@ namespace SimpleDonkeyManager
                     return;
                 }
 
+                string pendingInfo = pendingCount > 0
+                    ? $"(수동으로 표시한 제거 예정 {pendingCount:N0}개 포함)\n"
+                    : "";
                 var confirm = MessageBox.Show(
                     $"필터 조건에 따라 {removeNumbers.Count:N0}개의 프레임이 제외됩니다.\n" +
+                    pendingInfo +
                     "제외된 프레임은 filtered 폴더로 백업되며 [필터 초기화] 또는 [삭제 되돌리기]로 복구할 수 있습니다.\n\n계속하시겠습니까?",
                     "필터 적용 확인", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if (confirm != DialogResult.OK)
@@ -474,6 +514,10 @@ namespace SimpleDonkeyManager
                 // 실제 파일을 filtered 폴더로 백업하며 제거
                 int actuallyRemoved = imageManager.RemoveFrames(removeNumbers);
                 LogInfo($"필터 적용: {actuallyRemoved}개 프레임 제거 및 filtered 백업 완료");
+
+                // 제거 예정 상태 초기화 (필터 적용으로 확정됨)
+                pendingRemovedNumbers.Clear();
+                UpdatePendingUi();
 
                 // 메모리 목록 갱신 (제거된 프레임 반영)
                 originalFrameDataList = imageManager.GetAllFrameData();
@@ -573,6 +617,9 @@ namespace SimpleDonkeyManager
 
                 LogInfo($"직전 삭제 되돌리기 완료 (현재 프레임: {filteredFrameDataList.Count}개)");
 
+                // 프레임 목록이 갱신되었으므로 제거 예정 마커 재동기화
+                UpdatePendingUi();
+
                 if (filteredFrameDataList.Count > 0 && imageList != null)
                 {
                     try { imageList.SelectFrame(0); }
@@ -630,6 +677,10 @@ namespace SimpleDonkeyManager
 
                 UpdateStatistics();
                 UpdateUndoButtonState();
+
+                // 외부에서 삭제 상태가 교체되었으므로 제거 예정 상태 초기화
+                pendingRemovedNumbers.Clear();
+                UpdatePendingUi();
 
                 if (filteredFrameDataList.Count > 0 && imageList != null)
                 {
@@ -691,6 +742,10 @@ namespace SimpleDonkeyManager
                 }
                 UpdateStatistics();
 
+                // 제거 예정 상태도 초기화 (모든 프레임 복원됨)
+                pendingRemovedNumbers.Clear();
+                UpdatePendingUi();
+
                 LogInfo("필터가 초기화됨 (모든 프레임 복원)");
 
                 // 첫 번째 프레임 선택
@@ -716,6 +771,89 @@ namespace SimpleDonkeyManager
             finally
             {
                 UpdateUndoButtonState();
+            }
+        }
+
+        /// <summary>
+        /// 제거 예정(pending) 집합을 ImageViewer/타임라인과 라벨/버튼 강조에 반영합니다.
+        /// </summary>
+        private void UpdatePendingUi()
+        {
+            try
+            {
+                if (imageViewer != null)
+                    imageViewer.SetPendingRemovedNumbers(pendingRemovedNumbers);
+
+                int count = pendingRemovedNumbers.Count;
+
+                if (lblPendingRemove != null)
+                {
+                    if (count > 0)
+                    {
+                        lblPendingRemove.Text = $"제거 예정 {count:N0}개 · 필터 적용을 눌러 확정";
+                        lblPendingRemove.Visible = true;
+                    }
+                    else
+                    {
+                        lblPendingRemove.Visible = false;
+                    }
+                }
+
+                // 필터 적용 버튼 강조 (제거 예정이 있을 때만)
+                if (btnFilterStart != null)
+                {
+                    if (filterStartOriginalBackColor == null)
+                        filterStartOriginalBackColor = btnFilterStart.BackColor;
+
+                    if (count > 0)
+                    {
+                        btnFilterStart.BackColor = Color.FromArgb(220, 53, 69);
+                        btnFilterStart.ForeColor = Color.White;
+                        btnFilterStart.Font = new Font(btnFilterStart.Font, FontStyle.Bold);
+                    }
+                    else
+                    {
+                        btnFilterStart.BackColor = filterStartOriginalBackColor.Value;
+                        btnFilterStart.ForeColor = SystemColors.ControlText;
+                        btnFilterStart.Font = new Font(btnFilterStart.Font, FontStyle.Regular);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"제거 예정 UI 갱신 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 제거 예정으로 표시된 프레임을 우클릭하여 취소를 요청했을 때 호출됩니다.
+        /// 사용자 확인 후 해당 프레임을 제거 예정에서 해제합니다.
+        /// </summary>
+        private void ImageViewer_PendingRemoveCancelRequested(object sender, int frameNumber)
+        {
+            try
+            {
+                if (!pendingRemovedNumbers.Contains(frameNumber))
+                    return;
+
+                var confirm = MessageBox.Show(
+                    $"Frame {frameNumber}의 제거 예정을 취소하시겠습니까?",
+                    "제거 예정 취소", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (confirm != DialogResult.Yes)
+                    return;
+
+                pendingRemovedNumbers.Remove(frameNumber);
+                UpdatePendingUi();
+
+                MainWindow mainWindow = FindMainWindow();
+                mainWindow?.SetStatusMessage(
+                    $"② 데이터 필터링 —  Frame {frameNumber} 제거 예정 취소됨  (남은 제거 예정: {pendingRemovedNumbers.Count:N0}개)",
+                    MainWindow.StatusLevel.Info);
+                LogInfo($"Frame {frameNumber} 제거 예정 취소");
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"제거 예정 취소 예외: {ex.Message}");
             }
         }
 
@@ -759,66 +897,21 @@ namespace SimpleDonkeyManager
 
                 int frameNumber = selectedFrame.FrameNumber;
 
-                // 실제 폴더의 이미지/identifier/catalog에서 해당 프레임 삭제 (filtered 폴더로 백업)
-                if (imageManager != null)
+                // 즉시 삭제하지 않고 '제거 예정'으로 등록 (필터 적용 시 확정)
+                if (pendingRemovedNumbers.Contains(frameNumber))
                 {
-                    bool fileRemoved = imageManager.RemoveFrame(frameNumber);
-                    if (!fileRemoved)
-                    {
-                        LogWarning($"프레임 {frameNumber} 실제 파일 삭제 실패 또는 대상 파일 없음");
-                    }
-                    else
-                    {
-                        LogInfo($"프레임 {frameNumber} 실제 파일 삭제 및 filtered 백업 완료");
-                    }
-                }
-
-                // 필터링된 리스트에서 제거
-                bool removed = filteredFrameDataList.Remove(selectedFrame);
-                if (!removed)
-                {
-                    // 참조가 다를 수 있으므로 FrameNumber로 다시 시도
-                    int removedCount = filteredFrameDataList.RemoveAll(f => f != null && f.FrameNumber == frameNumber);
-                    removed = removedCount > 0;
-                }
-
-                // 원본 리스트에서도 제거하여 필터 미리보기/적용 시 재등장 방지
-                originalFrameDataList?.RemoveAll(f => f != null && f.FrameNumber == frameNumber);
-
-                if (!removed)
-                {
-                    LogWarning($"프레임 {frameNumber} 제거 실패: 리스트에서 찾을 수 없음");
+                    LogInfo($"프레임 {frameNumber}은(는) 이미 제거 예정 상태입니다");
                     return;
                 }
 
-                // UI 갱신
-                imageList.LoadFrames(filteredFrameDataList);
-                if (imageViewer != null && imageManager != null)
-                {
-                    // ImageViewer의 내부 프레임 목록도 갱신
-                    imageViewer.SetImageManager(imageManager);
-                }
-                UpdateStatistics();
+                pendingRemovedNumbers.Add(frameNumber);
+                UpdatePendingUi();
 
-                // 인접 프레임으로 선택 이동
-                if (filteredFrameDataList.Count > 0)
-                {
-                    int nextIndex = Math.Min(selectedIndex, filteredFrameDataList.Count - 1);
-                    try
-                    {
-                        imageList.SelectFrame(nextIndex);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogWarning($"인접 프레임 선택 실패: {ex.Message}");
-                    }
-                }
-
-                LogInfo($"프레임 {frameNumber} 제거됨 (남은 프레임: {filteredFrameDataList.Count}개)");
+                LogInfo($"프레임 {frameNumber} 제거 예정 등록 (제거 예정: {pendingRemovedNumbers.Count}개)");
 
                 MainWindow mainWindow = FindMainWindow();
                 mainWindow?.SetStatusMessage(
-                    $"② 데이터 필터링 —  Frame {frameNumber} 제거됨  (남은 프레임: {filteredFrameDataList.Count:N0}개)",
+                    $"② 데이터 필터링 —  Frame {frameNumber} 제거 예정  (총 제거 예정: {pendingRemovedNumbers.Count:N0}개)  ·  [필터 적용]을 눌러 확정",
                     MainWindow.StatusLevel.Info);
             }
             catch (Exception ex)
@@ -867,46 +960,31 @@ namespace SimpleDonkeyManager
                 }
 
                 var confirm = MessageBox.Show(
-                    $"선택된 구간의 {removeNumbers.Count:N0}개 프레임을 제거합니다.\n" +
-                    "제거된 프레임은 filtered 폴더로 백업되며 [삭제 되돌리기] 또는 [필터 초기화]로 복구할 수 있습니다.\n\n계속하시겠습니까?",
-                    "선택 구간 프레임 제거", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    $"선택된 구간의 {removeNumbers.Count:N0}개 프레임을 제거 예정으로 표시합니다.\n" +
+                    "표시된 프레임은 빨갛게 표시되며, [필터 적용]을 눌러야 실제로 제거됩니다.\n\n계속하시겠습니까?",
+                    "선택 구간 제거 예정", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (confirm != DialogResult.Yes)
                     return;
 
-                // 실제 파일을 filtered 폴더로 백업하며 일괄 제거
-                int actuallyRemoved = imageManager != null ? imageManager.RemoveFrames(removeNumbers) : 0;
-
-                // 복구된 디스크 상태로 메모리 목록 갱신
-                if (imageManager != null)
+                // 즉시 삭제하지 않고 '제거 예정'으로 등록 (필터 적용 시 확정)
+                int newlyAdded = 0;
+                foreach (int num in removeNumbers)
                 {
-                    originalFrameDataList = imageManager.GetAllFrameData();
-                    filteredFrameDataList = new List<FrameData>(originalFrameDataList);
+                    if (pendingRemovedNumbers.Add(num))
+                        newlyAdded++;
                 }
 
-                // UI 갱신
-                if (imageList != null)
-                    imageList.LoadFrames(filteredFrameDataList);
-                if (imageViewer != null && imageManager != null)
-                    imageViewer.SetImageManager(imageManager);
+                // 구간 선택 해제 후 마커/오버레이 갱신
+                if (imageViewer != null)
+                    imageViewer.ClearTimelineSelection();
+                UpdatePendingUi();
 
-                UpdateStatistics();
-
-                // 첫 번째 프레임 선택
-                if (filteredFrameDataList.Count > 0 && imageList != null)
-                {
-                    try { imageList.SelectFrame(0); }
-                    catch (Exception ex) { LogWarning($"첫 번째 프레임 선택 실패: {ex.Message}"); }
-                }
-
-                LogInfo($"선택 구간 프레임 제거 완료: {actuallyRemoved}개 제거 (남은 프레임: {filteredFrameDataList.Count}개)");
+                LogInfo($"선택 구간 제거 예정 등록: {newlyAdded}개 추가 (총 제거 예정: {pendingRemovedNumbers.Count}개)");
 
                 MainWindow mainWindow = FindMainWindow();
                 mainWindow?.SetStatusMessage(
-                    $"② 데이터 필터링 —  선택 구간 {actuallyRemoved:N0}개 프레임 제거됨  (남은 프레임: {filteredFrameDataList.Count:N0}개)",
+                    $"② 데이터 필터링 —  선택 구간 {newlyAdded:N0}개 프레임 제거 예정  (총 제거 예정: {pendingRemovedNumbers.Count:N0}개)  ·  [필터 적용]을 눌러 확정",
                     MainWindow.StatusLevel.Info);
-
-                MessageBox.Show($"선택 구간의 {actuallyRemoved:N0}개 프레임이 제거되었습니다.\n(남은 프레임: {filteredFrameDataList.Count:N0}개)",
-                    "선택 구간 프레임 제거", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -1357,6 +1435,264 @@ namespace SimpleDonkeyManager
         private void chkThrottle_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+
+        /// <summary>
+        /// 스냅샷 저장소를 초기화하고, 마지막 스냅샷의 작성자 ID를 입력란에 복원합니다.
+        /// </summary>
+        private void InitializeSnapshotStore()
+        {
+            try
+            {
+                if (imageManager == null)
+                    return;
+
+                string managerFolder = imageManager.ManagerFolderPath;
+                if (string.IsNullOrEmpty(managerFolder))
+                    return;
+
+                snapshotStore = new SnapshotStore(managerFolder);
+
+                // 마지막 스냅샷의 작성자 ID 복원 (메모는 복원하지 않음)
+                if (txtSnapshotAuthor != null)
+                    txtSnapshotAuthor.Text = snapshotStore.LastAuthorId;
+
+                // 내역 창이 열려 있으면 갱신
+                RefreshSnapshotHistory();
+
+                LogInfo($"스냅샷 저장소 초기화 완료 ({snapshotStore.Snapshots.Count}개 스냅샷)");
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"스냅샷 저장소 초기화 오류: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 현재 삭제(제외) 상태를 새 스냅샷으로 저장합니다.
+        /// </summary>
+        private void btnSaveSnapshot_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (imageManager == null)
+                {
+                    MessageBox.Show("저장할 데이터가 없습니다. 먼저 데이터 폴더를 불러오세요.",
+                        "스냅샷 저장", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (snapshotStore == null)
+                    InitializeSnapshotStore();
+
+                if (snapshotStore == null)
+                {
+                    MessageBox.Show("스냅샷 저장소를 초기화할 수 없습니다.",
+                        "스냅샷 저장", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                string authorId = txtSnapshotAuthor?.Text?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(authorId))
+                {
+                    MessageBox.Show("작성자 ID를 입력하세요.",
+                        "스냅샷 저장", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtSnapshotAuthor?.Focus();
+                    return;
+                }
+
+                string memo = txtSnapshotMemo?.Text?.Trim() ?? string.Empty;
+
+                var deletedFrames = imageManager.GetCurrentDeletedFrameNumbers();
+                var snapshot = snapshotStore.Add(authorId, memo, deletedFrames);
+
+                // 저장 후 메모 입력란 비우기 (작성자 ID는 유지)
+                if (txtSnapshotMemo != null)
+                    txtSnapshotMemo.Text = string.Empty;
+
+                RefreshSnapshotHistory();
+
+                LogInfo($"스냅샷 저장됨: 작성자={authorId}, 삭제={snapshot.DeletedCount}개");
+
+                MainWindow mainWindow = FindMainWindow();
+                mainWindow?.SetStatusMessage(
+                    $"필터 스냅샷이 저장되었습니다. (제외 프레임 {snapshot.DeletedCount}개)",
+                    MainWindow.StatusLevel.Success);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"스냅샷 저장 중 오류 발생: {ex.Message}",
+                    "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"스냅샷 저장 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 스냅샷 내역 창을 엽니다. (non-modal, 메인 창 오른쪽에 배치)
+        /// </summary>
+        private void btnSnapshotHistory_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (imageManager == null)
+                {
+                    MessageBox.Show("먼저 데이터 폴더를 불러오세요.",
+                        "스냅샷 내역", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (snapshotStore == null)
+                    InitializeSnapshotStore();
+
+                // 이미 열려 있으면 앞으로 가져오기
+                if (snapshotHistoryForm != null && !snapshotHistoryForm.IsDisposed)
+                {
+                    snapshotHistoryForm.RefreshList();
+                    snapshotHistoryForm.BringToFront();
+                    snapshotHistoryForm.Activate();
+                    return;
+                }
+
+                snapshotHistoryForm = new SnapshotHistoryForm(this);
+                snapshotHistoryForm.FormClosed += (s, args) => snapshotHistoryForm = null;
+
+                // 메인 창 오른쪽에 배치하되, 화면 밖으로 나가지 않도록 보정
+                MainWindow mainWindow = FindMainWindow();
+                PositionHistoryForm(snapshotHistoryForm, mainWindow);
+
+                snapshotHistoryForm.Show(mainWindow);
+                snapshotHistoryForm.BringToFront();
+                snapshotHistoryForm.Activate();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"스냅샷 내역 창을 여는 중 오류 발생: {ex.Message}",
+                    "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogWarning($"스냅샷 내역 창 예외: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 내역 창을 메인 창 오른쪽에 배치하되, 화면 작업 영역을 벗어나면
+        /// 화면 안쪽(오른쪽 정렬 또는 메인 창 위에 겹치기)으로 보정합니다.
+        /// </summary>
+        private void PositionHistoryForm(SnapshotHistoryForm form, MainWindow mainWindow)
+        {
+            try
+            {
+                form.StartPosition = FormStartPosition.Manual;
+
+                Rectangle anchor = mainWindow != null ? mainWindow.Bounds : this.Bounds;
+                Rectangle workingArea = Screen.FromRectangle(anchor).WorkingArea;
+
+                int width = form.Width;
+                int height = form.Height;
+
+                // 1순위: 메인 창 오른쪽
+                int x = anchor.Right + 5;
+                int y = anchor.Top;
+
+                // 오른쪽에 공간이 부족하면 화면 오른쪽 끝에 붙임
+                if (x + width > workingArea.Right)
+                    x = workingArea.Right - width;
+
+                // 그래도 메인 창과 너무 겹치면 화면 왼쪽 경계까지만 보정
+                if (x < workingArea.Left)
+                    x = workingArea.Left;
+
+                // 세로 위치 보정
+                if (y + height > workingArea.Bottom)
+                    y = workingArea.Bottom - height;
+                if (y < workingArea.Top)
+                    y = workingArea.Top;
+
+                form.Location = new Point(x, y);
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"내역 창 위치 보정 오류: {ex.Message}");
+                form.StartPosition = FormStartPosition.CenterScreen;
+            }
+        }
+
+        /// <summary>
+        /// 스냅샷 내역 창에서 사용할 저장소를 반환합니다.
+        /// </summary>
+        public SnapshotStore GetSnapshotStore() => snapshotStore;
+
+        /// <summary>
+        /// 지정한 스냅샷 시점으로 데이터 상태를 되돌립니다.
+        /// 현재 삭제 상태를 모두 복구한 뒤 스냅샷의 삭제 집합을 다시 적용합니다.
+        /// </summary>
+        public bool LoadSnapshot(string snapshotId)
+        {
+            try
+            {
+                if (imageManager == null || snapshotStore == null)
+                    return false;
+
+                var snapshot = snapshotStore.GetById(snapshotId);
+                if (snapshot == null)
+                {
+                    LogWarning($"불러올 스냅샷을 찾을 수 없습니다: {snapshotId}");
+                    return false;
+                }
+
+                bool ok = imageManager.ApplyDeletedFrameNumbers(snapshot.DeletedFrameNumbers);
+                if (!ok)
+                {
+                    LogWarning("스냅샷 적용에 실패했습니다.");
+                    return false;
+                }
+
+                // 메모리 목록/리스트/뷰어/통계 동기화
+                RefreshAfterExternalChange();
+
+                LogInfo($"스냅샷 불러오기 완료: 작성자={snapshot.AuthorId}, 삭제={snapshot.DeletedCount}개");
+
+                MainWindow mainWindow = FindMainWindow();
+                mainWindow?.SetStatusMessage(
+                    $"스냅샷을 불러왔습니다. (제외 프레임 {snapshot.DeletedCount}개)",
+                    MainWindow.StatusLevel.Success);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"스냅샷 불러오기 예외: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 지정한 스냅샷을 이력에서만 제거합니다. (실제 데이터는 변경하지 않음)
+        /// </summary>
+        public bool DeleteSnapshot(string snapshotId)
+        {
+            try
+            {
+                if (snapshotStore == null)
+                    return false;
+
+                bool removed = snapshotStore.Remove(snapshotId);
+                if (removed)
+                    LogInfo($"스냅샷 이력 제거됨: {snapshotId}");
+                return removed;
+            }
+            catch (Exception ex)
+            {
+                LogWarning($"스냅샷 제거 예외: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 내역 창이 열려 있으면 목록을 다시 로드합니다.
+        /// </summary>
+        private void RefreshSnapshotHistory()
+        {
+            if (snapshotHistoryForm != null && !snapshotHistoryForm.IsDisposed)
+                snapshotHistoryForm.RefreshList();
         }
 
         /// <summary>

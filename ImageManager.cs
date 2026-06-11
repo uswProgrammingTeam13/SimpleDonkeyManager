@@ -53,6 +53,12 @@ namespace SimpleDonkeyManager
         private string filteredFolderPath;
 
         /// <summary>
+        /// 스냅샷/백업 등 프로그램 관리 데이터를 보관하는 SimpleDonkeyManager 폴더 경로.
+        /// 이미지 폴더 하위에 생성됩니다. (예: {images}/SimpleDonkeyManager)
+        /// </summary>
+        private string managerFolderPath;
+
+        /// <summary>
         /// 직전 삭제(RemoveFrames) 때 filtered 폴더로 이동된 파일들의 파일명 목록.
         /// "삭제 되돌리기"(UndoLastRemove)에서 이 파일들만 원위치로 복구합니다.
         /// </summary>
@@ -133,6 +139,36 @@ namespace SimpleDonkeyManager
         }
 
         /// <summary>
+        /// 스냅샷/백업 등 프로그램 관리 데이터를 보관하는 SimpleDonkeyManager 폴더 경로.
+        /// 폴더가 아직 없으면 생성합니다. 데이터 폴더가 로드되지 않은 경우 null을 반환합니다.
+        /// </summary>
+        public string ManagerFolderPath
+        {
+            get
+            {
+                try
+                {
+                    if (string.IsNullOrEmpty(managerFolderPath))
+                    {
+                        if (string.IsNullOrEmpty(imagesFolderPath))
+                            return null;
+                        managerFolderPath = Path.Combine(imagesFolderPath, "SimpleDonkeyManager");
+                    }
+
+                    if (!Directory.Exists(managerFolderPath))
+                        Directory.CreateDirectory(managerFolderPath);
+
+                    return managerFolderPath;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ManagerFolderPath 오류: {ex.Message}");
+                    return managerFolderPath;
+                }
+            }
+        }
+
+        /// <summary>
         /// 로드된 프레임 데이터 목록.
         /// </summary>
         public List<FrameData> FrameDataList
@@ -169,8 +205,11 @@ namespace SimpleDonkeyManager
                 if (string.IsNullOrEmpty(imagesFolderPath) || !Directory.Exists(imagesFolderPath))
                     return false;
 
-                // filtered 백업 폴더는 이미지 폴더 기준으로 둔다
-                filteredFolderPath = Path.Combine(imagesFolderPath, "filtered");
+                // 관리용 폴더(SimpleDonkeyManager)와 그 하위 filtered 백업 폴더는 이미지 폴더 기준으로 둔다.
+                // 기존 {images}/filtered 폴더가 있으면 새 위치로 마이그레이션한다.
+                managerFolderPath = Path.Combine(imagesFolderPath, "SimpleDonkeyManager");
+                filteredFolderPath = Path.Combine(managerFolderPath, "Filtered");
+                MigrateLegacyFilteredFolder();
 
                 try
                 {
@@ -1176,6 +1215,77 @@ namespace SimpleDonkeyManager
         }
 
         /// <summary>
+        /// 현재 filtered 폴더에 백업되어 있는(=현재 삭제 상태인) 프레임 번호 집합을 반환합니다.
+        /// 스냅샷 저장 시 현재 상태를 표현하는 기준이 됩니다.
+        /// </summary>
+        public List<int> GetCurrentDeletedFrameNumbers()
+        {
+            var result = new List<int>();
+            try
+            {
+                if (string.IsNullOrEmpty(filteredFolderPath) || !Directory.Exists(filteredFolderPath))
+                    return result;
+
+                var set = new HashSet<int>();
+                foreach (string filePath in Directory.GetFiles(filteredFolderPath, "*.jpg"))
+                {
+                    if (IsZoneIdentifierArtifact(filePath))
+                        continue;
+
+                    string num = ExtractFrameNumber(Path.GetFileNameWithoutExtension(filePath));
+                    if (int.TryParse(num, out int n))
+                        set.Add(n);
+                }
+
+                result = set.OrderBy(x => x).ToList();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"현재 삭제 프레임 집합 조회 오류: {ex.Message}");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 데이터셋을 목표 삭제 프레임 집합 상태로 전환합니다.
+        /// 현재 삭제된 모든 프레임을 원위치로 복구한 뒤, 목표 프레임들을 다시 삭제합니다.
+        /// 스냅샷(특정 시점)으로 되돌릴 때 사용합니다.
+        /// </summary>
+        public bool ApplyDeletedFrameNumbers(IEnumerable<int> targetFrameNumbers)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(imagesFolderPath) || !Directory.Exists(imagesFolderPath))
+                    return false;
+
+                var target = new HashSet<int>(targetFrameNumbers ?? Enumerable.Empty<int>());
+
+                // 1) 현재 삭제 상태를 모두 복구 (filtered 폴더 비우기)
+                if (!string.IsNullOrEmpty(filteredFolderPath) && Directory.Exists(filteredFolderPath)
+                    && Directory.GetFiles(filteredFolderPath).Length > 0)
+                {
+                    RestoreAllFrames(); // 내부에서 ScanFolder 호출
+                }
+                else
+                {
+                    // 복구할 게 없으면 메모리 일관성을 위해 재스캔
+                    ScanFolder(selectedFolderPath);
+                }
+
+                // 2) 목표 프레임 삭제 적용
+                if (target.Count > 0)
+                    RemoveFrames(target);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"삭제 프레임 집합 적용 오류: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 되돌릴 수 있는 직전 삭제 내역이 있는지 여부.
         /// </summary>
         public bool CanUndoLastRemove
@@ -1190,15 +1300,71 @@ namespace SimpleDonkeyManager
         {
             try
             {
-                if (string.IsNullOrEmpty(filteredFolderPath))
-                    filteredFolderPath = Path.Combine(imagesFolderPath, "filtered");
+                if (string.IsNullOrEmpty(managerFolderPath) && !string.IsNullOrEmpty(imagesFolderPath))
+                    managerFolderPath = Path.Combine(imagesFolderPath, "SimpleDonkeyManager");
 
-                if (!Directory.Exists(filteredFolderPath))
+                if (string.IsNullOrEmpty(filteredFolderPath) && !string.IsNullOrEmpty(managerFolderPath))
+                    filteredFolderPath = Path.Combine(managerFolderPath, "Filtered");
+
+                if (!string.IsNullOrEmpty(managerFolderPath) && !Directory.Exists(managerFolderPath))
+                    Directory.CreateDirectory(managerFolderPath);
+
+                if (!string.IsNullOrEmpty(filteredFolderPath) && !Directory.Exists(filteredFolderPath))
                     Directory.CreateDirectory(filteredFolderPath);
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"filtered 폴더 생성 오류: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 기존 버전에서 사용하던 {images}/filtered 폴더가 있으면
+        /// 새 위치({images}/SimpleDonkeyManager/Filtered)로 파일을 이전합니다.
+        /// </summary>
+        private void MigrateLegacyFilteredFolder()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(imagesFolderPath))
+                    return;
+
+                string legacyPath = Path.Combine(imagesFolderPath, "filtered");
+                if (!Directory.Exists(legacyPath))
+                    return;
+
+                // 새 위치가 기존 위치와 동일하면(이론상 없음) 건너뛴다.
+                if (string.Equals(Path.GetFullPath(legacyPath), Path.GetFullPath(filteredFolderPath ?? ""), StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                EnsureFilteredFolder();
+
+                foreach (string filePath in Directory.GetFiles(legacyPath))
+                {
+                    try
+                    {
+                        string destPath = Path.Combine(filteredFolderPath, Path.GetFileName(filePath));
+                        if (File.Exists(destPath))
+                            File.Delete(destPath);
+                        File.Move(filePath, destPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"filtered 마이그레이션 파일 이동 오류: {filePath}, {ex.Message}");
+                    }
+                }
+
+                // 비워진 기존 폴더 삭제 시도
+                try
+                {
+                    if (Directory.GetFiles(legacyPath).Length == 0 && Directory.GetDirectories(legacyPath).Length == 0)
+                        Directory.Delete(legacyPath);
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"filtered 폴더 마이그레이션 오류: {ex.Message}");
             }
         }
 

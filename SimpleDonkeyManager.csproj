@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>resources\donkeycar_data_manager.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

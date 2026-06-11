@@ -25,6 +25,9 @@ namespace SimpleDonkeyManager
         private bool isFiltered = false;  // 필터 여부
         private bool userStopped = false; // 사용자가 학습을 중지했는지 여부
         private int currentEpoch = 0;     // 로그에서 추적한 현재 에포크 (loss 줄에 epoch이 없을 때 사용)
+        private int totalEpochs = 0;      // 전체 에포크 수 (Epoch x/total 에서 추출)
+        private double lastTrendMetric = double.NaN; // 직전 에포크의 정확도(또는 loss 폴백) 추적용
+        private int lastLabelEpoch = 0;   // 라벨을 마지막으로 갱신한 에포크 (에포크당 1회 갱신 보장)
         private ChartDataModel chartDataModel = new ChartDataModel();  // 그래프 데이터 모델
         private PlotView plotView = null;  // OxyPlot 뷰어
         private PlotModel plotModel = null;  // 플롯 모델 (Donkey UI 형식)
@@ -473,6 +476,16 @@ namespace SimpleDonkeyManager
                 btnStartTraining.Text = "⏹ 학습 중지";
                 prgTrainingProgress.Value = 0;
                 lstTrainingLog.Items.Clear();
+
+                // 진행 정보 라벨 초기화
+                currentEpoch = 0;
+                totalEpochs = 0;
+                lastTrendMetric = double.NaN;
+                lastLabelEpoch = 0;
+                lblEpochInfo.Text = "Epoch -/-";
+                lblEpochInfo.ForeColor = Color.FromArgb(40, 40, 40);
+                lblAccuracyTrend.Text = "정확성 증가율 : -%";
+                lblAccuracyTrend.ForeColor = Color.FromArgb(40, 40, 40);
 
                 // 상태막 업데이트
                 FindMainWindow()?.SetStatusMessage(
@@ -991,6 +1004,7 @@ namespace SimpleDonkeyManager
                     {
                         // 현재 에포크 추적 (loss 줄에는 Epoch 정보가 없는 경우가 많으므로 별도 보관)
                         currentEpoch = current;
+                        totalEpochs = total;
 
                         int progress = (int)((double)current / total * 100);
                         if (prgTrainingProgress != null && !prgTrainingProgress.IsDisposed)
@@ -1049,11 +1063,143 @@ namespace SimpleDonkeyManager
                     {
                         UpdateChartWithMetric(epochNum, trainLoss.Value, valLoss);
                     }
+
+                    // 라벨(에포크/정확성 증가율)은 "에포크가 완료될 때"만 갱신합니다.
+                    // Keras는 한 에포크 안에서 진행 줄(ETA: 포함)을 여러 번 출력하므로,
+                    // 진행 중 줄은 제외하고(= ETA: 없음) 에포크당 1회만 반영합니다.
+                    bool isEpochCompletionLine = !logLine.Contains("ETA:");
+                    if (epochNum > 0 && isEpochCompletionLine && epochNum != lastLabelEpoch)
+                    {
+                        lastLabelEpoch = epochNum;
+
+                        // 에포크 라벨 갱신
+                        if (lblEpochInfo != null && !lblEpochInfo.IsDisposed)
+                        {
+                            int totalForLabel = totalEpochs > 0 ? totalEpochs : epochNum;
+                            UpdateEpochInfo(epochNum, totalForLabel);
+                        }
+
+                        // 정확성 증가율 라벨 갱신.
+                        // accuracy 로그가 있으면 그것을 사용하고, 없으면(회귀 모델) 검증/훈련 손실 기반의
+                        // 의사 정확도(1 / (1 + loss))로 추이를 계산합니다.
+                        double? metric = null;
+
+                        // accuracy/acc 로그 추출 (val_accuracy 우선, 없으면 accuracy)
+                        var accMatch = System.Text.RegularExpressions.Regex.Match(logLine, @"(?:val_)?(?:accuracy|acc):\s*([\d.eE+-]+)");
+                        if (accMatch.Success && double.TryParse(accMatch.Groups[1].Value,
+                            System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double accVal))
+                        {
+                            metric = accVal;
+                        }
+                        else
+                        {
+                            // 손실 기반 의사 정확도 (손실이 낮을수록 정확도 높음)
+                            float? refLoss = valLoss ?? trainLoss;
+                            if (refLoss.HasValue)
+                            {
+                                metric = 1.0 / (1.0 + refLoss.Value);
+                            }
+                        }
+
+                        if (metric.HasValue)
+                        {
+                            UpdateAccuracyTrend(metric.Value);
+                        }
+                    }
                 }
             }
             catch
             {
                 // 파싱 실패해도 계속 진행
+            }
+        }
+
+        /// <summary>
+        /// 에포크 정보 라벨을 갱신합니다. (UI 스레드 안전)
+        /// </summary>
+        private void UpdateEpochInfo(int current, int total)
+        {
+            if (lblEpochInfo == null || lblEpochInfo.IsDisposed)
+            {
+                return;
+            }
+
+            string text = $"Epoch {current}/{total}";
+            try
+            {
+                if (lblEpochInfo.InvokeRequired)
+                {
+                    lblEpochInfo.Invoke((Action)(() => lblEpochInfo.Text = text));
+                }
+                else
+                {
+                    lblEpochInfo.Text = text;
+                }
+            }
+            catch
+            {
+                // UI 갱신 실패 무시
+            }
+        }
+
+        /// <summary>
+        /// 직전 에포크 대비 현재 에포크의 정확성 증가율을 계산하여 라벨을 갱신합니다.
+        /// - 첫 번째 에포크(비교 대상 없음): "-%" 표시 (검정색)
+        /// - 정확성이 증가한 경우: "정확성 증가율 : +X.X%" (초록색)
+        /// - 정확성이 유지/감소한 경우: "정확성 증가율 : X.X%" (회색)
+        /// </summary>
+        private void UpdateAccuracyTrend(double currentMetric)
+        {
+            if (lblAccuracyTrend == null || lblAccuracyTrend.IsDisposed)
+            {
+                return;
+            }
+
+            string text;
+            Color color;
+
+            if (double.IsNaN(lastTrendMetric) || lastTrendMetric <= 0)
+            {
+                // 첫 에포크: 비교 대상이 없으므로 증가율 없음
+                text = "정확성 증가율 : -%";
+                color = Color.FromArgb(40, 40, 40);
+            }
+            else
+            {
+                double increaseRate = (currentMetric - lastTrendMetric) / lastTrendMetric * 100.0;
+                if (increaseRate > 0.0)
+                {
+                    text = $"정확성 증가율 : +{increaseRate:F1}%";
+                    color = Color.FromArgb(0, 153, 0); // 초록색
+                }
+                else
+                {
+                    text = $"정확성 증가율 : {increaseRate:F1}%";
+                    color = Color.FromArgb(110, 110, 110); // 회색
+                }
+            }
+
+            lastTrendMetric = currentMetric;
+
+            try
+            {
+                if (lblAccuracyTrend.InvokeRequired)
+                {
+                    lblAccuracyTrend.Invoke((Action)(() =>
+                    {
+                        lblAccuracyTrend.Text = text;
+                        lblAccuracyTrend.ForeColor = color;
+                    }));
+                }
+                else
+                {
+                    lblAccuracyTrend.Text = text;
+                    lblAccuracyTrend.ForeColor = color;
+                }
+            }
+            catch
+            {
+                // UI 갱신 실패 무시
             }
         }
 
