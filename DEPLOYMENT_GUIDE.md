@@ -136,7 +136,7 @@ python --version
 
 ```
 ☑️ Add Python 3.11 to PATH     ← 반드시 체크!
-☑️ Install pip
+☑️ Install pip   
 ```
 
 설치 후 PowerShell 재시작:
