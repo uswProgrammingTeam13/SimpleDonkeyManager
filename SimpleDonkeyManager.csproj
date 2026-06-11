@@ -35,8 +35,18 @@
   <ItemGroup>
     <Content Include="resources\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
+
+  <!-- python 학습/검증 스크립트를 Debug, Release, publish 출력 디렉토리에 복사 -->
+  <ItemGroup>
+    <Content Include="python\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Remove="donkey_env\**" />
     <EmbeddedResource Remove="donkey_env\**" />

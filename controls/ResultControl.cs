@@ -916,23 +916,13 @@ namespace SimpleDonkeyManager.controls
         {
             try
             {
-                DirectoryInfo currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-                for (int i = 0; i < 8; i++)
-                {
-                    if (currentDir == null) break;
-
-                    string candidate = Path.Combine(currentDir.FullName, "python", scriptName);
-                    if (File.Exists(candidate))
-                        return candidate;
-
-                    string candidate2 = Path.Combine(currentDir.FullName, scriptName);
-                    if (File.Exists(candidate2))
-                        return candidate2;
-
-                    currentDir = currentDir.Parent;
-                }
+                return RuntimePathResolver.FindPythonScript(scriptName);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                AppendValidationError($"{scriptName} 검색 오류: {ex.Message}");
+            }
+
             return null;
         }
 
@@ -940,19 +930,13 @@ namespace SimpleDonkeyManager.controls
         {
             try
             {
-                DirectoryInfo currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-                for (int i = 0; i < 8; i++)
-                {
-                    if (currentDir == null) break;
-
-                    string pythonPath = Path.Combine(currentDir.FullName, "donkey_env", "Scripts", "python.exe");
-                    if (File.Exists(pythonPath))
-                        return pythonPath;
-
-                    currentDir = currentDir.Parent;
-                }
+                return RuntimePathResolver.FindLocalVenvPython();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                AppendValidationError($"Python 실행 파일 검색 오류: {ex.Message}");
+            }
+
             return null;
         }
 

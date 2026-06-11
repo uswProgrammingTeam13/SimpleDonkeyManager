@@ -720,52 +720,19 @@ namespace SimpleDonkeyManager
         {
             try
             {
-                // 로컬 가상환경 경로들
-                string[] possiblePaths = new string[]
+                LogDetail("로컬 가상환경 Python 검색 시작...");
+                foreach (string root in RuntimePathResolver.GetSearchRoots())
                 {
-                    // donkey_env 가상환경 (프로젝트 루트)
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "donkey_env", "Scripts", "python.exe"),
-                    Path.Combine(Directory.GetCurrentDirectory(), "donkey_env", "Scripts", "python.exe"),
-
-                    // 부모 디렉토리 탐색
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "donkey_env", "Scripts", "python.exe"),
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "donkey_env", "Scripts", "python.exe"),
-                };
-
-                foreach (string path in possiblePaths)
-                {
-                    try
-                    {
-                        string fullPath = Path.GetFullPath(path);
-                        if (File.Exists(fullPath))
-                        {
-                            LogDetail($"로컬 가상환경 Python 찾음: {fullPath}");
-                            return fullPath;
-                        }
-                    }
-                    catch
-                    {
-                        // 경로 파싱 오류 무시
-                    }
+                    LogDetail($"  검색 위치: {Path.Combine(root, "donkey_env", "Scripts", "python.exe")}");
                 }
 
-                // 직접 탐색
-                DirectoryInfo currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-                for (int i = 0; i < 6; i++)
+                string? pythonPath = RuntimePathResolver.FindLocalVenvPython();
+                if (!string.IsNullOrEmpty(pythonPath))
                 {
-                    if (currentDir.Parent == null) break;
-
-                    string pythonPath = Path.Combine(currentDir.FullName, "donkey_env", "Scripts", "python.exe");
-                    if (File.Exists(pythonPath))
-                    {
-                        LogDetail($"로컬 가상환경 Python 찾음: {pythonPath}");
-                        return pythonPath;
-                    }
-
-                    currentDir = currentDir.Parent;
+                    LogDetail($"로컬 가상환경 Python 찾음: {pythonPath}");
+                    return pythonPath;
                 }
 
-                // 로컬 가상환경이 없으면 null 반환 (시스템 Python 사용)
                 LogDetail("로컬 가상환경을 찾을 수 없습니다. 시스템 전역 Python을 사용합니다.");
                 return null;
             }
@@ -885,65 +852,19 @@ namespace SimpleDonkeyManager
                 LogDetail($"  BaseDirectory: {AppDomain.CurrentDomain.BaseDirectory}");
                 LogDetail($"  CurrentDirectory: {Directory.GetCurrentDirectory()}");
 
-                // 경로 후보들
-                string[] possiblePaths = new string[]
+                foreach (string root in RuntimePathResolver.GetSearchRoots())
                 {
-                    // 1. 실행 파일 디렉토리 (bin/Debug/net10)
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "python", "train.py"),
-
-                    // 2. 프로젝트 루트로 상대 경로 이동 (bin/Debug/net10 -> 루트로 4단계 상위)
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "python", "train.py"),
-
-                    // 3. 현재 작업 디렉토리
-                    Path.Combine(Directory.GetCurrentDirectory(), "python", "train.py"),
-
-                    // 4. 실행 파일의 부모 디렉토리들 탐색
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "python", "train.py"),
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "python", "train.py"),
-                };
-
-                foreach (string path in possiblePaths)
-                {
-                    try
-                    {
-                        string fullPath = Path.GetFullPath(path);
-                        LogDetail($"  검색 위치: {fullPath}");
-
-                        if (File.Exists(fullPath))
-                        {
-                            LogDetail($"  ✓ 찾음!");
-                            return fullPath;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogDetail($"  경로 파싱 오류: {ex.Message}");
-                    }
+                    LogDetail($"  검색 위치: {Path.Combine(root, "python", "train.py")}");
                 }
 
-                // 마지막 수단: 프로젝트 폴더 직접 검색
-                LogDetail($"프로젝트 폴더 직접 검색 중...");
-
-                // SimpleDonkeyManager 프로젝트 폴더 찾기
-                DirectoryInfo currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-
-                for (int i = 0; i < 6; i++)
+                string? pythonScriptPath = RuntimePathResolver.FindPythonScript("train.py");
+                if (!string.IsNullOrEmpty(pythonScriptPath))
                 {
-                    if (currentDir.Parent == null) break;
-
-                    string pythonPath = Path.Combine(currentDir.FullName, "python", "train.py");
-                    LogDetail($"  검색 위치: {pythonPath}");
-
-                    if (File.Exists(pythonPath))
-                    {
-                        LogDetail($"  ✓ 찾음!");
-                        return pythonPath;
-                    }
-
-                    currentDir = currentDir.Parent;
+                    LogDetail($"  찾음: {pythonScriptPath}");
+                    return pythonScriptPath;
                 }
 
-                LogWarning("train.py를 찾을 수 없습니다. 프로젝트 루트의 python 폴더에 train.py가 있는지 확인하세요.");
+                LogWarning("train.py를 찾을 수 없습니다. 실행 폴더 또는 프로젝트 루트의 python 폴더를 확인하세요.");
                 return null;
             }
             catch (Exception ex)
