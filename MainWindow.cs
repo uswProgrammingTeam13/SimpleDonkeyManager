@@ -1,4 +1,5 @@
 using SimpleDonkeyManager.controls;
+using System.Diagnostics;
 
 namespace SimpleDonkeyManager
 {
@@ -25,6 +26,7 @@ namespace SimpleDonkeyManager
         public MainWindow()
         {
             InitializeComponent();
+            ApplyApplicationIcon();
             logger = new Logger();
             helpManager = new HelpManager();
 
@@ -41,6 +43,54 @@ namespace SimpleDonkeyManager
 
             // 초기 화면 도움말 표시
             ShowHelpTab(HelpManager.HELP_INITIAL);
+        }
+
+        private void ApplyApplicationIcon()
+        {
+            try
+            {
+                string? iconPath = FindApplicationIconPath();
+                if (!string.IsNullOrEmpty(iconPath))
+                {
+                    Icon = new Icon(iconPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Application icon load failed: {ex.Message}");
+            }
+        }
+
+        private static string? FindApplicationIconPath()
+        {
+            const string relativeIconPath = @"resources\donkeycar_data_manager.ico";
+            string[] candidates =
+            {
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativeIconPath),
+                Path.Combine(Directory.GetCurrentDirectory(), relativeIconPath),
+            };
+
+            foreach (string candidate in candidates)
+            {
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            DirectoryInfo? currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            for (int i = 0; i < 8 && currentDir != null; i++)
+            {
+                string candidate = Path.Combine(currentDir.FullName, relativeIconPath);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                currentDir = currentDir.Parent;
+            }
+
+            return null;
         }
 
         private void InitializeHelpTexts()

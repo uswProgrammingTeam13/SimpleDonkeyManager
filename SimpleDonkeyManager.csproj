@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>resources\donkeycar_data_manager.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,9 +46,6 @@
   <!-- OxyPlot for WinForms - 학습 그래프 표시 -->
   <ItemGroup>
     <PackageReference Include="OxyPlot.WindowsForms" Version="2.1.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="resources\readme_screenchots\" />
   </ItemGroup>
 
 </Project>
