@@ -31,6 +31,8 @@ namespace SimpleDonkeyManager
             pnlTrainLog = new Panel();
             lblTrainingLog = new Label();
             lstTrainingLog = new ListBox();
+            lblEpochInfo = new Label();
+            lblAccuracyTrend = new Label();
             pnlTrainButtons = new TableLayoutPanel();
             btnStartTraining = new Button();
             btnCheckTrainingResult = new Button();
@@ -218,6 +220,8 @@ namespace SimpleDonkeyManager
             pnlTrainLog.BorderStyle = BorderStyle.FixedSingle;
             pnlTrainLog.Controls.Add(lblTrainingLog);
             pnlTrainLog.Controls.Add(lstTrainingLog);
+            pnlTrainLog.Controls.Add(lblEpochInfo);
+            pnlTrainLog.Controls.Add(lblAccuracyTrend);
             pnlTrainLog.Dock = DockStyle.Fill;
             pnlTrainLog.Location = new Point(3, 254);
             pnlTrainLog.Margin = new Padding(3, 4, 3, 4);
@@ -241,8 +245,30 @@ namespace SimpleDonkeyManager
             lstTrainingLog.Location = new Point(10, 31);
             lstTrainingLog.Margin = new Padding(3, 4, 3, 4);
             lstTrainingLog.Name = "lstTrainingLog";
-            lstTrainingLog.Size = new Size(520, 244);
+            lstTrainingLog.Size = new Size(520, 200);
             lstTrainingLog.TabIndex = 1;
+            // 
+            // lblEpochInfo
+            // 
+            lblEpochInfo.AutoSize = true;
+            lblEpochInfo.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            lblEpochInfo.ForeColor = Color.FromArgb(40, 40, 40);
+            lblEpochInfo.Location = new Point(10, 240);
+            lblEpochInfo.Name = "lblEpochInfo";
+            lblEpochInfo.Size = new Size(80, 18);
+            lblEpochInfo.TabIndex = 2;
+            lblEpochInfo.Text = "Epoch -/-";
+            // 
+            // lblAccuracyTrend
+            // 
+            lblAccuracyTrend.AutoSize = true;
+            lblAccuracyTrend.Font = new Font("나눔고딕", 11F, FontStyle.Bold);
+            lblAccuracyTrend.ForeColor = Color.FromArgb(0, 153, 0);
+            lblAccuracyTrend.Location = new Point(10, 264);
+            lblAccuracyTrend.Name = "lblAccuracyTrend";
+            lblAccuracyTrend.Size = new Size(120, 18);
+            lblAccuracyTrend.TabIndex = 3;
+            lblAccuracyTrend.Text = "정확성 증가율 : -%";
             // 
             // pnlTrainButtons
             // 
@@ -360,6 +386,8 @@ namespace SimpleDonkeyManager
         private System.Windows.Forms.Label lblProgressLabel;
         private System.Windows.Forms.Panel pnlTrainLog;
         private System.Windows.Forms.Label lblTrainingLog;
+        private System.Windows.Forms.Label lblEpochInfo;
+        private System.Windows.Forms.Label lblAccuracyTrend;
         private System.Windows.Forms.TableLayoutPanel pnlTrainButtons;
         private Button btnCheckTrainingResult;
     }

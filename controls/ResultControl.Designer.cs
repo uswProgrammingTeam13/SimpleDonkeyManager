@@ -45,6 +45,8 @@
             tlpValidation = new TableLayoutPanel();
             pnlValidationTop = new Panel();
             btnStartValidation = new Button();
+            prgValidation = new ProgressBar();
+            lblValidationProgress = new Label();
             validationViewer1 = new SimpleDonkeyManager.controlutils.ValidationViewer();
             grpValidationSummary = new GroupBox();
             tlpValidationSummary = new TableLayoutPanel();
@@ -260,7 +262,7 @@
             tlpValidation.Location = new Point(3, 25);
             tlpValidation.Name = "tlpValidation";
             tlpValidation.RowCount = 3;
-            tlpValidation.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
+            tlpValidation.RowStyles.Add(new RowStyle(SizeType.Absolute, 80F));
             tlpValidation.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tlpValidation.RowStyles.Add(new RowStyle(SizeType.Absolute, 175F));
             tlpValidation.Size = new Size(377, 566);
@@ -268,17 +270,19 @@
             // 
             // pnlValidationTop
             // 
+            pnlValidationTop.Controls.Add(prgValidation);
+            pnlValidationTop.Controls.Add(lblValidationProgress);
             pnlValidationTop.Controls.Add(btnStartValidation);
             pnlValidationTop.Dock = DockStyle.Fill;
             pnlValidationTop.Location = new Point(0, 0);
             pnlValidationTop.Margin = new Padding(0);
             pnlValidationTop.Name = "pnlValidationTop";
-            pnlValidationTop.Size = new Size(377, 50);
+            pnlValidationTop.Size = new Size(377, 80);
             pnlValidationTop.TabIndex = 0;
             // 
             // btnStartValidation
             // 
-            btnStartValidation.Dock = DockStyle.Fill;
+            btnStartValidation.Dock = DockStyle.Top;
             btnStartValidation.FlatAppearance.BorderColor = Color.DodgerBlue;
             btnStartValidation.FlatAppearance.MouseOverBackColor = Color.Azure;
             btnStartValidation.FlatStyle = FlatStyle.Flat;
@@ -291,6 +295,29 @@
             btnStartValidation.Text = "🔍 검증 시작";
             btnStartValidation.UseVisualStyleBackColor = true;
             btnStartValidation.Click += BtnStartValidation_Click;
+            // 
+            // prgValidation
+            // 
+            prgValidation.Dock = DockStyle.Bottom;
+            prgValidation.Location = new Point(0, 68);
+            prgValidation.Margin = new Padding(0);
+            prgValidation.Name = "prgValidation";
+            prgValidation.Size = new Size(377, 12);
+            prgValidation.TabIndex = 2;
+            prgValidation.Visible = false;
+            // 
+            // lblValidationProgress
+            // 
+            lblValidationProgress.Dock = DockStyle.Bottom;
+            lblValidationProgress.Font = new Font("나눔고딕", 9F, FontStyle.Regular, GraphicsUnit.Point, 129);
+            lblValidationProgress.ForeColor = Color.FromArgb(80, 80, 80);
+            lblValidationProgress.Location = new Point(0, 50);
+            lblValidationProgress.Name = "lblValidationProgress";
+            lblValidationProgress.Size = new Size(377, 18);
+            lblValidationProgress.TabIndex = 1;
+            lblValidationProgress.Text = "";
+            lblValidationProgress.TextAlign = ContentAlignment.MiddleCenter;
+            lblValidationProgress.Visible = false;
             // 
             // validationViewer1
             // 
@@ -437,6 +464,8 @@
         private TableLayoutPanel tlpValidation;
         private Panel pnlValidationTop;
         private Button btnStartValidation;
+        private ProgressBar prgValidation;
+        private Label lblValidationProgress;
         private GroupBox grpValidationSummary;
         private TableLayoutPanel tlpValidationSummary;
         private Label lblValCount;

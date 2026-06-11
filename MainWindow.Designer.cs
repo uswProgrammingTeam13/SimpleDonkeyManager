@@ -46,6 +46,7 @@
             tabPageResult = new TabPage();
             richTxtHelpResult = new RichTextBox();
             tableLayoutPanelButtons = new TableLayoutPanel();
+            btnHome = new Button();
             btnDataLoadCon = new Button();
             btnDataFilterCon = new Button();
             btnTraningCon = new Button();
@@ -284,15 +285,17 @@
             // tableLayoutPanelButtons
             // 
             tableLayoutPanelButtons.BackColor = Color.FromArgb(248, 248, 248);
-            tableLayoutPanelButtons.ColumnCount = 4;
+            tableLayoutPanelButtons.ColumnCount = 5;
+            tableLayoutPanelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 60F));
             tableLayoutPanelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             tableLayoutPanelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             tableLayoutPanelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             tableLayoutPanelButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanelButtons.Controls.Add(btnDataLoadCon, 0, 0);
-            tableLayoutPanelButtons.Controls.Add(btnDataFilterCon, 1, 0);
-            tableLayoutPanelButtons.Controls.Add(btnTraningCon, 2, 0);
-            tableLayoutPanelButtons.Controls.Add(btnResultCon, 3, 0);
+            tableLayoutPanelButtons.Controls.Add(btnHome, 0, 0);
+            tableLayoutPanelButtons.Controls.Add(btnDataLoadCon, 1, 0);
+            tableLayoutPanelButtons.Controls.Add(btnDataFilterCon, 2, 0);
+            tableLayoutPanelButtons.Controls.Add(btnTraningCon, 3, 0);
+            tableLayoutPanelButtons.Controls.Add(btnResultCon, 4, 0);
             tableLayoutPanelButtons.Dock = DockStyle.Top;
             tableLayoutPanelButtons.Location = new Point(0, 0);
             tableLayoutPanelButtons.Margin = new Padding(0);
@@ -301,6 +304,19 @@
             tableLayoutPanelButtons.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
             tableLayoutPanelButtons.Size = new Size(1184, 60);
             tableLayoutPanelButtons.TabIndex = 2;
+            // 
+            // btnHome
+            // 
+            btnHome.Dock = DockStyle.Fill;
+            btnHome.Font = new Font("맑은 고딕", 18F, FontStyle.Bold, GraphicsUnit.Point, 129);
+            btnHome.ForeColor = Color.RoyalBlue;
+            btnHome.Location = new Point(5, 5);
+            btnHome.Margin = new Padding(5);
+            btnHome.Name = "btnHome";
+            btnHome.Size = new Size(50, 50);
+            btnHome.TabIndex = 0;
+            btnHome.Text = "🏠";
+            btnHome.UseVisualStyleBackColor = true;
             // 
             // btnDataLoadCon
             // 
@@ -418,6 +434,7 @@
         private Panel pnlSplitPanel1;
         private Panel pnlSplitPanel2;
         private Button btnResultCon;
+        private Button btnHome;
         private Button btnDataLoadCon;
         private Button btnDataFilterCon;
         private Button btnTraningCon;

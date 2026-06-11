@@ -132,14 +132,19 @@ def main():
     angle_errors = []
     throttle_errors = []
 
+    # 진행 마커는 매 프레임이 아닌 일정 간격(전체의 약 1%)으로만 출력하여
+    # stdout I/O 로 인한 검증 속도 저하를 최소화합니다.
+    progress_interval = max(1, total // 100)
+
     for i, frame in enumerate(frames):
         image_path = frame.get("image")
         if not image_path or not os.path.exists(image_path):
             continue
 
-        # C# UI 가 진행 중인 프레임 이미지를 표시할 수 있도록
-        # 처리 직전에 파싱하기 쉬운 진행 마커를 출력합니다.
-        log(f"[PROGRESS]\t{i + 1}\t{total}\t{frame.get('frame', i)}\t{image_path}")
+        # C# UI 가 진행률 상태바를 갱신할 수 있도록 일정 간격으로 진행 마커를 출력합니다.
+        # (이미지 미리보기를 표시하지 않으므로 이미지 경로는 전송하지 않습니다.)
+        if (i + 1) % progress_interval == 0 or (i + 1) == total:
+            log(f"[PROGRESS]\t{i + 1}\t{total}")
 
         try:
             with open(image_path, "rb") as imgf:
@@ -179,9 +184,6 @@ def main():
             "angle_error": angle_err,
             "throttle_error": throttle_err,
         })
-
-        if (i + 1) % 25 == 0 or (i + 1) == total:
-            log(f"[검증] 진행: {i + 1}/{total}")
 
     count = len(results)
     if count > 0:

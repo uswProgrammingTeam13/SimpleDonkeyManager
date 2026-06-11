@@ -1,4 +1,5 @@
 using SimpleDonkeyManager.controls;
+using System.Diagnostics;
 
 namespace SimpleDonkeyManager
 {
@@ -25,6 +26,7 @@ namespace SimpleDonkeyManager
         public MainWindow()
         {
             InitializeComponent();
+            ApplyApplicationIcon();
             logger = new Logger();
             helpManager = new HelpManager();
 
@@ -41,6 +43,54 @@ namespace SimpleDonkeyManager
 
             // 초기 화면 도움말 표시
             ShowHelpTab(HelpManager.HELP_INITIAL);
+        }
+
+        private void ApplyApplicationIcon()
+        {
+            try
+            {
+                string? iconPath = FindApplicationIconPath();
+                if (!string.IsNullOrEmpty(iconPath))
+                {
+                    Icon = new Icon(iconPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Application icon load failed: {ex.Message}");
+            }
+        }
+
+        private static string? FindApplicationIconPath()
+        {
+            const string relativeIconPath = @"resources\donkeycar_data_manager.ico";
+            string[] candidates =
+            {
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativeIconPath),
+                Path.Combine(Directory.GetCurrentDirectory(), relativeIconPath),
+            };
+
+            foreach (string candidate in candidates)
+            {
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            DirectoryInfo? currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            for (int i = 0; i < 8 && currentDir != null; i++)
+            {
+                string candidate = Path.Combine(currentDir.FullName, relativeIconPath);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                currentDir = currentDir.Parent;
+            }
+
+            return null;
         }
 
         private void InitializeHelpTexts()
@@ -86,6 +136,7 @@ namespace SimpleDonkeyManager
             initialScreen.BringToFront();
 
             // 버튼 클릭 이벤트 연결
+            btnHome.Click += BtnHome_Click;
             btnDataLoadCon.Click += BtnDataLoadCon_Click;
             btnDataFilterCon.Click += BtnDataFilterCon_Click;
             btnTraningCon.Click += BtnTraningCon_Click;
@@ -124,6 +175,27 @@ namespace SimpleDonkeyManager
                     SetStatusMessage("④ 학습 결과 확인 —  학습이 완료된 결과 그래프와 이미지를 확인하세요.", StatusLevel.Wait);
                     break;
             }
+        }
+
+        /// <summary>
+        /// 초기 화면(InitialScreen)으로 돌아갑니다.
+        /// </summary>
+        private void ShowInitialScreen()
+        {
+            if (currentControlIndex != -1)
+            {
+                controls[currentControlIndex].Visible = false;
+                currentControlIndex = -1;
+            }
+
+            initialScreen.Visible = true;
+            initialScreen.BringToFront();
+
+            // 모든 단계 버튼의 강조 표시 해제
+            UpdateButtonIndicator(-1);
+
+            // 초기 화면 도움말 탭으로 전환
+            ShowHelpTab(HelpManager.HELP_INITIAL);
         }
 
         /// <summary>
@@ -166,6 +238,11 @@ namespace SimpleDonkeyManager
                     btnResultCon.BackColor = Color.LightSkyBlue;
                     break;
             }
+        }
+
+        private void BtnHome_Click(object? sender, EventArgs e)
+        {
+            ShowInitialScreen();
         }
 
         private void BtnDataLoadCon_Click(object? sender, EventArgs e)
